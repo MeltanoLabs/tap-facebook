@@ -1,0 +1,51 @@
+{
+    "type": "object",
+    "default": {},
+    "properties": {
+        "data": {
+            "type": "array",
+            "default": [],
+            "title": "The data Schema",
+            "items": {
+                "type": "object",
+                "default": {},
+                "properties": {
+                    "account_id": {
+                        "type": "string"
+                    },
+                    "date_start": {
+                        "type": "string"
+                    },
+                    "date_stop": {
+                        "type": "string"
+
+                    },
+                    "impressions": {
+                        "type": "string"
+
+                    },
+                    "spend": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "paging": {
+            "type": "object",
+            "default": {},
+            "properties": {
+                "cursors": {
+                    "type": "object",
+                    "properties": {
+                        "before": {
+                            "type": "string"
+                        },
+                        "after": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -20,6 +20,8 @@ plugins:
     - name: start_date
       value: '2010-01-01T00:00:00Z'
   loaders:
-  - name: target-jsonl
-    variant: andyh1203
-    pip_url: target-jsonl
+    - name: target-csv
+      variant: hotgluexyz
+      pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
+      config:
+        destination_path: /Users/monika/Documents/tap-facebook/output
