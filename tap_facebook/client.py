@@ -36,7 +36,7 @@ class facebookStream(Stream):
         """Return a new authenticator object."""
         return BearerTokenAuthenticator.create_for_stream(
             self,
-            token=self.config.get("api_key")
+            token='EAAxr7JKixwoBAC2h3Q49V17ZBBTuQSbMlSyUzHllkXmtHvm59ArOHDXgj8rgu8ZCUwVxuc2CQWnurwFc5QQN80Y6BoZBoeLMLMoUxsGSpn5QSyeQKj4xKWTozFSHhjxXT40TMrBbnSZAeEBmU2QzIQDPhvhut2ld5ZBEZA5T15PHrofaDeO0Px'
         )
 
     def get_next_page_token(

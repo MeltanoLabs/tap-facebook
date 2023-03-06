@@ -9,6 +9,9 @@ from tap_facebook.streams import (
     facebookStream,
     adsinsightStream,
 )
+import os
+from dotenv import load_dotenv
+load_dotenv()
 # TODO: Compile a list of custom stream types here
 #       OR rewrite discover_streams() below with your custom logic.
 STREAM_TYPES = [
@@ -26,7 +29,8 @@ class Tapfacebook(Tap):
             "api_key",
             th.StringType,
             required=True,
-            description="The token to authenticate against the API service"
+            description="The token to authenticate against the API service",
+            default=os.getenv("api_key"),
         ),
         th.Property(
             "project_ids",
