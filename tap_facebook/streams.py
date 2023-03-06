@@ -1,7 +1,8 @@
 """Stream type classes for tap-facebook."""
 
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Any, Dict, Optional, Union, List, Iterable
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
@@ -15,8 +16,9 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 class adsinsightStream(facebookStream):
     """Define custom stream."""
-    name = "adsinsight"
-    path = "/insights"
+
+    name = "ads"
+    path = "/ads"
     primary_keys = ["id"]
-    replication_key = None
-    schema_filepath = SCHEMAS_DIR / "insight.json"
+    replication_key = "created_time"
+    schema_filepath = SCHEMAS_DIR / "ads.json"
