@@ -11,7 +11,7 @@ plugins:
     - catalog
     - discover
     config:
-      account_id: '542163415992887'
+      #account_id:
       start_date: '2017-01-01T00:00:00Z'
     select:
     - ads_insights
