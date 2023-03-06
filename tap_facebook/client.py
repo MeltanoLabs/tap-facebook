@@ -11,6 +11,9 @@ from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
 from singer_sdk.authenticators import BearerTokenAuthenticator
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -36,7 +39,7 @@ class facebookStream(Stream):
         """Return a new authenticator object."""
         return BearerTokenAuthenticator.create_for_stream(
             self,
-            token='EAAxr7JKixwoBAC2h3Q49V17ZBBTuQSbMlSyUzHllkXmtHvm59ArOHDXgj8rgu8ZCUwVxuc2CQWnurwFc5QQN80Y6BoZBoeLMLMoUxsGSpn5QSyeQKj4xKWTozFSHhjxXT40TMrBbnSZAeEBmU2QzIQDPhvhut2ld5ZBEZA5T15PHrofaDeO0Px'
+            token=os.getenv("api_key")
         )
 
     def get_next_page_token(
