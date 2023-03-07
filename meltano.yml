@@ -11,14 +11,16 @@ plugins:
     - catalog
     - discover
     config:
-      start_date: '2010-01-01T00:00:00Z'
+      start_date: '2017-01-01T00:00:00Z'
+    select:
+    - ads_insights
     settings:
     # TODO: To configure using Meltano, declare settings and their types here:
-    - name: username
-    - name: password
-      kind: password
-    - name: start_date
-      value: '2010-01-01T00:00:00Z'
+    #- name: username
+    #- name: password
+    #  kind: password
+    #- name: start_date
+    #  value: '2010-01-01T00:00:00Z'
   loaders:
     - name: target-csv
       variant: hotgluexyz
