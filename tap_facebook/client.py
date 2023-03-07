@@ -18,12 +18,14 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class facebookStream(RESTStream):
     """facebook stream class."""
 
-    # TODO: Set the API's base URL here:
+    # open config.json to read account id
     with open("config.json") as config_json:
         config = json.load(config_json)
 
+    # get account id from config.json
     account_id = config['account_id']
 
+    # add account id in the url
     url_base = "https://graph.facebook.com/v16.0/act_{}".format(account_id)
 
     # OR use a dynamic url_base:
@@ -127,7 +129,6 @@ class facebookStream(RESTStream):
         Returns:
             A dictionary with the JSON body for a POST requests.
         """
-        # TODO: Delete this method if no payload is required. (Most REST APIs.)
         return None
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
@@ -139,8 +140,6 @@ class facebookStream(RESTStream):
         Yields:
             Each record from the source.
         """
-        # TODO: Parse response body and return a set of records.
-        print(extract_jsonpath(self.records_jsonpath, input=response.json()))
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
@@ -153,5 +152,4 @@ class facebookStream(RESTStream):
         Returns:
             The updated record dictionary, or ``None`` to skip the record.
         """
-        # TODO: Delete this method if not needed.
         return row

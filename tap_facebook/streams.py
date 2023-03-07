@@ -8,12 +8,9 @@ from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_facebook.client import facebookStream
 
-# TODO: Delete this is if not using json files for schema definition
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
-# TODO: - Override `UsersStream` and `GroupsStream` with your own stream definition.
-#       - Copy-paste as many times as needed to create multiple stream types.
 
-
+# ads insights stream
 class adsinsightStream(facebookStream):
     name = "adsinsights"
     path = "/insights"
@@ -22,9 +19,26 @@ class adsinsightStream(facebookStream):
     tap_stream_id = "adsinsights"
     #replication_key = "created_time"
 
+# ads stream
 class adsStream(facebookStream):
     name = "ads"
-    path = "/ads"
+    path = "/insights?level=ad"
     primary_keys = ["id"]
     schema_filepath = SCHEMAS_DIR / "ads.json"
     tap_stream_id = "ads"
+
+# adsets stream
+class adsetsStream(facebookStream):
+    name = "adsets"
+    path = "/insights?level=adset"
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "adsets.json"
+    tap_stream_id = "adsets"
+
+# campaigns stream
+class campaignStream(facebookStream):
+    name = "campaigns"
+    path = "/insights?level=campaign"
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "campaigns.json"
+    tap_stream_id = "campaigns"

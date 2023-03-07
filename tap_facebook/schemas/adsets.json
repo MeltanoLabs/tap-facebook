@@ -140,6 +140,44 @@
       ],
       "format": "date-time"
     },
+    "spend": {
+      "type": [
+        "null",
+        "number"
+      ]
+    },
+    "date_start": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "date_stop": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "ad_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "adset_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "impressions": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
     "lifetime_budget": {
       "type": [
         "null",

@@ -10,7 +10,33 @@
         "string"
       ]
     },
+    "spend": {
+      "type": [
+        "null",
+        "number"
+      ]
+    },
+    "date_start": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
+    "date_stop": {
+      "type": [
+        "null",
+        "string"
+      ],
+      "format": "date-time"
+    },
     "account_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "ad_id": {
       "type": [
         "null",
         "string"
@@ -26,6 +52,12 @@
       "type": [
         "null",
         "string"
+      ]
+    },
+    "impressions": {
+      "type": [
+        "null",
+        "integer"
       ]
     },
     "adlabels": {
