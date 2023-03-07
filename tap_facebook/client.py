@@ -26,8 +26,8 @@ class facebookStream(RESTStream):
     #     """Return the API URL root, configurable via tap settings."""
     #     return self.config["api_url"]
 
-    records_jsonpath = "$[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.next_page"  # Or override `get_next_page_token`.
+    records_jsonpath = "$.data[*]"  # Or override `parse_response`.
+    next_page_token_jsonpath = "$.paging.start"  # Or override `get_next_page_token`.
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
