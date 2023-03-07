@@ -19,7 +19,7 @@ class facebookStream(RESTStream):
     """facebook stream class."""
 
     # open config.json to read account id
-    with open("config.json") as config_json:
+    with open(".secrets/config.json") as config_json:
         config = json.load(config_json)
 
     # get account id from config.json
