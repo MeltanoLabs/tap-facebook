@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable
 
 import requests
+import json
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
@@ -17,8 +18,15 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class facebookStream(RESTStream):
     """facebook stream class."""
 
-    # TODO: Set the API's base URL here:
-    url_base = "https://graph.facebook.com/v16.0/act_542163415992887"
+    # open config.json to read account id
+    with open(".secrets/config.json") as config_json:
+        config = json.load(config_json)
+
+    # get account id from config.json
+    account_id = config['account_id']
+
+    # add account id in the url
+    url_base = "https://graph.facebook.com/v16.0/act_{}".format(account_id)
 
     # OR use a dynamic url_base:
     # @property
@@ -26,8 +34,8 @@ class facebookStream(RESTStream):
     #     """Return the API URL root, configurable via tap settings."""
     #     return self.config["api_url"]
 
-    records_jsonpath = "$[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.next_page"  # Or override `get_next_page_token`.
+    records_jsonpath = "$.data[*]"  # Or override `parse_response`.
+    next_page_token_jsonpath = "$.paging.start"  # Or override `get_next_page_token`.
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -121,7 +129,6 @@ class facebookStream(RESTStream):
         Returns:
             A dictionary with the JSON body for a POST requests.
         """
-        # TODO: Delete this method if no payload is required. (Most REST APIs.)
         return None
 
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
@@ -133,7 +140,6 @@ class facebookStream(RESTStream):
         Yields:
             Each record from the source.
         """
-        # TODO: Parse response body and return a set of records.
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:
@@ -146,5 +152,4 @@ class facebookStream(RESTStream):
         Returns:
             The updated record dictionary, or ``None`` to skip the record.
         """
-        # TODO: Delete this method if not needed.
         return row

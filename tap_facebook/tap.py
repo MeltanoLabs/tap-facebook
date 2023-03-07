@@ -5,23 +5,31 @@ from __future__ import annotations
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
-# TODO: Import your custom stream types here:
+# streams
 from tap_facebook import streams
 from tap_facebook.streams import ( 
   adsinsightStream,
-  facebookStream
+  adsStream,
+  adsetsStream,
+  facebookStream,
+  campaignStream
 )
 
 STREAM_TYPES = [
     adsinsightStream,
+    adsStream,
+    adsetsStream,
+    campaignStream
 ]
+
+
 
 class Tapfacebook(Tap):
     """facebook tap class."""
 
     name = "tap-facebook"
 
-    # TODO: Update this section with the actual config values you expect:
+    # add parameters you have in config.json
     config_jsonschema = th.PropertiesList(
         th.Property(
             "access_token",
@@ -39,12 +47,6 @@ class Tapfacebook(Tap):
             th.DateTimeType,
             description="The earliest record date to sync"
         ),
-        th.Property(
-            "api_url",
-            th.StringType,
-            default="https://graph.facebook.com/v16.0/act_542163415992887",
-            description="The url for the API service"
-        ),
     ).to_dict()
 
     def discover_streams(self) -> list[streams.facebookStream]:
@@ -53,7 +55,10 @@ class Tapfacebook(Tap):
         Returns:
             A list of discovered streams.
         """
-        return [stream_class(tap=self) for stream_class in STREAM_TYPES]
+        adstream = [streams.campaignStream(self)]
+        stream_list = [stream_class(tap=self) for stream_class in STREAM_TYPES]
+
+        return stream_list
 
 
 if __name__ == "__main__":

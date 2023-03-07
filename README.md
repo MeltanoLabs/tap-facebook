@@ -35,6 +35,15 @@ environment variable is set either in the terminal context or in the `.env` file
 
 - [ ] `Developer TODO:` If your tap requires special access on the source system, or any special authentication requirements, provide those here.
 
+### Configure using config.json
+
+Create a config.json file n the tap-facebook-sdk directory, add the following keys to the config.json:
+
+- [ ] `start_date:` start date for facebook api
+- [ ] `account_id:` account id
+- [ ] `access_token:` access token for bearer authentication
+
+
 ## Usage
 
 You can easily run `tap-facebook` by itself or in a pipeline using [Meltano](https://meltano.com/).
