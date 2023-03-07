@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable
 
 import requests
+import json
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
@@ -18,7 +19,12 @@ class facebookStream(RESTStream):
     """facebook stream class."""
 
     # TODO: Set the API's base URL here:
-    url_base = "https://graph.facebook.com/v16.0/act_542163415992887"
+    with open("config.json") as config_json:
+        config = json.load(config_json)
+
+    account_id = config['account_id']
+
+    url_base = "https://graph.facebook.com/v16.0/act_{}".format(account_id)
 
     # OR use a dynamic url_base:
     # @property
@@ -134,6 +140,7 @@ class facebookStream(RESTStream):
             Each record from the source.
         """
         # TODO: Parse response body and return a set of records.
+        print(extract_jsonpath(self.records_jsonpath, input=response.json()))
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
     def post_process(self, row: dict, context: dict | None = None) -> dict | None:

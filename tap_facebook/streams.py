@@ -15,11 +15,16 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 class adsinsightStream(facebookStream):
-    """Define custom stream."""
-
     name = "adsinsights"
     path = "/insights"
     primary_keys = ["id"]
     schema_filepath = SCHEMAS_DIR / "ads_insights.json"
     tap_stream_id = "adsinsights"
     #replication_key = "created_time"
+
+class adsStream(facebookStream):
+    name = "ads"
+    path = "/ads"
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "ads.json"
+    tap_stream_id = "ads"
