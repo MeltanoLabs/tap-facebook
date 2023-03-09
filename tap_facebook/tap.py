@@ -55,10 +55,10 @@ class Tapfacebook(Tap):
         Returns:
             A list of discovered streams.
         """
-        adstream = [streams.campaignStream(self)]
+        adstream = [streams.adsinsightStream(self)]
         stream_list = [stream_class(tap=self) for stream_class in STREAM_TYPES]
 
-        return stream_list
+        return adstream
 
 
 if __name__ == "__main__":
