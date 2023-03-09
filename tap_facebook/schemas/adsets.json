@@ -17,6 +17,96 @@
       ],
       "format": "date-time"
     },
+    "billing_event": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "campaign_attribution": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "destination_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "is_dynamic_creative": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "learning_stage_info": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "lifetime_imps": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "multi_optimization_goal_weight": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "optimization_goal": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "optimization_sub_event": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "pacing_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "recurring_budget_semantics": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "source_adset_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "status": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "targeting_optimization_types": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "use_new_app_click": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
     "promoted_object": {
       "type": [
         "null",
@@ -139,44 +229,6 @@
         "string"
       ],
       "format": "date-time"
-    },
-    "spend": {
-      "type": [
-        "null",
-        "number"
-      ]
-    },
-    "date_start": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "date_stop": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "ad_id": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "adset_id": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "impressions": {
-      "type": [
-        "null",
-        "integer"
-      ]
     },
     "lifetime_budget": {
       "type": [
