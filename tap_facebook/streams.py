@@ -111,8 +111,46 @@ class adsetsStream(facebookStream):
 
 # campaigns stream
 class campaignStream(facebookStream):
+    columns = ["id",
+               "account_id",
+               "updated_time",
+               "created_time",
+               "start_time",
+               "stop_time",
+               "name",
+               "buying_type",
+               "budget_remaining",
+               "can_create_brand_lift_study",
+               "can_use_spend_cap",
+               "configured_status",
+               "effective_status",
+               "has_secondary_skadnetwork_reporting",
+               "is_skadnetwork_attribution",
+               "objective",
+               "primary_attribution",
+               "promoted_object",
+               "smart_promotion_type",
+               "source_campaign_id",
+               "special_ad_categories",
+               "special_ad_category",
+               "special_ad_category_country",
+               "spend_cap",
+               "status",
+               "topline_id"]
+
+    columns_remaining = ["ad_strategy_group_id",
+                         "ad_strategy_id",
+                         "adlabels",
+                         "boosted_object_id",
+                         "daily_budget",
+                         "issues_info",
+                         "last_budget_toggling_time",
+                         "lifetime_budget",
+                         "pacing_type",
+                         "recommendations"]
+
     name = "campaigns"
-    path = "/insights?level=campaign"
+    path = "/campaigns?fields={}".format(columns)
     primary_keys = ["id"]
     schema_filepath = SCHEMAS_DIR / "campaigns.json"
     tap_stream_id = "campaigns"

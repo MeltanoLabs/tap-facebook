@@ -36,7 +36,85 @@
         "string"
       ]
     },
+    "can_create_brand_lift_study": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "can_use_spend_cap": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "configured_status": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "has_secondary_skadnetwork_reporting": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "is_skadnetwork_attribution": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "primary_attribution": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "smart_promotion_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "source_campaign_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "special_ad_categories": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "special_ad_category": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "status": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "topline_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
     "spend_cap": {
+      "type": [
+        "null",
+        "number"
+      ]
+    },
+    "budget_remaining": {
       "type": [
         "null",
         "number"
@@ -46,7 +124,15 @@
       "type": "string",
       "format": "date-time"
     },
+    "stop_time": {
+      "type": "string",
+      "format": "date-time"
+    },
     "updated_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "created_time": {
       "type": "string",
       "format": "date-time"
     },
