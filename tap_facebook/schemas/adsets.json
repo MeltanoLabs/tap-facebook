@@ -17,6 +17,30 @@
       ],
       "format": "date-time"
     },
+    "billing_event": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "campaign_attribution": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "destination_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "is_dynamic_creative": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
     "promoted_object": {
       "type": [
         "null",
@@ -139,44 +163,6 @@
         "string"
       ],
       "format": "date-time"
-    },
-    "spend": {
-      "type": [
-        "null",
-        "number"
-      ]
-    },
-    "date_start": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "date_stop": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "ad_id": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "adset_id": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "impressions": {
-      "type": [
-        "null",
-        "integer"
-      ]
     },
     "lifetime_budget": {
       "type": [

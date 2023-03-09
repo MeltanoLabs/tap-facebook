@@ -21,14 +21,33 @@ class adsinsightStream(facebookStream):
 
 # ads stream
 class adsStream(facebookStream):
+    columns = ["id",
+               "account_id",
+               "adset_id",
+               "campaign_id",
+               "bid_type",
+               "status",
+               "updated_time",
+               "created_time",
+               "name",
+               "effective_status",
+               "last_updated_by_app_id",
+               "source_ad_id",
+               "creative",
+               "tracking_specs",
+               "conversion_specs"]
+
+    columns_remaining = ["adlabels", "recommendations"]
+
     name = "ads"
-    path = "/insights?level=ad"
+    path = "/ads?fields={}".format(columns)
     primary_keys = ["id"]
     schema_filepath = SCHEMAS_DIR / "ads.json"
     tap_stream_id = "ads"
 
 # adsets stream
 class adsetsStream(facebookStream):
+
     name = "adsets"
     path = "/insights?level=adset"
     primary_keys = ["id"]

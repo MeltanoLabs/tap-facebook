@@ -24,38 +24,6 @@
         "string"
       ]
     },
-    "spend": {
-      "type": [
-        "null",
-        "number"
-      ]
-    },
-    "date_start": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "date_stop": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
-    },
-    "campaign_id": {
-      "type": [
-        "null",
-        "string"
-      ]
-    },
-    "impressions": {
-      "type": [
-        "null",
-        "integer"
-      ]
-    },
     "effective_status": {
       "type": [
         "null",

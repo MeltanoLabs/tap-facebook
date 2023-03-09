@@ -19,7 +19,7 @@ class facebookStream(RESTStream):
     """facebook stream class."""
 
     # open config.json to read account id
-    with open(".secrets/config.json") as config_json:
+    with open("config.json") as config_json:
         config = json.load(config_json)
 
     # get account id from config.json
@@ -111,6 +111,15 @@ class facebookStream(RESTStream):
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
+
+        path = str(self.path)
+        print("URL Path: ", path)
+
+        if path == "/insights?level=ad":
+            params["bid_amount"] = "bid_amount"
+
+        print("URL Params: ", params)
+
         return params
 
     def prepare_request_payload(
