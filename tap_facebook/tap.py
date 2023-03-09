@@ -58,7 +58,7 @@ class Tapfacebook(Tap):
         adstream = [streams.adsinsightStream(self)]
         stream_list = [stream_class(tap=self) for stream_class in STREAM_TYPES]
 
-        return adstream
+        return stream_list
 
 
 if __name__ == "__main__":
