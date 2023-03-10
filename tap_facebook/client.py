@@ -7,6 +7,7 @@ from typing import Any, Callable, Iterable
 
 import requests
 import json
+import copy
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
@@ -35,7 +36,7 @@ class facebookStream(RESTStream):
     #     return self.config["api_url"]
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.paging.cursor.after"  # Or override `get_next_page_token`.
+    next_page_token_jsonpath = "$.paging.cursors.after"  # Or override `get_next_page_token`.
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -106,19 +107,12 @@ class facebookStream(RESTStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        if next_page_token:
-            params["page"] = next_page_token
+        params["limit"] = 250
+        if next_page_token is not None:
+            params["after"] = next_page_token
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
-
-        path = str(self.path)
-        print("URL Path: ", path)
-
-        if path == "/insights?level=ad":
-            params["bid_amount"] = "bid_amount"
-
-        print("URL Params: ", params)
 
         return params
 
