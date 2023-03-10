@@ -19,7 +19,7 @@ class facebookStream(RESTStream):
     """facebook stream class."""
 
     # open config.json to read account id
-    with open("config.json") as config_json:
+    with open(".secrets/config.json") as config_json:
         config = json.load(config_json)
 
     # get account id from config.json
@@ -35,7 +35,7 @@ class facebookStream(RESTStream):
     #     return self.config["api_url"]
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.paging.start"  # Or override `get_next_page_token`.
+    next_page_token_jsonpath = "$.paging.cursor.after"  # Or override `get_next_page_token`.
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
