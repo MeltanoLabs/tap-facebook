@@ -7,7 +7,6 @@ from typing import Any, Callable, Iterable
 
 import requests
 import json
-import copy
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
@@ -50,20 +49,6 @@ class facebookStream(RESTStream):
             token=self.config.get("access_token", ""),
         )
 
-    @property
-    def http_headers(self) -> dict:
-        """Return the http headers needed.
-
-        Returns:
-            A dictionary of HTTP headers.
-        """
-        headers = {}
-        if "user_agent" in self.config:
-            headers["User-Agent"] = self.config.get("user_agent")
-        # If not using an authenticator, you may also provide inline auth headers:
-        # headers["Private-Token"] = self.config.get("auth_token")
-        return headers
-
     def get_next_page_token(
         self,
         response: requests.Response,
@@ -78,9 +63,6 @@ class facebookStream(RESTStream):
         Returns:
             The next pagination token.
         """
-        # TODO: If pagination is required, return a token which can be used to get the
-        #       next page. If this is the final page, return "None" to end the
-        #       pagination loop.
         if self.next_page_token_jsonpath:
             all_matches = extract_jsonpath(
                 self.next_page_token_jsonpath, response.json()
