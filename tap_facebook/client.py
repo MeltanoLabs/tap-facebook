@@ -19,7 +19,7 @@ class facebookStream(RESTStream):
     """facebook stream class."""
 
     # open config.json to read account id
-    with open("config.json") as config_json:
+    with open(".secrets/config.json") as config_json:
         config = json.load(config_json)
 
     # get account id from config.json
@@ -35,7 +35,7 @@ class facebookStream(RESTStream):
     #     return self.config["api_url"]
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.paging.start"  # Or override `get_next_page_token`.
+    next_page_token_jsonpath = "$.paging.cursors.after"  # Or override `get_next_page_token`.
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -48,20 +48,6 @@ class facebookStream(RESTStream):
             self,
             token=self.config.get("access_token", ""),
         )
-
-    @property
-    def http_headers(self) -> dict:
-        """Return the http headers needed.
-
-        Returns:
-            A dictionary of HTTP headers.
-        """
-        headers = {}
-        if "user_agent" in self.config:
-            headers["User-Agent"] = self.config.get("user_agent")
-        # If not using an authenticator, you may also provide inline auth headers:
-        # headers["Private-Token"] = self.config.get("auth_token")
-        return headers
 
     def get_next_page_token(
         self,
@@ -77,9 +63,6 @@ class facebookStream(RESTStream):
         Returns:
             The next pagination token.
         """
-        # TODO: If pagination is required, return a token which can be used to get the
-        #       next page. If this is the final page, return "None" to end the
-        #       pagination loop.
         if self.next_page_token_jsonpath:
             all_matches = extract_jsonpath(
                 self.next_page_token_jsonpath, response.json()
@@ -106,19 +89,12 @@ class facebookStream(RESTStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        if next_page_token:
-            params["page"] = next_page_token
+        params["limit"] = 250
+        if next_page_token is not None:
+            params["after"] = next_page_token
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
-
-        path = str(self.path)
-        print("URL Path: ", path)
-
-        if path == "/insights?level=ad":
-            params["bid_amount"] = "bid_amount"
-
-        print("URL Params: ", params)
 
         return params
 

@@ -21,23 +21,11 @@ class adsinsightStream(facebookStream):
                "campaign_name",
                "date_start",
                "date_stop",
-               "unique_actions",
-               "actions",
-               "action_values",
-               "outbound_clicks",
-               "unique_outbound_clicks",
-               "video_30_sec_watched_actions",
-               "video_p25_watched_actions",
-               "video_p50_watched_actions",
-               "video_p75_watched_actions",
-               "video_p100_watched_actions",
-               "video_play_curve_actions",
                "clicks",
                "website_ctr",
                "unique_inline_link_click_ctr",
                "frequency",
                "account_name",
-               "canvas_avg_view_time",
                "unique_inline_link_clicks",
                "cost_per_unique_action_type",
                "inline_post_engagement",
@@ -45,18 +33,21 @@ class adsinsightStream(facebookStream):
                "cpc",
                "cost_per_unique_inline_link_click",
                "cpm",
+               "canvas_avg_view_time",
                "cost_per_inline_post_engagement",
                "inline_link_click_ctr",
                "cpp",
                "cost_per_action_type",
                "unique_link_clicks_ctr",
-               "spend,cost_per_unique_click",
+               "spend",
+               "cost_per_unique_click",
                "unique_clicks",
                "social_spend",
                "reach",
                "canvas_avg_view_percent",
                "objective",
                "quality_ranking",
+               "video_play_curve_actions",
                "engagement_rate_ranking",
                "conversion_rate_ranking",
                "impressions",
@@ -64,8 +55,20 @@ class adsinsightStream(facebookStream):
                "cost_per_inline_link_click",
                "ctr"]
 
+    columns_remaining = [
+        "unique_actions",
+        "actions",
+        "action_values",
+        "outbound_clicks",
+        "unique_outbound_clicks",
+        "video_30_sec_watched_actions",
+        "video_p25_watched_actions",
+        "video_p50_watched_actions",
+        "video_p75_watched_actions",
+        "video_p100_watched_actions"]
+
     name = "adsinsights"
-    path = "/insights?fields={}".format(columns)
+    path = "/insights?level=ad&fields={}".format(columns)
     primary_keys = ["id"]
     schema_filepath = SCHEMAS_DIR / "ads_insights.json"
     tap_stream_id = "adsinsights"

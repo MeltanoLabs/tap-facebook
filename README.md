@@ -37,7 +37,7 @@ environment variable is set either in the terminal context or in the `.env` file
 
 ### Configure using config.json
 
-Create a config.json file n the tap-facebook-sdk directory, add the following keys to the config.json:
+Create a config.json file in the secrets folder of the tap-facebook-sdk directory, add the following keys to the config.json:
 
 - [ ] `start_date:` start date for facebook api
 - [ ] `account_id:` account id
