@@ -38,7 +38,7 @@
     "is_dynamic_creative": {
       "type": [
         "null",
-        "string"
+        "boolean"
       ]
     },
     "learning_stage_info": {
@@ -50,7 +50,7 @@
     "lifetime_imps": {
       "type": [
         "null",
-        "string"
+        "number"
       ]
     },
     "multi_optimization_goal_weight": {
@@ -185,7 +185,7 @@
     "daily_budget": {
       "type": [
         "null",
-        "number"
+        "string"
       ],
       "maximum": 100000000000000000000000000000000,
       "minimum": -100000000000000000000000000000000,
@@ -196,7 +196,7 @@
     "budget_remaining": {
       "type": [
         "null",
-        "number"
+        "string"
       ],
       "maximum": 100000000000000000000000000000000,
       "minimum": -100000000000000000000000000000000,
@@ -233,7 +233,7 @@
     "lifetime_budget": {
       "type": [
         "null",
-        "number"
+        "string"
       ],
       "maximum": 100000000000000000000000000000000,
       "minimum": -100000000000000000000000000000000,
@@ -251,25 +251,25 @@
         "CLICKS": {
           "type": [
             "null",
-            "integer"
+            "string"
           ]
         },
         "ACTIONS": {
           "type": [
             "null",
-            "integer"
+            "string"
           ]
         },
         "IMPRESSIONS": {
           "type": [
             "null",
-            "integer"
+            "string"
           ]
         },
         "REACH": {
           "type": [
             "null",
-            "integer"
+            "string"
           ]
         }
       }
