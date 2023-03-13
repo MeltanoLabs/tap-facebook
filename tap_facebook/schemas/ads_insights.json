@@ -87,7 +87,7 @@
     "frequency": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "account_name": {
