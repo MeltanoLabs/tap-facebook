@@ -87,7 +87,7 @@
     "frequency": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "account_name": {
@@ -99,13 +99,13 @@
     "canvas_avg_view_time": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "unique_inline_link_clicks": {
       "type": [
         "null",
-        "integer"
+        "string"
       ]
     },
     "cost_per_unique_action_type": {
@@ -137,7 +137,7 @@
     "inline_post_engagement": {
       "type": [
         "null",
-        "integer"
+        "string"
       ]
     },
     "campaign_name": {
@@ -149,7 +149,7 @@
     "inline_link_clicks": {
       "type": [
         "null",
-        "integer"
+        "string"
       ]
     },
     "campaign_id": {
@@ -161,7 +161,7 @@
     "cpc": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "ad_name": {
@@ -173,31 +173,31 @@
     "cost_per_unique_inline_link_click": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "cpm": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "cost_per_inline_post_engagement": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "inline_link_click_ctr": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "cpp": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "cost_per_action_type": {
@@ -229,19 +229,19 @@
     "unique_link_clicks_ctr": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "spend": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "cost_per_unique_click": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "adset_name": {
@@ -253,19 +253,19 @@
     "unique_clicks": {
       "type": [
         "null",
-        "integer"
+        "string"
       ]
     },
     "social_spend": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "canvas_avg_view_percent": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "account_id": {
@@ -308,31 +308,31 @@
     "impressions": {
       "type": [
         "null",
-        "integer"
+        "string"
       ]
     },
     "unique_ctr": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "cost_per_inline_link_click": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "ctr": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "reach": {
       "type": [
         "null",
-        "integer"
+        "string"
       ]
     }
   }

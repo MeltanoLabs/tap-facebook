@@ -69,7 +69,7 @@ class adsinsightStream(facebookStream):
 
     name = "adsinsights"
     path = "/insights?level=ad&fields={}".format(columns)
-    primary_keys = ["id"]
+    primary_keys = ["account_id","date_start"]
     schema_filepath = SCHEMAS_DIR / "ads_insights.json"
     tap_stream_id = "adsinsights"
     #replication_key = "created_time"
@@ -81,6 +81,7 @@ class adsStream(facebookStream):
                "adset_id",
                "campaign_id",
                "bid_type",
+               "bid_info",
                "status",
                "updated_time",
                "created_time",
@@ -90,7 +91,8 @@ class adsStream(facebookStream):
                "source_ad_id",
                "creative",
                "tracking_specs",
-               "conversion_specs"]
+               "conversion_specs",
+               "recommendations"]
 
     columns_remaining = ["adlabels", "recommendations"]
 
@@ -191,17 +193,17 @@ class campaignStream(facebookStream):
                "special_ad_category_country",
                "spend_cap",
                "status",
-               "topline_id"]
+               "topline_id",
+               "boosted_object_id",
+               "pacing_type"]
 
     columns_remaining = ["ad_strategy_group_id",
                          "ad_strategy_id",
                          "adlabels",
-                         "boosted_object_id",
                          "daily_budget",
                          "issues_info",
                          "last_budget_toggling_time",
                          "lifetime_budget",
-                         "pacing_type",
                          "recommendations"]
 
     name = "campaigns"
