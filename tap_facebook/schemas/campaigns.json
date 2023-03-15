@@ -133,20 +133,16 @@
       ]
     },
     "start_time": {
-      "type": "string",
-      "format": "date-time"
+      "type": ["null","string"]
     },
     "stop_time": {
-      "type": "string",
-      "format": "date-time"
-    },
+      "type": ["null","string"]
+    }, 
     "updated_time": {
-      "type": "string",
-      "format": "date-time"
+      "type": ["null","string"]
     },
     "created_time": {
-      "type": "string",
-      "format": "date-time"
+      "type": ["null","string"]
     },
     "ads": {
       "properties": {
@@ -183,8 +179,7 @@
         "properties": {
           "id": {"type": "string"},
           "name": {"type": "string"},
-          "created_time": {"type": "string", "format": "date-time"},
-          "updated_time": {"type": "string", "format": "date-time"}
+          "created_time": {"type": "string", "format": "date-time"}
         }
       }
     }
