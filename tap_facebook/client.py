@@ -89,7 +89,7 @@ class facebookStream(RESTStream):
             A dictionary of URL query parameters.
         """
         params: dict = {}
-        params["limit"] = 250
+        params["limit"] = 25
         if next_page_token is not None:
             params["after"] = next_page_token
         if self.replication_key:

@@ -74,13 +74,13 @@
     "pacing_type": {
       "type": [
         "null",
-        "string"
+        "array"
       ]
     },
     "recurring_budget_semantics": {
       "type": [
         "null",
-        "string"
+        "boolean"
       ]
     },
     "source_adset_id": {
@@ -98,13 +98,13 @@
     "targeting_optimization_types": {
       "type": [
         "null",
-        "string"
+        "array"
       ]
     },
     "use_new_app_click": {
       "type": [
         "null",
-        "string"
+        "boolean"
       ]
     },
     "promoted_object": {

@@ -39,13 +39,13 @@
     "can_create_brand_lift_study": {
       "type": [
         "null",
-        "string"
+        "boolean"
       ]
     },
     "can_use_spend_cap": {
       "type": [
         "null",
-        "string"
+        "boolean"
       ]
     },
     "configured_status": {
@@ -57,13 +57,13 @@
     "has_secondary_skadnetwork_reporting": {
       "type": [
         "null",
-        "string"
+        "boolean"
       ]
     },
     "is_skadnetwork_attribution": {
       "type": [
         "null",
-        "string"
+        "boolean"
       ]
     },
     "primary_attribution": {
@@ -78,7 +78,19 @@
         "string"
       ]
     },
+    "pacing_type": {
+      "type": [
+        "null",
+        "array"
+      ]
+    },
     "source_campaign_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "boosted_object_id": {
       "type": [
         "null",
         "string"
@@ -87,7 +99,7 @@
     "special_ad_categories": {
       "type": [
         "null",
-        "string"
+        "array"
       ]
     },
     "special_ad_category": {
@@ -111,13 +123,13 @@
     "spend_cap": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "budget_remaining": {
       "type": [
         "null",
-        "number"
+        "string"
       ]
     },
     "start_time": {
