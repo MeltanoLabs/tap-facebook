@@ -17,7 +17,7 @@ plugins:
     inherit_from: tap-facebook
     config:
       start_date: '2023-03-14T00:00:00Z'
-    load_schema: TEST_MELTANO_FACEBOOK_STREAMS
+    load_schema: MELTANO_FACEBOOK
     select:
     - ads.*
   - name: facebook-ads-insights
