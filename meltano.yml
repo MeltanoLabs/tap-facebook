@@ -11,31 +11,31 @@ plugins:
     - catalog
     - discover
     config:
-      start_date: '2023-03-14T00:00:00Z'
+      start_date: MELTANO_START_DATE
       insights_buffer_days: 7
   - name: facebook-ads
     inherit_from: tap-facebook
     config:
-      start_date: '2023-03-14T00:00:00Z'
-    load_schema: MELTANO_FACEBOOK
+      start_date: MELTANO_START_DATE
+    load_schema: SNOWFLAKE_TARGET_SCHEMA
     select:
     - ads.*
   - name: facebook-ads-insights
     inherit_from: tap-facebook
     config:
-      start_date: '2023-03-14T00:00:00Z'
+      start_date: MELTANO_START_DATE
     select:
     - adsinsights.*
   - name: facebook-adsets
     inherit_from: tap-facebook
     config:
-      start_date: '2023-03-14T00:00:00Z'
+      start_date: MELTANO_START_DATE
     select:
     - adsets.*
   - name: facebook-campaigns
     inherit_from: tap-facebook
     config:
-      start_date: '2023-03-14T00:00:00Z'
+      start_date: MELTANO_START_DATE
     select:
     - campaigns.*
   loaders:
@@ -43,7 +43,7 @@ plugins:
     variant: hotgluexyz
     pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
     config:
-      destination_path: /home/xiao/Downloads/src/cerberus-netdiscover-flask/tap-facebook-sdk/output
+      destination_path: $MELTANO_PROJECT_ROOT
   - name: target-snowflake
     variant: transferwise
     pip_url: pipelinewise-target-snowflake
@@ -53,6 +53,6 @@ plugins:
     variant: andyh1203
     pip_url: target-jsonl
     config:
-      destination_path: /home/xiao/Downloads/src/cerberus-netdiscover-flask/tap-facebook-sdk/output
+      destination_path: $MELTANO_PROJECT_ROOT
       do_timestamp_file: true
-      custom_name: meltano_sdk_output.json
+      custom_name: MELTANO_OUTPUT_FILE
