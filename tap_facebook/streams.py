@@ -47,7 +47,6 @@ class adsinsightStream(facebookStream):
                "canvas_avg_view_percent",
                "objective",
                "quality_ranking",
-               "video_play_curve_actions",
                "engagement_rate_ranking",
                "conversion_rate_ranking",
                "impressions",
@@ -69,7 +68,6 @@ class adsinsightStream(facebookStream):
 
     name = "adsinsights"
     path = "/insights?level=ad&fields={}".format(columns)
-    primary_keys = ["account_id","date_start"]
     schema_filepath = SCHEMAS_DIR / "ads_insights.json"
     tap_stream_id = "adsinsights"
     #replication_key = "created_time"
@@ -131,10 +129,7 @@ class adsetsStream(facebookStream):
                "pacing_type",
                "recurring_budget_semantics",
                "source_adset_id",
-               "status",
-               "targeting",
-               "targeting_optimization_types",
-               "use_new_app_click"]
+               "status"]
 
     columns_remaining = ["adlabels",
                          "adset_schedule",
@@ -162,7 +157,6 @@ class adsetsStream(facebookStream):
 
     name = "adsets"
     path = "/adsets?fields={}".format(columns)
-    primary_keys = ["id"]
     schema_filepath = SCHEMAS_DIR / "adsets.json"
     tap_stream_id = "adsets"
 
@@ -208,6 +202,5 @@ class campaignStream(facebookStream):
 
     name = "campaigns"
     path = "/campaigns?fields={}".format(columns)
-    primary_keys = ["id"]
     schema_filepath = SCHEMAS_DIR / "campaigns.json"
     tap_stream_id = "campaigns"

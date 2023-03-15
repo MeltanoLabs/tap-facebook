@@ -11,11 +11,7 @@
       ]
     },
     "end_time": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
+      "type": "string"
     },
     "billing_event": {
       "type": [
@@ -176,11 +172,7 @@
       ]
     },
     "updated_time": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
+      "type": "string"
     },
     "daily_budget": {
       "type": [
@@ -217,18 +209,10 @@
       ]
     },
     "created_time": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
+      "type": "string"
     },
     "start_time": {
-      "type": [
-        "null",
-        "string"
-      ],
-      "format": "date-time"
+      "type": "string"
     },
     "lifetime_budget": {
       "type": [
