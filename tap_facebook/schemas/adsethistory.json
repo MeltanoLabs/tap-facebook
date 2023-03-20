@@ -86,6 +86,186 @@
         "string"
       ]
     },
+    "asset_feed_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "bid_amount": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "bid_info_actions": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "bid_info_impressions": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "bid_strategy": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "daily_min_spend_target": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "daily_spend_cap": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "instagram_actor_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "lifetime_min_spend_target": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "lifetime_spend_cap": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_application_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_custom_conversion_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_custom_event_str": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_custom_event_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_event_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_object_store_url": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_offer_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_offline_conversion_data_set_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_page_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_pixel_aggregation_rule": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_pixel_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_pixel_rule": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_place_page_set_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_product_catalog_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_product_set_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object_retention_days": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "review_feedback": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "rf_prediction_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "configured_status": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "attribution_spec": {
+      "type": [
+        "null",
+        "array"
+      ]
+    },
     "status": {
       "type": [
         "null",

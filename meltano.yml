@@ -12,12 +12,14 @@ plugins:
     - discover
     config:
       start_date: MELTANO_START_DATE
+      account_id: MELTANO_ACCOUNT_ID
       insights_buffer_days: 7
+      access_token: MELTANO_ACCESS_TOKEN
   - name: facebook-ads
     inherit_from: tap-facebook
     config:
       start_date: MELTANO_START_DATE
-    load_schema: SNOWFLAKE_TARGET_SCHEMA
+    load_schema: MELTANO_FACEBOOK
     select:
     - ads.*
   - name: facebook-ads-insights
@@ -38,12 +40,30 @@ plugins:
       start_date: MELTANO_START_DATE
     select:
     - campaigns.*
+  - name: facebook-adhistory
+    inherit_from: tap-facebook
+    config:
+      start_date: MELTANO_START_DATE
+    select:
+    - ad_history.*
+  - name: facebook-campaignhistory
+    inherit_from: tap-facebook
+    config:
+      start_date: MELTANO_START_DATE
+    select:
+    - campaign_history.*
+  - name: facebook-adsethistory
+    inherit_from: tap-facebook
+    config:
+      start_date: MELTANO_START_DATE
+    select:
+    - ad_set_history.*
   loaders:
   - name: target-csv
     variant: hotgluexyz
     pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
     config:
-      destination_path: $MELTANO_PROJECT_ROOT
+      destination_path: MELTANO_OUTPUT_PATH
   - name: target-snowflake
     variant: transferwise
     pip_url: pipelinewise-target-snowflake
@@ -53,6 +73,6 @@ plugins:
     variant: andyh1203
     pip_url: target-jsonl
     config:
-      destination_path: $MELTANO_PROJECT_ROOT
+      destination_path: MELTANO_OUTPUT_PATH
       do_timestamp_file: true
       custom_name: MELTANO_OUTPUT_FILE

@@ -28,6 +28,30 @@
         "string"
       ]
     },
+    "bid_amount": {
+      "type": [
+        "null",
+        "integer"
+      ]
+    },
+    "conversion_domain": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "configured_status": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "effective_status": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
     "adlabels": {
       "type": [
         "null",
