@@ -279,12 +279,13 @@ class campaignhistoryStream(facebookStream):
                "special_ad_category",
                "special_ad_category_country",
                "spend_cap",
+               "promoted_object",
                "status",
                "topline_id"]
 
     name = "campaign_history"
     path = "/campaigns?fields={}".format(columns)
-    schema_filepath = SCHEMAS_DIR / "campaigns.json"
+    schema_filepath = SCHEMAS_DIR / "campaignhistory.json"
     tap_stream_id = "campaign_history"
 
 class adsethistoryStream(facebookStream):
@@ -349,3 +350,95 @@ class adsethistoryStream(facebookStream):
     path = "/adsets?fields={}".format(columns)
     schema_filepath = SCHEMAS_DIR / "adsethistory.json"
     tap_stream_id = "ad_set_history"
+
+class adconversionStream(facebookStream):
+    columns = ["id",
+               "adset_id",
+               "campaign_id",
+               "conversion_id"
+               "application",
+               "creative",
+               "dataset",
+               "event",
+               "event_creator",
+               "event_type",
+               "fb_pixel",
+               "fb_pixel_event",
+               "index",
+               "leadgen",
+               "object",
+               "object_domain",
+               "offer",
+               "offer_creator",
+               "offsite_pixel",
+               "page",
+               "page_parent",
+               "post",
+               "post_object",
+               "post_object_wall",
+               "post_wall",
+               "question",
+               "question_creator",
+               "response",
+               "subtype",
+               "updated_time",
+               "created_time"]
+
+    name = "ad_conversion"
+    path = "/ads?fields={}".format(columns)
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "adconversion.json"
+    tap_stream_id = "ad_conversion"
+
+class campaignlabelStream(facebookStream):
+    columns = ["id",
+               "account_id",
+               "ad_label_id"
+               "source_campaign_id",
+               "adlabels"
+               "updated_time",
+               "created_time"]
+
+    name = "campaign_label"
+    path = "/ads?fields={}".format(columns)
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "campaignlabel.json"
+    tap_stream_id = "campaign_label"
+
+class adgroupissuesinfoStream(facebookStream):
+    columns = ["id",
+               "account_id",
+               "error_code"
+               "error_message",
+               "error_summary",
+               "error_type",
+               "index",
+               "level",
+               "updated_time",
+               "created_time"]
+
+    name = "ad_group_issues_info"
+    path = "/ads?fields={}".format(columns)
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "adgroupissuesinfo.json"
+    tap_stream_id = "ad_group_issues_info"
+
+class adrecommendationStream(facebookStream):
+    columns = ["id",
+               "account_id",
+               "blame_field"
+               "code",
+               "confidence",
+               "importance",
+               "index",
+               "message",
+               "recommendation_data",
+               "title",
+               "updated_time",
+               "created_time"]
+
+    name = "ad_recommendation"
+    path = "/ads?fields={}".format(columns)
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "adrecommendation.json"
+    tap_stream_id = "ad_recommendation"

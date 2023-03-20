@@ -36,62 +36,6 @@
         "string"
       ]
     },
-    "promoted_object": {
-      "type": [
-        "null",
-        "object"
-      ],
-      "properties": {
-        "custom_event_type": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "pixel_id": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "pixel_rule": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "page_id": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "object_store_url": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "application_id": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "product_set_id": {
-          "type": [
-            "null",
-            "string"
-          ]
-        },
-        "offer_id": {
-          "type": [
-            "null",
-            "string"
-          ]
-        }
-      }
-    },
     "bid_strategy": {
       "type": [
         "null",
@@ -225,6 +169,62 @@
         "string"
       ]
     },
+    "promoted_object": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "properties": {
+        "custom_event_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "pixel_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "pixel_rule": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "page_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "object_store_url": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "application_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "product_set_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "offer_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
     "can_create_brand_lift_study": {
       "type": [
         "null",
@@ -332,34 +332,6 @@
     },
     "created_time": {
       "type": ["null","string"]
-    },
-    "ads": {
-      "properties": {
-        "data": {
-          "items": {
-            "properties": {
-              "id": {
-                "type": [
-                  "null",
-                  "string"
-                ]
-              }
-            },
-            "type": [
-              "null",
-              "object"
-            ]
-          },
-          "type": [
-            "null",
-            "array"
-          ]
-        }
-      },
-      "type": [
-        "null",
-        "object"
-      ]
     },
     "adlabels": {
       "type": ["null", "array"],
