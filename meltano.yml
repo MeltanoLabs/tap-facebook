@@ -73,6 +73,6 @@ plugins:
     variant: andyh1203
     pip_url: target-jsonl
     config:
-      destination_path: MELTANO_OUTPUT_PATH
+      destination_path: $MELTANO_PROJECT_ROOT
       do_timestamp_file: true
       custom_name: MELTANO_OUTPUT_FILE
