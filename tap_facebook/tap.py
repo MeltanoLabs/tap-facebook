@@ -19,7 +19,11 @@ from tap_facebook.streams import (
   adconversionStream,
   campaignlabelStream,
   adgroupissuesinfoStream,
-  adrecommendationStream
+  adrecommendationStream,
+  adsetscheduleStream,
+  adcampaignissuesinfoStream,
+  adsetattributionStream,
+  adtrackingStream
 )
 
 STREAM_TYPES = [
@@ -33,7 +37,11 @@ STREAM_TYPES = [
     adconversionStream,
     campaignlabelStream,
     adgroupissuesinfoStream,
-    adrecommendationStream
+    adrecommendationStream,
+    adsetscheduleStream,
+    adcampaignissuesinfoStream,
+    adsetattributionStream,
+    adtrackingStream
 ]
 
 
@@ -69,10 +77,10 @@ class Tapfacebook(Tap):
         Returns:
             A list of discovered streams.
         """
-        adstream = [streams.adrecommendationStream(self)]
+        adstream = [streams.adtrackingStream(self)]
         stream_list = [stream_class(tap=self) for stream_class in STREAM_TYPES]
 
-        return adstream
+        return stream_list
 
 
 if __name__ == "__main__":
