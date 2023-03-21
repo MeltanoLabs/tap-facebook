@@ -1,0 +1,113 @@
+{
+  "properties": {
+    "id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "account_id": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "promoted_object": {
+      "type": [
+        "null",
+        "object"
+      ],
+      "properties": {
+        "custom_event_type": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "pixel_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "pixel_rule": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "page_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "object_store_url": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "application_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "product_set_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "offer_id": {
+          "type": [
+            "null",
+            "string"
+          ]
+        }
+      }
+    },
+    "event_type": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "index": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "window_days": {
+      "type": [
+        "null",
+        "string"
+      ]
+    },
+    "updated_time": {
+      "type": ["null","string"],
+      "format": "timestamp-ntz"
+    },
+    "created_time": {
+      "type": ["null","string"],
+      "format": "timestamp-ntz"
+    },
+    "adlabels": {
+      "type": ["null", "array"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "created_time": {"type": "string", "format": "date-time"}
+        }
+      }
+    }
+  },
+  "type": [
+    "null",
+    "object"
+  ]
+}

@@ -442,3 +442,94 @@ class adrecommendationStream(facebookStream):
     primary_keys = ["id"]
     schema_filepath = SCHEMAS_DIR / "adrecommendation.json"
     tap_stream_id = "ad_recommendation"
+
+class adsetscheduleStream(facebookStream):
+    columns = ["id",
+               "account_id",
+               "days",
+               "start_minute",
+               "end_minute",
+               "index",
+               "timezone_type",
+               "updated_time",
+               "created_time"]
+
+    name = "adset_schedule"
+    path = "/ads?fields={}".format(columns)
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "adsetschedule.json"
+    tap_stream_id = "adset_schedule"
+
+class adcampaignissuesinfoStream(facebookStream):
+    columns = ["id",
+               "account_id",
+               "error_code"
+               "error_message",
+               "error_summary",
+               "error_type",
+               "index",
+               "level",
+               "updated_time",
+               "created_time"]
+
+    name = "ad_campaign_issues_info"
+    path = "/ads?fields={}".format(columns)
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "adcampaignissuesinfo.json"
+    tap_stream_id = "ad_campaign_issues_info"
+
+class adsetattributionStream(facebookStream):
+    columns = ["id",
+               "account_id",
+               "event_type",
+               "index",
+               "window_days",
+               "updated_time",
+               "created_time"]
+
+    name = "ad_set_attribution"
+    path = "/ads?fields={}".format(columns)
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "adsetattribution.json"
+    tap_stream_id = "ad_set_attribution"
+
+class adtrackingStream(facebookStream):
+    columns = ["id",
+               "adset_id",
+               "campaign_id",
+               "conversion_id"
+               "application",
+               "creative",
+               "dataset",
+               "event",
+               "event_creator",
+               "event_type",
+               "fb_pixel",
+               "fb_pixel_event",
+               "index",
+               "leadgen",
+               "object",
+               "object_domain",
+               "offer",
+               "offer_creator",
+               "offsite_pixel",
+               "page",
+               "page_parent",
+               "post",
+               "post_object",
+               "post_object_wall",
+               "post_wall",
+               "question",
+               "question_creator",
+               "response",
+               "subtype",
+               "updated_time",
+               "created_time"]
+
+    name = "ad_tracking"
+    path = "/ads?fields={}".format(columns)
+    primary_keys = ["id"]
+    schema_filepath = SCHEMAS_DIR / "adtracking.json"
+    tap_stream_id = "ad_tracking"
+
+

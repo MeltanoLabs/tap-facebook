@@ -44,6 +44,21 @@ Create a config.json file in the secrets folder of the tap-facebook-sdk director
 - [ ] `access_token:` access token for bearer authentication
 
 
+### Environment VAriables
+
+Create a .env file and add the following variables to id:
+
+- [ ] `TARGET_SNOWFLAKE_PASSWORD:` snowflake password
+- [ ] `TARGET_SNOWFLAKE_ACCOUNT:` snowflake accound id
+- [ ] `TARGET_SNOWFLAKE_WAREHOUSE:` snowflake warehouse
+- [ ] `TARGET_SNOWFLAKE_USER:` snowflake user
+- [ ] `TARGET_SNOWFLAKE_DATABASE:` snowflake database
+- [ ] `TARGET_SNOWFLAKE_SCHEMA:` snowflake schema
+- [ ] `TARGET_SNOWFLAKE_ROLE:` snowflake role
+- [ ] `TARGET_SNOWFLAKE_FILE_FORMAT:` snowflake output file format
+- [ ] `TARGET_SNOWFLAKE_PRIMARY_KEY_REQUIRED` you can set this to false if not all tables have primary key
+
+
 ## Usage
 
 You can easily run `tap-facebook` by itself or in a pipeline using [Meltano](https://meltano.com/).
