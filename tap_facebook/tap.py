@@ -7,6 +7,10 @@ from singer_sdk import typing as th  # JSON schema typing helpers
 
 # streams
 from tap_facebook import streams
+
+#TODO:  We need to add the CREATIVE_HISTORY,FIVETRAN_AUDIT, FREQUENCY_CONTROL, PACING_TYPE, REACH_FREQUENCY
+# TARGETING_OPTIMIZATION_TYPES,ACCOUNT_HISTORY in  streams  and STREAM_TYPES.
+
 from tap_facebook.streams import ( 
   adsinsightStream,
   adsStream,
