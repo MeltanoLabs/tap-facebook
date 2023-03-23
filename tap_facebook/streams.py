@@ -10,6 +10,13 @@ from tap_facebook.client import facebookStream
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
+
+#TODO  we need to add the streams for the below tables,
+# CREATIVE_HISTORY,FIVETRAN_AUDIT, FREQUENCY_CONTROL, PACING_TYPE, REACH_FREQUENCY
+# TARGETING_OPTIMIZATION_TYPES,ACCOUNT_HISTORY
+
+
+
 # ads insights stream
 class adsinsightStream(facebookStream):
     columns = ["account_id",
