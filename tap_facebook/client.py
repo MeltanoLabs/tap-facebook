@@ -127,14 +127,3 @@ class facebookStream(RESTStream):
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
-    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        """As needed, append or transform raw data to match expected structure.
-
-        Args:
-            row: An individual record from the stream.
-            context: The stream context.
-
-        Returns:
-            The updated record dictionary, or ``None`` to skip the record.
-        """
-        return row

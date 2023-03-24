@@ -54,6 +54,9 @@ class adsinsightStream(facebookStream):
                "cost_per_inline_link_click",
                "ctr"]
 
+
+#   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
+
     columns_remaining = [
         "unique_actions",
         "actions",
@@ -91,6 +94,8 @@ class adsStream(facebookStream):
                "tracking_specs",
                "conversion_specs",
                "recommendations"]
+
+#   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
 
     columns_remaining = ["adlabels", "recommendations"]
 
@@ -130,6 +135,8 @@ class adsetsStream(facebookStream):
                "recurring_budget_semantics",
                "source_adset_id",
                "status"]
+
+#   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
 
     columns_remaining = ["adlabels",
                          "adset_schedule",
@@ -190,6 +197,8 @@ class campaignStream(facebookStream):
                "topline_id",
                "boosted_object_id",
                "pacing_type"]
+
+#   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
 
     columns_remaining = ["ad_strategy_group_id",
                          "ad_strategy_id",
