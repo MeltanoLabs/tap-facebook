@@ -6,6 +6,15 @@ from pathlib import Path
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
+PropertiesList = th.PropertiesList
+Property = th.Property
+ObjectType = th.ObjectType
+DateTimeType = th.DateTimeType
+StringType = th.StringType
+ArrayType = th.ArrayType
+BooleanType = th.BooleanType
+IntegerType = th.IntegerType
+
 from tap_facebook.client import facebookStream
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -198,8 +207,7 @@ class campaignStream(facebookStream):
                "boosted_object_id",
                "pacing_type"]
 
-#   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
-
+    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
     columns_remaining = ["ad_strategy_group_id",
                          "ad_strategy_id",
                          "adlabels",
@@ -211,8 +219,60 @@ class campaignStream(facebookStream):
 
     name = "campaigns"
     path = "/campaigns?fields={}".format(columns)
-    schema_filepath = SCHEMAS_DIR / "campaigns.json"
     tap_stream_id = "campaigns"
+    # schema_filepath = SCHEMAS_DIR / "campaigns.json"
+    schema = PropertiesList(
+        Property("name", StringType),
+        Property("objective", StringType),
+        Property("id", StringType),
+        Property("account_id", StringType),
+        Property("effective_status", StringType),
+        Property("buying_type", StringType),
+        Property("can_create_brand_lift_study", BooleanType),
+        Property("can_use_spend_cap", BooleanType),
+        Property("configured_status", StringType),
+        Property("has_secondary_skadnetwork_reporting", BooleanType),
+        Property("is_skadnetwork_attribution", BooleanType),
+        Property("primary_attribution", StringType),
+        Property("smart_promotion_type", StringType),
+        Property("pacing_type", ArrayType),
+        Property("source_campaign_id", StringType),
+        Property("boosted_object_id", StringType),
+        Property("special_ad_categories", ArrayType),
+        Property("special_ad_category", StringType),
+        Property("status", StringType),
+        Property("topline_id", StringType),
+        Property("spend_cap", StringType),
+        Property("budget_remaining", StringType),
+        Property("start_time", StringType),
+        Property("stop_time", StringType),
+        Property("updated_time", StringType),
+        Property("created_time", StringType),
+        # TODO resolve ads object SDK schema logic withi
+        Property("ads",
+                 PropertiesList(
+                     Property(
+                         "data",
+                         ArrayType(
+                         ObjectType(
+                             Property("id",StringType),
+                         )
+                     )
+                     )
+                 )
+                 ),
+        Property("adlabels",
+                 ArrayType(
+                     Property("items", ObjectType(
+                       Property("id", StringType),
+                       Property("name", StringType),
+                       Property("created_time", DateTimeType)
+                     )
+                              )
+                 )
+                 )
+    ).to_dict()
+
 
 class adhistoryStream(facebookStream):
     columns = ["id",
