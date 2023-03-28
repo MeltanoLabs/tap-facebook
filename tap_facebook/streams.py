@@ -85,18 +85,65 @@ class adsinsightStream(facebookStream):
         Property("clicks", StringType),
         Property("date_stop", StringType),
         Property("ad_id", StringType),
-        Property("website_ctr",
 
+        Property("website_ctr",
                  ArrayType(
                      ObjectType(
-
-
-
+                         Property("value", StringType),
+                         Property("action_destination", StringType),
+                         Property("action_target_id", StringType),
+                         Property("action_type", StringType)
                      )
-                 )),
+                 )
+                 ),
 
+        Property("unique_inline_link_click_ctr", StringType),
+        Property("adset_id", StringType),
+        Property("frequency", StringType),
+        Property("account_name", StringType),
+        Property("canvas_avg_view_time", StringType),
+        Property("unique_inline_link_clicks", StringType),
 
-    )
+        Property("cost_per_unique_action_type",
+                 ArrayType(
+                     ObjectType(
+                         Property("value", StringType),
+                         Property("action_type", StringType)
+                     )
+                 )
+                 ),
+
+        Property("inline_post_engagement", StringType),
+        Property("campaign_name", StringType),
+        Property("inline_link_clicks", StringType),
+        Property("campaign_id", StringType),
+        Property("cpc", StringType),
+        Property("ad_name", StringType),
+        Property("cost_per_unique_inline_link_click", StringType),
+        Property("cpm", StringType),
+        Property("cost_per_inline_post_engagement", StringType),
+        Property("inline_link_click_ctr", StringType),
+        Property("cpp", StringType),
+        Property("cost_per_action_type", StringType),
+        Property("unique_link_clicks_ctr", StringType),
+        Property("spend", StringType),
+        Property("cost_per_unique_click", StringType),
+        Property("adset_name", StringType),
+        Property("unique_clicks", StringType),
+        Property("social_spend", StringType),
+        Property("canvas_avg_view_percent", StringType),
+        Property("account_id", StringType),
+        Property("date_start", DateTimeType),
+        Property("objective", StringType),
+        Property("quality_ranking", StringType),
+        Property("engagement_rate_ranking", StringType),
+        Property("conversion_rate_ranking", StringType),
+        Property("impressions", StringType),
+        Property("unique_ctr", StringType),
+        Property("cost_per_inline_link_click", StringType),
+        Property("ctr", StringType),
+        Property("reach", StringType)
+    ).to_dict()
 
     tap_stream_id = "adsinsights"
     #replication_key = "created_time"
