@@ -1,4 +1,5 @@
 version: 1
+default_environment: dev
 send_anonymous_usage_stats: true
 project_id: tap-facebook
 plugins:
@@ -76,3 +77,15 @@ plugins:
       destination_path: $MELTANO_PROJECT_ROOT
       do_timestamp_file: true
       custom_name: MELTANO_OUTPUT_FILE
+environments:
+    - name: dev
+      config:
+        plugins:
+          loaders:
+            - name: target-csv
+            - name: target-snowflake
+              config:
+                default_target_schema: MELTANO_LINKEDIN
+                primary_key_required: false
+    - name: staging
+    - name: prod

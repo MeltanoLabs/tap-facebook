@@ -6,6 +6,15 @@ from pathlib import Path
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
+PropertiesList = th.PropertiesList
+Property = th.Property
+ObjectType = th.ObjectType
+DateTimeType = th.DateTimeType
+StringType = th.StringType
+ArrayType = th.ArrayType
+BooleanType = th.BooleanType
+IntegerType = th.IntegerType
+
 from tap_facebook.client import facebookStream
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -71,7 +80,72 @@ class adsinsightStream(facebookStream):
 
     name = "adsinsights"
     path = "/insights?level=ad&fields={}".format(columns)
-    schema_filepath = SCHEMAS_DIR / "ads_insights.json"
+    #schema_filepath = SCHEMAS_DIR / "ads_insights.json"
+    # TODO: test completed SDK stream
+    schema = PropertiesList(
+        Property("clicks", StringType),
+        Property("date_stop", StringType),
+        Property("ad_id", StringType),
+
+        Property("website_ctr",
+                 ArrayType(
+                     ObjectType(
+                         Property("value", StringType),
+                         Property("action_destination", StringType),
+                         Property("action_target_id", StringType),
+                         Property("action_type", StringType)
+                     )
+                 )
+                 ),
+
+        Property("unique_inline_link_click_ctr", StringType),
+        Property("adset_id", StringType),
+        Property("frequency", StringType),
+        Property("account_name", StringType),
+        Property("canvas_avg_view_time", StringType),
+        Property("unique_inline_link_clicks", StringType),
+
+        Property("cost_per_unique_action_type",
+                 ArrayType(
+                     ObjectType(
+                         Property("value", StringType),
+                         Property("action_type", StringType)
+                     )
+                 )
+                 ),
+
+        Property("inline_post_engagement", StringType),
+        Property("campaign_name", StringType),
+        Property("inline_link_clicks", StringType),
+        Property("campaign_id", StringType),
+        Property("cpc", StringType),
+        Property("ad_name", StringType),
+        Property("cost_per_unique_inline_link_click", StringType),
+        Property("cpm", StringType),
+        Property("cost_per_inline_post_engagement", StringType),
+        Property("inline_link_click_ctr", StringType),
+        Property("cpp", StringType),
+        Property("cost_per_action_type", StringType),
+        Property("unique_link_clicks_ctr", StringType),
+        Property("spend", StringType),
+        Property("cost_per_unique_click", StringType),
+        Property("adset_name", StringType),
+        Property("unique_clicks", StringType),
+        Property("social_spend", StringType),
+        Property("canvas_avg_view_percent", StringType),
+        Property("account_id", StringType),
+        Property("date_start", DateTimeType),
+        Property("objective", StringType),
+        Property("quality_ranking", StringType),
+        Property("engagement_rate_ranking", StringType),
+        Property("conversion_rate_ranking", StringType),
+        Property("impressions", StringType),
+        Property("unique_ctr", StringType),
+        Property("cost_per_inline_link_click", StringType),
+        Property("ctr", StringType),
+        Property("reach", StringType)
+    ).to_dict()
+
     tap_stream_id = "adsinsights"
     #replication_key = "created_time"
 
@@ -102,7 +176,214 @@ class adsStream(facebookStream):
     name = "ads"
     path = "/ads?fields={}".format(columns)
     primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "ads.json"
+    # schema_filepath = SCHEMAS_DIR / "ads.json"
+
+    schema = PropertiesList(
+        Property("bid_type", StringType),
+        Property("account_id", StringType),
+        Property("campaign_id", StringType),
+        Property("adset_id", StringType),
+
+        Property("adlabels",
+                 ArrayType(
+                     ObjectType(
+                         Property("id", StringType),
+                         Property("created_time", DateTimeType),
+                         Property("name", StringType),
+                         Property("updated_time", DateTimeType),
+                     )
+                 )
+                 ),
+        Property("bid_amount", IntegerType),
+
+        Property("bid_info",
+                 ObjectType(
+                    Property("CLICKS", IntegerType),
+                    Property("ACTIONS", IntegerType),
+                    Property("REACH", IntegerType),
+                    Property("IMPRESSIONS", IntegerType),
+                    Property("SOCIAL", IntegerType)
+                 )
+                 ),
+
+        Property("status", StringType),
+
+        Property("creative",
+                 ObjectType(
+                     Property("creative_id", StringType),
+                     Property("id", StringType)
+                 )
+                 ),
+
+        Property("id", StringType),
+        Property("updated_time", StringType),
+        Property("created_time", StringType),
+        Property("name", StringType),
+        Property("effective_status", StringType),
+        Property("last_updated_by_app_id", StringType),
+
+        Property("recommendations",
+                 ArrayType(
+                     ObjectType(
+                         Property("blame_field", StringType),
+                         Property("code", IntegerType),
+                         Property("confidence", StringType),
+                         Property("importance", StringType),
+                         Property("message", StringType),
+                         Property("title", StringType)
+                     )
+                 )
+                 ),
+
+        Property("source_ad_id", StringType),
+
+        Property("tracking_specs",
+                 ArrayType(
+                     ObjectType(
+                         Property("application",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("post", StringType),
+                         Property("conversion_id", StringType),
+                         Property("action.type",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("post.type",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("page",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("creative",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("dataset",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("event",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("event.creator",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("event_type",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("fb_pixel",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("fb_pixel_event",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("leadgen",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("object",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("object.domain",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("offer",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("offer.creator",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("offsite_pixel",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("page.parent",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("post.object",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("post.object.wall",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("question",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("question.creator",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("response",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("subtype",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  )
+                     )
+                 )
+                 ),
+        Property("conversion_specs",
+                 ArrayType(
+                     ObjectType(
+                         Property("application",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("application",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+
+                     )
+                 )
+                 )
+    ).to_dict()
+
     tap_stream_id = "ads"
 
 # adsets stream
@@ -164,7 +445,76 @@ class adsetsStream(facebookStream):
 
     name = "adsets"
     path = "/adsets?fields={}".format(columns)
-    schema_filepath = SCHEMAS_DIR / "adsets.json"
+    #schema_filepath = SCHEMAS_DIR / "adsets.json"
+
+    schema = PropertiesList(
+        Property("name", StringType),
+        Property("end_time", StringType),
+        Property("billing_event", StringType),
+        Property("campaign_attribution", StringType),
+        Property("destination_type", StringType),
+        Property("is_dynamic_creative", StringType),
+        Property("learning_stage_info", StringType),
+        Property("lifetime_imps", StringType),
+        Property("multi_optimization_goal_weight", StringType),
+        Property("optimization_goal", StringType),
+        Property("optimization_sub_event", StringType),
+        Property("pacing_type", StringType),
+        Property("recurring_budget_semantics", StringType),
+        Property("source_adset_id", StringType),
+        Property("status", StringType),
+        Property("targeting_optimization_types", StringType),
+        Property("use_new_app_click", BooleanType),
+
+        Property("promoted_object",
+                 ObjectType(
+                     Property("custom_event_type", StringType),
+                     Property("pixel_id", StringType),
+                     Property("pixel_rule", StringType),
+                     Property("page_id", StringType),
+                     Property("object_store_url", StringType),
+                     Property("application_id", StringType),
+                     Property("product_set_id", StringType),
+                     Property("offer_id", StringType)
+                 )
+        ),
+
+        Property("id", StringType),
+        Property("account_id", StringType),
+        Property("updated_time", StringType),
+        Property("daily_budget", StringType),
+        Property("budget_remaining", StringType),
+        Property("effective_status", StringType),
+        Property("campaign_id", StringType),
+        Property("created_time", StringType),
+        Property("start_time", StringType),
+        Property("lifetime_budget", StringType),
+
+        Property("bid_info",
+                 ObjectType(
+                     Property("CLICKS", IntegerType),
+                     Property("ACTIONS", IntegerType),
+                     Property("REACH", IntegerType),
+                     Property("IMPRESSIONS", IntegerType),
+                     Property("SOCIAL", IntegerType)
+                 )
+        ),
+
+        Property("adlabels",
+                 ArrayType(
+                     Property("items", ObjectType(
+                         Property("id", StringType),
+                         Property("name", StringType),
+                         Property("created_time", DateTimeType)
+                         )
+                     )
+                 )
+        )
+
+    ).to_dict()
+
+    #   TODO: ADD TARGETING COLUMNS TO ADSETS
+
     tap_stream_id = "adsets"
 
 # campaigns stream
@@ -198,8 +548,7 @@ class campaignStream(facebookStream):
                "boosted_object_id",
                "pacing_type"]
 
-#   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
-
+    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
     columns_remaining = ["ad_strategy_group_id",
                          "ad_strategy_id",
                          "adlabels",
@@ -211,334 +560,56 @@ class campaignStream(facebookStream):
 
     name = "campaigns"
     path = "/campaigns?fields={}".format(columns)
-    schema_filepath = SCHEMAS_DIR / "campaigns.json"
     tap_stream_id = "campaigns"
+    # schema_filepath = SCHEMAS_DIR / "campaigns.json"
+    PropertiesList = th.PropertiesList
+    Property = th.Property
+    ObjectType = th.ObjectType
+    DateTimeType = th.DateTimeType
+    StringType = th.StringType
+    ArrayType = th.ArrayType(StringType)
+    BooleanType = th.BooleanType
+    IntegerType = th.IntegerType
 
-class adhistoryStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "adset_id",
-               "campaign_id",
-               "creative",
-               "bid_amount",
-               "bid_type",
-               "bid_info",
-               "status",
-               "conversion_domain",
-               "configured_status",
-               "effective_status",
-               "updated_time",
-               "created_time",
-               "name",
-               "last_updated_by_app_id",
-               "source_ad_id"]
+    schema = PropertiesList(
+        Property("name", StringType),
+        Property("objective", StringType),
+        Property("id", StringType),
+        Property("account_id", StringType),
+        Property("effective_status", StringType),
+        Property("buying_type", StringType),
+        Property("can_create_brand_lift_study", BooleanType),
+        Property("can_use_spend_cap", BooleanType),
+        Property("configured_status", StringType),
+        Property("has_secondary_skadnetwork_reporting", BooleanType),
+        Property("is_skadnetwork_attribution", BooleanType),
+        Property("primary_attribution", StringType),
+        Property("smart_promotion_type", StringType),
+        Property("pacing_type", ArrayType),
+        Property("source_campaign_id", StringType),
+        Property("boosted_object_id", StringType),
+        Property("special_ad_categories", ArrayType),
+        Property("special_ad_category", StringType),
+        Property("status", StringType),
+        Property("topline_id", StringType),
+        Property("spend_cap", StringType),
+        Property("budget_remaining", StringType),
+        Property("daily_budget", StringType),
+        Property("start_time", StringType),
+        Property("stop_time", StringType),
+        Property("updated_time", StringType),
+        Property("created_time", StringType),
 
-    name = "ad_history"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "adhistory.json"
-    tap_stream_id = "ad_history"
+        Property("adlabels",
+                 th.ArrayType(
+                     Property("items", ObjectType(
+                       Property("id", StringType),
+                       Property("name", StringType),
+                       Property("created_time", DateTimeType)
+                       )
+                     )
+                 )
+       )
 
-class campaignhistoryStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "updated_time",
-               "created_time",
-               "start_time",
-               "stop_time",
-               "name",
-               "bid_strategy",
-               "boosted_object_id",
-               "ad_strategy_group_id",
-               "ad_strategy_id",
-               "budget_rebalance_flag",
-               "buying_type",
-               "daily_budget",
-               "lifetime_budget",
-               "budget_remaining",
-               "can_create_brand_lift_study",
-               "can_use_spend_cap",
-               "configured_status",
-               "effective_status",
-               "has_secondary_skadnetwork_reporting",
-               "is_skadnetwork_attribution",
-               "last_budget_toggling_time",
-               "objective",
-               "pacing_type",
-               "promoted_object_application_type",
-               "promoted_object_custom_conversion_id",
-               "promoted_object_custom_event_str",
-               "promoted_object_custom_event_type",
-               "promoted_object_event_id",
-               "promoted_object_object_store_url",
-               "promoted_object_offer_id",
-               "promoted_object_offline_conversion_data_set_id",
-               "promoted_object_page_id",
-               "promoted_object_pixel_aggregation_rule",
-               "promoted_object_pixel_id",
-               "promoted_object_pixel_rule",
-               "promoted_object_place_page_set_id",
-               "promoted_object_product_catalog_id",
-               "promoted_object_product_set_id",
-               "promoted_object_retention_days",
-               "primary_attribution",
-               "smart_promotion_type",
-               "source_campaign_id",
-               "special_ad_categories",
-               "special_ad_category",
-               "special_ad_category_country",
-               "spend_cap",
-               "promoted_object",
-               "status",
-               "topline_id"]
-
-    name = "campaign_history"
-    path = "/campaigns?fields={}".format(columns)
-    schema_filepath = SCHEMAS_DIR / "campaignhistory.json"
-    tap_stream_id = "campaign_history"
-
-class adsethistoryStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "campaign_id",
-               "updated_time",
-               "created_time",
-               "start_time",
-               "end_time",
-               "name",
-               "asset_feed_id",
-               "bid_amount",
-               "bid_info_actions",
-               "bid_info_impressions",
-               "bid_strategy",
-               "billing_event",
-               "budget_remaining",
-               "configured_status",
-               "effective_status",
-               "daily_budget",
-               "lifetime_budget",
-               "daily_min_spend_target",
-               "daily_spend_cap",
-               "destination_type",
-               "instagram_actor_id",
-               "is_dynamic_creative",
-               "learning_stage_info",
-               "lifetime_imps",
-               "lifetime_min_spend_target",
-               "lifetime_spend_cap",
-               "multi_optimization_goal_weight",
-               "optimization_goal",
-               "optimization_sub_event",
-               "promoted_object_application_type",
-               "promoted_object_custom_conversion_id",
-               "promoted_object_custom_event_str",
-               "promoted_object_custom_event_type",
-               "promoted_object_event_id",
-               "promoted_object_object_store_url",
-               "promoted_object_offer_id",
-               "promoted_object_offline_conversion_data_set_id",
-               "promoted_object_page_id",
-               "promoted_object_pixel_aggregation_rule",
-               "promoted_object_pixel_id",
-               "promoted_object_pixel_rule",
-               "promoted_object_place_page_set_id",
-               "promoted_object_product_catalog_id",
-               "promoted_object_product_set_id",
-               "promoted_object_retention_days",
-               "recurring_budget_semantics",
-               "review_feedback",
-               "rf_prediction_id",
-               "promoted_object",
-               "attribution_spec",
-               "campaign_attribution",
-               "pacing_type",
-               "source_adset_id",
-               "status"]
-
-    name = "ad_set_history"
-    path = "/adsets?fields={}".format(columns)
-    schema_filepath = SCHEMAS_DIR / "adsethistory.json"
-    tap_stream_id = "ad_set_history"
-
-class adconversionStream(facebookStream):
-    columns = ["id",
-               "adset_id",
-               "campaign_id",
-               "conversion_id"
-               "application",
-               "creative",
-               "dataset",
-               "event",
-               "event_creator",
-               "event_type",
-               "fb_pixel",
-               "fb_pixel_event",
-               "index",
-               "leadgen",
-               "object",
-               "object_domain",
-               "offer",
-               "offer_creator",
-               "offsite_pixel",
-               "page",
-               "page_parent",
-               "post",
-               "post_object",
-               "post_object_wall",
-               "post_wall",
-               "question",
-               "question_creator",
-               "response",
-               "subtype",
-               "updated_time",
-               "created_time"]
-
-    name = "ad_conversion"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "adconversion.json"
-    tap_stream_id = "ad_conversion"
-
-class campaignlabelStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "ad_label_id"
-               "source_campaign_id",
-               "adlabels"
-               "updated_time",
-               "created_time"]
-
-    name = "campaign_label"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "campaignlabel.json"
-    tap_stream_id = "campaign_label"
-
-class adgroupissuesinfoStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "error_code"
-               "error_message",
-               "error_summary",
-               "error_type",
-               "index",
-               "level",
-               "updated_time",
-               "created_time"]
-
-    name = "ad_group_issues_info"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "adgroupissuesinfo.json"
-    tap_stream_id = "ad_group_issues_info"
-
-class adrecommendationStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "blame_field"
-               "code",
-               "confidence",
-               "importance",
-               "index",
-               "message",
-               "recommendation_data",
-               "title",
-               "updated_time",
-               "created_time"]
-
-    name = "ad_recommendation"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "adrecommendation.json"
-    tap_stream_id = "ad_recommendation"
-
-class adsetscheduleStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "days",
-               "start_minute",
-               "end_minute",
-               "index",
-               "timezone_type",
-               "updated_time",
-               "created_time"]
-
-    name = "adset_schedule"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "adsetschedule.json"
-    tap_stream_id = "adset_schedule"
-
-class adcampaignissuesinfoStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "error_code"
-               "error_message",
-               "error_summary",
-               "error_type",
-               "index",
-               "level",
-               "updated_time",
-               "created_time"]
-
-    name = "ad_campaign_issues_info"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "adcampaignissuesinfo.json"
-    tap_stream_id = "ad_campaign_issues_info"
-
-class adsetattributionStream(facebookStream):
-    columns = ["id",
-               "account_id",
-               "event_type",
-               "index",
-               "window_days",
-               "updated_time",
-               "created_time"]
-
-    name = "ad_set_attribution"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "adsetattribution.json"
-    tap_stream_id = "ad_set_attribution"
-
-class adtrackingStream(facebookStream):
-    columns = ["id",
-               "adset_id",
-               "campaign_id",
-               "conversion_id"
-               "application",
-               "creative",
-               "dataset",
-               "event",
-               "event_creator",
-               "event_type",
-               "fb_pixel",
-               "fb_pixel_event",
-               "index",
-               "leadgen",
-               "object",
-               "object_domain",
-               "offer",
-               "offer_creator",
-               "offsite_pixel",
-               "page",
-               "page_parent",
-               "post",
-               "post_object",
-               "post_object_wall",
-               "post_wall",
-               "question",
-               "question_creator",
-               "response",
-               "subtype",
-               "updated_time",
-               "created_time"]
-
-    name = "ad_tracking"
-    path = "/ads?fields={}".format(columns)
-    primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "adtracking.json"
-    tap_stream_id = "ad_tracking"
-
+    ).to_dict()
 
