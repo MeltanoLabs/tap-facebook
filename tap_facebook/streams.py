@@ -81,6 +81,7 @@ class adsinsightStream(facebookStream):
     name = "adsinsights"
     path = "/insights?level=ad&fields={}".format(columns)
     #schema_filepath = SCHEMAS_DIR / "ads_insights.json"
+    # TODO: test completed SDK stream
     schema = th.PropertiesList(
         Property("clicks", StringType),
         Property("date_stop", StringType),
@@ -372,9 +373,14 @@ class adsStream(facebookStream):
                                       Property("items", StringType)
                                   )
                                   ),
-                        
+                         Property("application",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
 
-    )
+
+    ).to_dict(
 
     tap_stream_id = "ads"
 
@@ -485,6 +491,7 @@ class campaignStream(facebookStream):
     path = "/campaigns?fields={}".format(columns)
     tap_stream_id = "campaigns"
     # schema_filepath = SCHEMAS_DIR / "campaigns.json"
+    # TODO: test completed SDK stream
     schema = PropertiesList(
         Property("name", StringType),
         Property("objective", StringType),
