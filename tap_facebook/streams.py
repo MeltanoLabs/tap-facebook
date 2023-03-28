@@ -6,6 +6,8 @@ from pathlib import Path
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
+from tap_facebook.client import facebookStream
+
 PropertiesList = th.PropertiesList
 Property = th.Property
 ObjectType = th.ObjectType
@@ -14,8 +16,6 @@ StringType = th.StringType
 ArrayType = th.ArrayType
 BooleanType = th.BooleanType
 IntegerType = th.IntegerType
-
-from tap_facebook.client import facebookStream
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
