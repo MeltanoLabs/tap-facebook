@@ -175,7 +175,207 @@ class adsStream(facebookStream):
     name = "ads"
     path = "/ads?fields={}".format(columns)
     primary_keys = ["id"]
-    schema_filepath = SCHEMAS_DIR / "ads.json"
+    # schema_filepath = SCHEMAS_DIR / "ads.json"
+
+    schema = th.PropertiesList(
+        Property("bid_type", StringType),
+        Property("account_id", StringType),
+        Property("campaign_id", StringType),
+        Property("adset_id", StringType),
+
+        Property("adlabels",
+                 ArrayType(
+                     ObjectType(
+                         Property("id", StringType),
+                         Property("created_time", DateTimeType),
+                         Property("name", StringType),
+                         Property("updated_time", DateTimeType),
+                     )
+                 )
+                 ),
+        Property("bid_amount", IntegerType),
+
+        Property("bid_info",
+                 ObjectType(
+                    Property("CLICKS", IntegerType),
+                    Property("ACTIONS", IntegerType),
+                    Property("REACH", IntegerType),
+                    Property("IMPRESSIONS", IntegerType),
+                    Property("SOCIAL", IntegerType)
+                 )
+                 ),
+
+        Property("status", StringType),
+
+        Property("creative",
+                 ObjectType(
+                     Property("creative_id", StringType),
+                     Property("id", StringType)
+                 )
+                 ),
+
+        Property("id", StringType),
+        Property("updated_time", DateTimeType),
+        Property("created_time", DateTimeType),
+        Property("name", StringType),
+        Property("effective_status", StringType),
+        Property("last_updated_by_app_id", DateTimeType),
+
+        Property("recommendations",
+                 ArrayType(
+                     ObjectType(
+                         Property("blame_field", StringType),
+                         Property("code", IntegerType),
+                         Property("confidence", StringType),
+                         Property("importance", StringType),
+                         Property("message", StringType),
+                         Property("title", StringType)
+                     )
+                 )
+                 ),
+
+        Property("source_ad_id", StringType),
+
+        Property("tracking_specs",
+                 ArrayType(
+                     ObjectType(
+                         Property("application",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("post", StringType),
+                         Property("conversion_id", StringType),
+                         Property("action.type",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("post.type",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("page",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("creative",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("dataset",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("event",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("event.creator",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("event_type",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("fb_pixel",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("fb_pixel_event",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("leadgen",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("object",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("object.domain",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("offer",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("offer.creator",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("offsite_pixel",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("page.parent",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("post.object",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("post.object.wall",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("question",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("question.creator",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("response",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                         Property("subtype",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  )
+                     )
+                 )
+                 ),
+        Property("conversion_specs",
+                 ArrayType(
+                     ObjectType(
+                         Property("application",
+                                  ArrayType(
+                                      Property("items", StringType)
+                                  )
+                                  ),
+                        
+
+    )
+
     tap_stream_id = "ads"
 
 # adsets stream
