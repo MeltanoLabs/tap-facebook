@@ -82,7 +82,7 @@ class adsinsightStream(facebookStream):
     path = "/insights?level=ad&fields={}".format(columns)
     #schema_filepath = SCHEMAS_DIR / "ads_insights.json"
     # TODO: test completed SDK stream
-    schema = th.PropertiesList(
+    schema = PropertiesList(
         Property("clicks", StringType),
         Property("date_stop", StringType),
         Property("ad_id", StringType),
@@ -178,7 +178,7 @@ class adsStream(facebookStream):
     primary_keys = ["id"]
     # schema_filepath = SCHEMAS_DIR / "ads.json"
 
-    schema = th.PropertiesList(
+    schema = PropertiesList(
         Property("bid_type", StringType),
         Property("account_id", StringType),
         Property("campaign_id", StringType),
@@ -216,11 +216,11 @@ class adsStream(facebookStream):
                  ),
 
         Property("id", StringType),
-        Property("updated_time", DateTimeType),
-        Property("created_time", DateTimeType),
+        Property("updated_time", StringType),
+        Property("created_time", StringType),
         Property("name", StringType),
         Property("effective_status", StringType),
-        Property("last_updated_by_app_id", DateTimeType),
+        Property("last_updated_by_app_id", StringType),
 
         Property("recommendations",
                  ArrayType(
@@ -379,8 +379,10 @@ class adsStream(facebookStream):
                                   )
                                   ),
 
-
-    ).to_dict(
+                     )
+                 )
+                 )
+    ).to_dict()
 
     tap_stream_id = "ads"
 
@@ -443,7 +445,76 @@ class adsetsStream(facebookStream):
 
     name = "adsets"
     path = "/adsets?fields={}".format(columns)
-    schema_filepath = SCHEMAS_DIR / "adsets.json"
+    #schema_filepath = SCHEMAS_DIR / "adsets.json"
+
+    schema = PropertiesList(
+        Property("name", StringType),
+        Property("end_time", StringType),
+        Property("billing_event", StringType),
+        Property("campaign_attribution", StringType),
+        Property("destination_type", StringType),
+        Property("is_dynamic_creative", StringType),
+        Property("learning_stage_info", StringType),
+        Property("lifetime_imps", StringType),
+        Property("multi_optimization_goal_weight", StringType),
+        Property("optimization_goal", StringType),
+        Property("optimization_sub_event", StringType),
+        Property("pacing_type", StringType),
+        Property("recurring_budget_semantics", StringType),
+        Property("source_adset_id", StringType),
+        Property("status", StringType),
+        Property("targeting_optimization_types", StringType),
+        Property("use_new_app_click", BooleanType),
+
+        Property("promoted_object",
+                 ObjectType(
+                     Property("custom_event_type", StringType),
+                     Property("pixel_id", StringType),
+                     Property("pixel_rule", StringType),
+                     Property("page_id", StringType),
+                     Property("object_store_url", StringType),
+                     Property("application_id", StringType),
+                     Property("product_set_id", StringType),
+                     Property("offer_id", StringType)
+                 )
+        ),
+
+        Property("id", StringType),
+        Property("account_id", StringType),
+        Property("updated_time", StringType),
+        Property("daily_budget", StringType),
+        Property("budget_remaining", StringType),
+        Property("effective_status", StringType),
+        Property("campaign_id", StringType),
+        Property("created_time", StringType),
+        Property("start_time", StringType),
+        Property("lifetime_budget", StringType),
+
+        Property("bid_info",
+                 ObjectType(
+                     Property("CLICKS", IntegerType),
+                     Property("ACTIONS", IntegerType),
+                     Property("REACH", IntegerType),
+                     Property("IMPRESSIONS", IntegerType),
+                     Property("SOCIAL", IntegerType)
+                 )
+        ),
+
+        Property("adlabels",
+                 ArrayType(
+                     Property("items", ObjectType(
+                         Property("id", StringType),
+                         Property("name", StringType),
+                         Property("created_time", DateTimeType)
+                         )
+                     )
+                 )
+        )
+
+    ).to_dict()
+
+    #   TODO: ADD TARGETING COLUMNS TO ADSETS
+
     tap_stream_id = "adsets"
 
 # campaigns stream
@@ -491,7 +562,15 @@ class campaignStream(facebookStream):
     path = "/campaigns?fields={}".format(columns)
     tap_stream_id = "campaigns"
     # schema_filepath = SCHEMAS_DIR / "campaigns.json"
-    # TODO: test completed SDK stream
+    PropertiesList = th.PropertiesList
+    Property = th.Property
+    ObjectType = th.ObjectType
+    DateTimeType = th.DateTimeType
+    StringType = th.StringType
+    ArrayType = th.ArrayType(StringType)
+    BooleanType = th.BooleanType
+    IntegerType = th.IntegerType
+
     schema = PropertiesList(
         Property("name", StringType),
         Property("objective", StringType),
@@ -515,34 +594,22 @@ class campaignStream(facebookStream):
         Property("topline_id", StringType),
         Property("spend_cap", StringType),
         Property("budget_remaining", StringType),
+        Property("daily_budget", StringType),
         Property("start_time", StringType),
         Property("stop_time", StringType),
         Property("updated_time", StringType),
         Property("created_time", StringType),
-        # TODO resolve ads object SDK schema logic withi
-        Property("ads",
-                 PropertiesList(
-                     Property(
-                         "data",
-                         ArrayType(
-                             ObjectType(
-                                 Property("id",
-                                          StringType
-                                          ),
-                             )
-                         )
-                     )
-                 )
-                 ),
+
         Property("adlabels",
-                 ArrayType(
+                 th.ArrayType(
                      Property("items", ObjectType(
                        Property("id", StringType),
                        Property("name", StringType),
                        Property("created_time", DateTimeType)
+                       )
                      )
-                              )
                  )
-                 )
+       )
+
     ).to_dict()
 

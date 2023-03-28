@@ -20,8 +20,8 @@ class facebookStream(RESTStream):
 
     # open config.json to read account id
     # TODO switch config to meltano.yml and env variables, config.json for testing
-    # with open(".secrets/config.json") as config_json:
-    #     config = json.load(config_json)
+    with open(".secrets/config.json") as config_json:
+        config = json.load(config_json)
 
     # get account id from config.json
     account_id = config['account_id']
