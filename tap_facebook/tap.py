@@ -7,21 +7,15 @@ from singer_sdk import typing as th  # JSON schema typing helpers
 
 # streams
 from tap_facebook import streams
-from tap_facebook.streams import ( 
-  adsinsightStream,
-  adsStream,
-  adsetsStream,
-  facebookStream,
-  campaignStream
-)
-
-STREAM_TYPES = [
+from tap_facebook.streams import (
     adsinsightStream,
     adsStream,
     adsetsStream,
-    campaignStream
-]
+    facebookStream,
+    campaignStream,
+)
 
+STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream]
 
 
 class Tapfacebook(Tap):
@@ -35,17 +29,13 @@ class Tapfacebook(Tap):
             "access_token",
             th.StringType,
             required=True,
-            description="The token to authenticate against the API service"
+            description="The token to authenticate against the API service",
         ),
-        th.Property(
-            "account_id",
-            th.StringType,
-            description="Account ID"
-        ),
+        th.Property("account_id", th.StringType, description="Account ID"),
         th.Property(
             "start_date",
             th.DateTimeType,
-            description="The earliest record date to sync"
+            description="The earliest record date to sync",
         ),
     ).to_dict()
 

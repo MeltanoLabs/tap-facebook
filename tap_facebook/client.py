@@ -24,13 +24,15 @@ class facebookStream(RESTStream):
         config = json.load(config_json)
 
     # get account id from config.json
-    account_id = config['account_id']
+    account_id = config["account_id"]
 
     # add account id in the url
     url_base = "https://graph.facebook.com/v16.0/act_{}".format(account_id)
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.paging.cursors.after"  # Or override `get_next_page_token`.
+    next_page_token_jsonpath = (
+        "$.paging.cursors.after"  # Or override `get_next_page_token`.
+    )
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -121,4 +123,3 @@ class facebookStream(RESTStream):
             Each record from the source.
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
-
