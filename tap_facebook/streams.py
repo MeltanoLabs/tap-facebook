@@ -22,6 +22,9 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 # ads insights stream
 class adsinsightStream(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/insights.
+    """
     columns = [
         "account_id",
         "ad_id",
@@ -152,6 +155,9 @@ class adsinsightStream(facebookStream):
 
 # ads stream
 class adsStream(facebookStream):
+    """
+
+    """
     columns = [
         "id",
         "account_id",
@@ -288,6 +294,9 @@ class adsStream(facebookStream):
 
 # adsets stream
 class adsetsStream(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/
+    """
     columns = [
         "id",
         "account_id",
@@ -424,6 +433,9 @@ class adsetsStream(facebookStream):
 
 # campaigns stream
 class campaignStream(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group.
+    """
     columns = [
         "id",
         "account_id",
