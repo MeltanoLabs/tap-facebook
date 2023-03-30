@@ -4,39 +4,39 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Callable, Iterable
-
-import requests
-import json
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
+#from dotenv import load_dotenv
+
+import requests, json
+#import os
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
+
+#load_dotenv(".env")
 
 
 class facebookStream(RESTStream):
     """facebook stream class."""
 
-    # open config.json to read account id
-    # TODO switch config to meltano.yml and env variables, config.json for testing
-    with open(".secrets/config.json") as config_json:
-        config = json.load(config_json)
-
-    # get account id from config.json
-    account_id = config['account_id']
+    # get access_token from environment file
+    #config = {"access_token": os.getenv("ACCESS_TOKEN")}
 
     # add account id in the url
-    url_base = "https://graph.facebook.com/v16.0/act_{}".format(account_id)
+    url_base = "https://graph.facebook.com/v16.0/act_"
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.paging.cursors.after"  # Or override `get_next_page_token`.
+    next_page_token_jsonpath = (
+        "$.paging.cursors.after"  # Or override `get_next_page_token`.
+    )
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
         """Return a new authenticator object.
 
-        Returns:
+        Returns,
             An authenticator instance.
         """
         return BearerTokenAuthenticator.create_for_stream(
@@ -51,11 +51,11 @@ class facebookStream(RESTStream):
     ) -> Any | None:
         """Return a token for identifying next page or None if no more pages.
 
-        Args:
+        Args,
             response: The HTTP ``requests.Response`` object.
             previous_token: The previous page token value.
 
-        Returns:
+        Returns,
             The next pagination token.
         """
         if self.next_page_token_jsonpath:
@@ -76,11 +76,11 @@ class facebookStream(RESTStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args:
+        Args,
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns:
+        Returns,
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -102,11 +102,11 @@ class facebookStream(RESTStream):
 
         By default, no payload will be sent (return None).
 
-        Args:
+        Args,
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns:
+        Returns,
             A dictionary with the JSON body for a POST requests.
         """
         return None
@@ -114,11 +114,10 @@ class facebookStream(RESTStream):
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
-        Args:
+        Args,
             response: The HTTP ``requests.Response`` object.
 
-        Yields:
+        Yields,
             Each record from the source.
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
-
