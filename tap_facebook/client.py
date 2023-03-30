@@ -21,11 +21,6 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class facebookStream(RESTStream):
     """facebook stream class."""
 
-    # open config.json to read account id
-    # TODO switch config to meltano.yml and env variables, config.json for testing
-    #with open(".secrets/config.json") as config_json:
-    #    config = json.load(config_json)
-
     # get access_token from environment file
     #config = {"access_token": os.getenv("ACCESS_TOKEN")}
 
