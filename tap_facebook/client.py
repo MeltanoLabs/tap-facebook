@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any, Callable, Iterable
-
-import requests
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
+#from dotenv import load_dotenv
+
+import requests, json
+#import os
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
+
+#load_dotenv(".env")
 
 
 class facebookStream(RESTStream):
@@ -20,14 +23,14 @@ class facebookStream(RESTStream):
 
     # open config.json to read account id
     # TODO switch config to meltano.yml and env variables, config.json for testing
-    with open(".secrets/config.json") as config_json:
-        config = json.load(config_json)
+    #with open(".secrets/config.json") as config_json:
+    #    config = json.load(config_json)
 
-    # get account id from config.json
-    account_id = config["account_id"]
+    # get access_token from environment file
+    #config = {"access_token": os.getenv("ACCESS_TOKEN")}
 
     # add account id in the url
-    url_base = "https://graph.facebook.com/v16.0/act_{}".format(account_id)
+    url_base = "https://graph.facebook.com/v16.0/act_"
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = (
