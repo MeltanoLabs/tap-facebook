@@ -11,60 +11,50 @@ plugins:
     - state
     - catalog
     - discover
+    settings:
+    - name: access_token
+      kind: password
+    - name: start_date
+      value: '2023-03-01T00:00:00Z'
+      kind: date_iso8601
+    - name: end_date
+      value: '2023-03-31T00:00:00Z'
+      kind: date_iso8601
     config:
-      start_date: TAP_FACEBOOK_START_DATE
-      account_id: TAP_FACEBOOK_ACCOUNT_ID
+      account_id: $TAP_FACEBOOK_ACCOUNT_ID
       insights_buffer_days: 7
-      access_token: ACCESS_TOKEN
+      access_token: $TAP_FACEBOOK_ACCESS_TOKEN
   - name: facebook-ads
     inherit_from: tap-facebook
-    config:
-      start_date: TAP_FACEBOOK_START_DATE
-    load_schema: MELTANO_FACEBOOK
+    load_schema: $TAP_FACEBOOK_SCHEMA
     select:
     - ads.*
   - name: facebook-ads-insights
     inherit_from: tap-facebook
-    config:
-      start_date: TAP_FACEBOOK_START_DATE
+    load_schema: $TAP_FACEBOOK_SCHEMA
     select:
     - adsinsights.*
   - name: facebook-adsets
     inherit_from: tap-facebook
-    config:
-      start_date: TAP_FACEBOOK_START_DATE
+    load_schema: $TAP_FACEBOOK_SCHEMA
     select:
     - adsets.*
   - name: facebook-campaigns
     inherit_from: tap-facebook
-    config:
-      start_date: TAP_FACEBOOK_START_DATE
+    load_schema: $TAP_FACEBOOK_SCHEMA
     select:
     - campaigns.*
-  - name: facebook-adhistory
+  - name: facebook-creatives
     inherit_from: tap-facebook
-    config:
-      start_date: TAP_FACEBOOK_START_DATE
+    load_schema: $TAP_FACEBOOK_SCHEMA
     select:
-    - ad_history.*
-  - name: facebook-campaignhistory
-    inherit_from: tap-facebook
-    config:
-      start_date: TAP_FACEBOOK_START_DATE
-    select:
-    - campaign_history.*
-  - name: facebook-adsethistory
-    inherit_from: tap-facebook
-    config:
-      start_date: TAP_FACEBOOK_START_DATE
-    select:
-    - ad_set_history.*
+    - creatives.*
   loaders:
   - name: target-csv
     variant: hotgluexyz
     pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
     config:
-      destination_path: MELTANO_OUTPUT_PATH
+      destination_path: $MELTANO_OUTPUT_PATH
   - name: target-snowflake
     variant: transferwise
     pip_url: pipelinewise-target-snowflake
@@ -76,7 +66,7 @@ plugins:
     config:
       destination_path: $MELTANO_PROJECT_ROOT
       do_timestamp_file: true
-      custom_name: MELTANO_OUTPUT_FILE
+      custom_name: $MELTANO_OUTPUT_FILE
 environments:
     - name: dev
       config:
@@ -85,7 +75,7 @@ environments:
             - name: target-csv
             - name: target-snowflake
               config:
-                default_target_schema: MELTANO_LINKEDIN
+                default_target_schema: $TARGET_SNOWFLAKE_SCHEMA
                 primary_key_required: false
     - name: staging
     - name: prod
