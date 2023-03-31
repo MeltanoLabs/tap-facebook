@@ -7,24 +7,18 @@ from typing import Any, Callable, Iterable
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
-#from dotenv import load_dotenv
 
 import requests, json
-#import os
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
-
-#load_dotenv(".env")
 
 
 class facebookStream(RESTStream):
     """facebook stream class."""
 
-    # get access_token from environment file
-    #config = {"access_token": os.getenv("ACCESS_TOKEN")}
-
     # add account id in the url
+    # path and fields will be added to this url in streams.py
     url_base = "https://graph.facebook.com/v16.0/act_"
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.

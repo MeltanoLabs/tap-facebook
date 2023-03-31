@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 
 import os
 
+# properties for instream schema
 PropertiesList = th.PropertiesList
 Property = th.Property
 ObjectType = th.ObjectType
@@ -31,6 +32,16 @@ class adsinsightStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/insights.
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
     columns = [
         "account_id",
         "ad_id",
@@ -163,8 +174,14 @@ class adsinsightStream(facebookStream):
 # ads stream
 class adsStream(facebookStream):
     """
-
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
     """
+
     columns = [
         "id",
         "account_id",
@@ -305,6 +322,16 @@ class adsetsStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
     columns = [
         "id",
         "account_id",
@@ -445,6 +472,16 @@ class campaignStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group.
     """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
     columns = [
         "id",
         "account_id",
@@ -546,6 +583,19 @@ class campaignStream(facebookStream):
     ).to_dict()
 
 class creativeStream(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
     columns = ["id",
                "account_id",
                "actor_id",
