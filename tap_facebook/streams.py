@@ -105,7 +105,9 @@ class adsinsightStream(facebookStream):
     account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
     path = "{}/insights?level=ad&fields={}".format(account_id, columns)
     # schema_filepath = SCHEMAS_DIR / "ads_insights.json"
-    # TODO: test completed SDK stream
+    replication_keys = ["date_start"]
+    replication_method = "incremental"
+
     schema = PropertiesList(
         Property("clicks", StringType),
         Property("date_stop", StringType),
@@ -211,6 +213,8 @@ class adsStream(facebookStream):
     path = "{}/ads?fields={}".format(account_id, columns)
     primary_keys = ["id"]
     # schema_filepath = SCHEMAS_DIR / "ads.json"
+    replication_keys = ["updated_time"]
+    replication_method = "incremental"
 
     schema = PropertiesList(
         Property("bid_type", StringType),
@@ -312,6 +316,54 @@ class adsStream(facebookStream):
                 )
             ),
         ),
+
+        Property("placement_specific_facebook_unsafe_substances", StringType),
+        Property("placement_specific_instagram_unsafe_substances", StringType),
+        Property("global_unsafe_substances", StringType),
+        Property("placement_specific_instagram_personal_attributes", StringType),
+        Property("global_personal_attributes", StringType),
+        Property("placement_specific_facebook_personal_attributes", StringType),
+        Property("placement_specific_instagram_nonexistent_functionality", StringType),
+        Property("global_nonexistent_functionality", StringType),
+        Property("placement_specific_facebook_nonexistent_functionality", StringType),
+        Property("placement_specific_facebook_advertising_policies", StringType),
+        Property("global_advertising_policies", StringType),
+        Property("global_spyware_or_malware", StringType),
+        Property("placement_specific_instagram_spyware_or_malware", StringType),
+        Property("placement_specific_facebook_spyware_or_malware", StringType),
+        Property("placement_specific_instagram_unrealistic_outcomes", StringType),
+        Property("global_unrealistic_outcomes", StringType),
+        Property("placement_specific_facebook_unrealistic_outcomes", StringType),
+        Property("placement_specific_facebook_brand_usage_in_ads", StringType),
+        Property("global_brand_usage_in_ads", StringType),
+        Property("global_personal_health_and_appearance", StringType),
+        Property("placement_specific_facebook_personal_health_and_appearance", StringType),
+        Property("placement_specific_instagram_personal_health_and_appearance", StringType),
+        Property("placement_specific_instagram_illegal_products_or_services", StringType),
+        Property("global_illegal_products_or_services", StringType),
+        Property("placement_specific_facebook_illegal_products_or_services", StringType),
+        Property("global_non_functional_landing_page", StringType),
+        Property("placement_specific_facebook_non_functional_landing_page", StringType),
+        Property("placement_specific_instagram_non_functional_landing_page", StringType),
+        Property("placement_specific_instagram_commercial_exploitation_of_crises_and_controversial_events", StringType),
+        Property("placement_specific_facebook_commercial_exploitation_of_crises_and_controversial_events", StringType),
+        Property("global_commercial_exploitation_of_crises_and_controversial_events", StringType),
+        Property("global_discriminatory_practices", StringType),
+        Property("placement_specific_facebook_discriminatory_practices", StringType),
+        Property("global_circumventing_systems", StringType),
+        Property("placement_specific_facebook_circumventing_systems", StringType),
+        Property("placement_specific_instagram_circumventing_systems", StringType),
+        Property("placement_specific_facebook_adult_content", StringType),
+        Property("placement_specific_facebook_sensational_content", StringType),
+        Property("global_adult_content", StringType),
+        Property("global_sensational_content", StringType),
+        Property("placement_specific_instagram_adult_content", StringType),
+        Property("placement_specific_instagram_brand_usage_in_ads", StringType),
+        Property("placement_specific_instagram_sensational_content", StringType),
+        Property("placement_specific_facebook_ads_about_social_issues_elections_or_politics", StringType),
+        Property("placement_specific_instagram_ads_about_social_issues_elections_or_politics", StringType),
+        Property("global_ads_about_social_issues_elections_or_politics", StringType)
+
     ).to_dict()
 
     tap_stream_id = "ads"
@@ -395,6 +447,8 @@ class adsetsStream(facebookStream):
     account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
     path = "{}/adsets?fields={}".format(account_id, columns)
     # schema_filepath = SCHEMAS_DIR / "adsets.json"
+    replication_keys = ["updated_time"]
+    replication_method = "incremental"
 
     schema = PropertiesList(
         Property("name", StringType),
@@ -530,6 +584,9 @@ class campaignStream(facebookStream):
     path = "{}/campaigns?fields={}".format(account_id, columns)
     tap_stream_id = "campaigns"
     # schema_filepath = SCHEMAS_DIR / "campaigns.json"
+    replication_keys = ["updated_time"]
+    replication_method = "incremental"
+
     PropertiesList = th.PropertiesList
     Property = th.Property
     ObjectType = th.ObjectType
@@ -652,6 +709,8 @@ class creativeStream(facebookStream):
     path = "{}/adcreatives?fields={}".format(account_id, columns)
     tap_stream_id = "creatives"
     # schema_filepath = SCHEMAS_DIR / "creatives.json"
+    replication_keys = ["id"]
+    replication_method = "incremental"
 
     schema = PropertiesList(
         Property("id", StringType),
