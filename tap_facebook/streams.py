@@ -7,10 +7,12 @@ from pathlib import Path
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_facebook.client import facebookStream
+from singer_sdk.streams import RESTStream
 
 from dotenv import load_dotenv
 
 import os
+import json
 
 # properties for instream schema
 PropertiesList = th.PropertiesList
@@ -26,6 +28,11 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 load_dotenv(".env")
 
+def facebook_account():
+    with open(".secrets/config.json") as file:
+        config = json.load(file)
+    account = config.get("account_id")
+    return account
 
 # ads insights stream
 class adsinsightStream(facebookStream):
@@ -102,7 +109,7 @@ class adsinsightStream(facebookStream):
     ]
 
     name = "adsinsights"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/insights?level=ad&fields={}".format(account_id, columns)
     replication_keys = ["date_start"]
     replication_method = "incremental"
@@ -208,7 +215,7 @@ class adsStream(facebookStream):
     columns_remaining = ["adlabels", "recommendations"]
 
     name = "ads"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/ads?fields={}".format(account_id, columns)
     primary_keys = ["id"]
     replication_keys = ["updated_time"]
@@ -360,7 +367,10 @@ class adsStream(facebookStream):
         Property("placement_specific_instagram_sensational_content", StringType),
         Property("placement_specific_facebook_ads_about_social_issues_elections_or_politics", StringType),
         Property("placement_specific_instagram_ads_about_social_issues_elections_or_politics", StringType),
-        Property("global_ads_about_social_issues_elections_or_politics", StringType)
+        Property("global_ads_about_social_issues_elections_or_politics", StringType),
+        Property("configured_status", StringType),
+        Property("conversion_domain", StringType),
+        Property("conversion_specs", StringType),
 
     ).to_dict()
 
@@ -442,7 +452,7 @@ class adsetsStream(facebookStream):
     ]
 
     name = "adsets"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/adsets?fields={}".format(account_id, columns)
     replication_keys = ["updated_time"]
     replication_method = "incremental"
@@ -454,7 +464,6 @@ class adsetsStream(facebookStream):
         Property("campaign_attribution", StringType),
         Property("destination_type", StringType),
         Property("is_dynamic_creative", StringType),
-        Property("learning_stage_info", StringType),
         Property("lifetime_imps", StringType),
         Property("multi_optimization_goal_weight", StringType),
         Property("optimization_goal", StringType),
@@ -511,6 +520,35 @@ class adsetsStream(facebookStream):
                 )
             ),
         ),
+
+        Property(
+            "attribution_spec",
+            ArrayType(
+                ObjectType(
+                    Property("event_type", StringType),
+                    Property("window_days", IntegerType)
+                )
+            ),
+        ),
+
+        Property(
+            "learning_stage_info",
+                ObjectType(
+                    Property("attribution_windows", ArrayType(StringType)),
+                    Property("conversions", IntegerType),
+                    Property("last_sig_edit_ts", IntegerType),
+                    Property("status", StringType)
+                )
+        ),
+
+        Property("configured_status", StringType),
+        Property("asset_feed_id", StringType),
+        Property("daily_min_spend_target", StringType),
+        Property("daily_spend_cap", StringType),
+        Property("instagram_actor_id", StringType),
+        Property("review_feedback", StringType),
+        Property("rf_prediction_id", StringType)
+
     ).to_dict()
 
     #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
@@ -577,7 +615,7 @@ class campaignStream(facebookStream):
     ]
 
     name = "campaigns"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/campaigns?fields={}".format(account_id, columns)
     tap_stream_id = "campaigns"
     replication_keys = ["updated_time"]
@@ -701,7 +739,7 @@ class creativeStream(facebookStream):
                "video_id"]
 
     name = "creatives"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/adcreatives?fields={}".format(account_id, columns)
     tap_stream_id = "creatives"
     replication_keys = ["id"]
