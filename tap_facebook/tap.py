@@ -28,7 +28,6 @@ class Tapfacebook(Tap):
         th.Property(
             "access_token",
             th.StringType,
-            #required=True,
             description="The token to authenticate against the API service",
         ),
         th.Property("account_id", th.StringType, description="Account ID"),
@@ -50,7 +49,6 @@ class Tapfacebook(Tap):
         Returns,
             A list of discovered streams.
         """
-        # adstream = [streams.creativeStream(self)]
         stream_list = [stream_class(tap=self) for stream_class in STREAM_TYPES]
 
         return stream_list
