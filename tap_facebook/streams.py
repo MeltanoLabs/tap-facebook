@@ -7,10 +7,12 @@ from pathlib import Path
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_facebook.client import facebookStream
+from singer_sdk.streams import RESTStream
 
 from dotenv import load_dotenv
 
 import os
+import json
 
 # properties for instream schema
 PropertiesList = th.PropertiesList
@@ -26,6 +28,11 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 load_dotenv(".env")
 
+def facebook_account():
+    with open(".secrets/config.json") as file:
+        config = json.load(file)
+    account = config.get("account_id")
+    return account
 
 # ads insights stream
 class adsinsightStream(facebookStream):
@@ -102,7 +109,7 @@ class adsinsightStream(facebookStream):
     ]
 
     name = "adsinsights"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/insights?level=ad&fields={}".format(account_id, columns)
     # schema_filepath = SCHEMAS_DIR / "ads_insights.json"
     replication_keys = ["date_start"]
@@ -209,7 +216,7 @@ class adsStream(facebookStream):
     columns_remaining = ["adlabels", "recommendations"]
 
     name = "ads"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/ads?fields={}".format(account_id, columns)
     primary_keys = ["id"]
     # schema_filepath = SCHEMAS_DIR / "ads.json"
@@ -444,7 +451,7 @@ class adsetsStream(facebookStream):
     ]
 
     name = "adsets"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/adsets?fields={}".format(account_id, columns)
     # schema_filepath = SCHEMAS_DIR / "adsets.json"
     replication_keys = ["updated_time"]
@@ -580,7 +587,7 @@ class campaignStream(facebookStream):
     ]
 
     name = "campaigns"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/campaigns?fields={}".format(account_id, columns)
     tap_stream_id = "campaigns"
     # schema_filepath = SCHEMAS_DIR / "campaigns.json"
@@ -705,7 +712,7 @@ class creativeStream(facebookStream):
                "video_id"]
 
     name = "creatives"
-    account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
+    account_id = facebook_account()
     path = "{}/adcreatives?fields={}".format(account_id, columns)
     tap_stream_id = "creatives"
     # schema_filepath = SCHEMAS_DIR / "creatives.json"
