@@ -9,6 +9,8 @@ from singer_sdk import typing as th  # JSON Schema typing helpers
 from tap_facebook.client import facebookStream
 from singer_sdk.streams import RESTStream
 
+from dotenv import load_dotenv
+
 import os
 import json
 
@@ -24,6 +26,7 @@ IntegerType = th.IntegerType
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
+load_dotenv(".env")
 
 def facebook_account():
     with open(".secrets/config.json") as file:
@@ -366,7 +369,10 @@ class adsStream(facebookStream):
         Property("placement_specific_instagram_sensational_content", StringType),
         Property("placement_specific_facebook_ads_about_social_issues_elections_or_politics", StringType),
         Property("placement_specific_instagram_ads_about_social_issues_elections_or_politics", StringType),
-        Property("global_ads_about_social_issues_elections_or_politics", StringType)
+        Property("global_ads_about_social_issues_elections_or_politics", StringType),
+        Property("configured_status", StringType),
+        Property("conversion_domain", StringType),
+        Property("conversion_specs", StringType),
 
     ).to_dict()
 
@@ -461,7 +467,6 @@ class adsetsStream(facebookStream):
         Property("campaign_attribution", StringType),
         Property("destination_type", StringType),
         Property("is_dynamic_creative", StringType),
-        Property("learning_stage_info", StringType),
         Property("lifetime_imps", StringType),
         Property("multi_optimization_goal_weight", StringType),
         Property("optimization_goal", StringType),
@@ -518,6 +523,35 @@ class adsetsStream(facebookStream):
                 )
             ),
         ),
+
+        Property(
+            "attribution_spec",
+            ArrayType(
+                ObjectType(
+                    Property("event_type", StringType),
+                    Property("window_days", IntegerType)
+                )
+            ),
+        ),
+
+        Property(
+            "learning_stage_info",
+                ObjectType(
+                    Property("attribution_windows", ArrayType(StringType)),
+                    Property("conversions", IntegerType),
+                    Property("last_sig_edit_ts", IntegerType),
+                    Property("status", StringType)
+                )
+        ),
+
+        Property("configured_status", StringType),
+        Property("asset_feed_id", StringType),
+        Property("daily_min_spend_target", StringType),
+        Property("daily_spend_cap", StringType),
+        Property("instagram_actor_id", StringType),
+        Property("review_feedback", StringType),
+        Property("rf_prediction_id", StringType)
+
     ).to_dict()
 
     #   TODO: ADD TARGETING COLUMNS TO ADSETS
