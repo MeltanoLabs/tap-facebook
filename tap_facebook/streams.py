@@ -104,7 +104,6 @@ class adsinsightStream(facebookStream):
     name = "adsinsights"
     account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
     path = "{}/insights?level=ad&fields={}".format(account_id, columns)
-    # schema_filepath = SCHEMAS_DIR / "ads_insights.json"
     replication_keys = ["date_start"]
     replication_method = "incremental"
 
@@ -212,7 +211,6 @@ class adsStream(facebookStream):
     account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
     path = "{}/ads?fields={}".format(account_id, columns)
     primary_keys = ["id"]
-    # schema_filepath = SCHEMAS_DIR / "ads.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -446,7 +444,6 @@ class adsetsStream(facebookStream):
     name = "adsets"
     account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
     path = "{}/adsets?fields={}".format(account_id, columns)
-    # schema_filepath = SCHEMAS_DIR / "adsets.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -583,7 +580,6 @@ class campaignStream(facebookStream):
     account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
     path = "{}/campaigns?fields={}".format(account_id, columns)
     tap_stream_id = "campaigns"
-    # schema_filepath = SCHEMAS_DIR / "campaigns.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -708,7 +704,6 @@ class creativeStream(facebookStream):
     account_id = os.getenv("TAP_FACEBOOK_ACCOUNT_ID")
     path = "{}/adcreatives?fields={}".format(account_id, columns)
     tap_stream_id = "creatives"
-    # schema_filepath = SCHEMAS_DIR / "creatives.json"
     replication_keys = ["id"]
     replication_method = "incremental"
 
