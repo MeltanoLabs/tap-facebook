@@ -17,7 +17,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class facebookStream(RESTStream):
     """facebook stream class."""
 
-    # add account id in the url
+    # TODO account ID parsed into URL within streams.py, consider moving to url_base
     # path and fields will be added to this url in streams.py
     url_base = "https://graph.facebook.com/v16.0/act_"
 
