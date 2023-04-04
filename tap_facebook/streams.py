@@ -9,8 +9,6 @@ from singer_sdk import typing as th  # JSON Schema typing helpers
 from tap_facebook.client import facebookStream
 from singer_sdk.streams import RESTStream
 
-from dotenv import load_dotenv
-
 import os
 import json
 
@@ -26,7 +24,6 @@ IntegerType = th.IntegerType
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
-load_dotenv(".env")
 
 def facebook_account():
     with open(".secrets/config.json") as file:
