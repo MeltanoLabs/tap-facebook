@@ -23,12 +23,6 @@ IntegerType = th.IntegerType
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
-def facebook_account():
-    with open(".secrets/config.json") as file:
-        config = json.load(file)
-    account = config.get("account_id")
-    return account
-
 # ads insights stream
 class adsinsightStream(facebookStream):
     """
@@ -104,7 +98,8 @@ class adsinsightStream(facebookStream):
     ]
 
     name = "adsinsights"
-    account_id = facebook_account()
+    # TODO: switching from config.json to meltano.yml
+    account_id = self.config.get("account_id")
     path = "{}/insights?level=ad&fields={}".format(account_id, columns)
     replication_keys = ["date_start"]
     replication_method = "incremental"
@@ -210,7 +205,8 @@ class adsStream(facebookStream):
     columns_remaining = ["adlabels", "recommendations"]
 
     name = "ads"
-    account_id = facebook_account()
+    # TODO: switching from config.json to meltano.yml
+    account_id = self.config.get("account_id")
     path = "{}/ads?fields={}".format(account_id, columns)
     primary_keys = ["id"]
     replication_keys = ["updated_time"]
@@ -447,7 +443,8 @@ class adsetsStream(facebookStream):
     ]
 
     name = "adsets"
-    account_id = facebook_account()
+    # TODO: switching from config.json to meltano.yml
+    account_id = self.config.get("account_id")
     path = "{}/adsets?fields={}".format(account_id, columns)
     replication_keys = ["updated_time"]
     replication_method = "incremental"
@@ -610,7 +607,8 @@ class campaignStream(facebookStream):
     ]
 
     name = "campaigns"
-    account_id = facebook_account()
+    # TODO: switching from config.json to meltano.yml
+    account_id = self.config.get("account_id")
     path = "{}/campaigns?fields={}".format(account_id, columns)
     tap_stream_id = "campaigns"
     replication_keys = ["updated_time"]
@@ -734,7 +732,8 @@ class creativeStream(facebookStream):
                "video_id"]
 
     name = "creatives"
-    account_id = facebook_account()
+    # TODO: switching from config.json to meltano.yml
+    account_id = self.config.get("account_id")
     path = "{}/adcreatives?fields={}".format(account_id, columns)
     tap_stream_id = "creatives"
     replication_keys = ["id"]
