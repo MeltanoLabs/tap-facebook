@@ -23,6 +23,8 @@ plugins:
       kind: date_iso8601
     - name: account_id
       value: ${TAP_FACEBOOK_ACCOUNT_ID}
+    - name: api_version
+      value: ${TAP_FACEBOOK_VERSION}
     config:
       insights_buffer_days: 7
   - name: facebook-ads
