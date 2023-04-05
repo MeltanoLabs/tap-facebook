@@ -82,7 +82,7 @@ class adsinsightStream(facebookStream):
         "ctr",
     ]
 
-    #   TODO: MISSING DATA
+    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
 
     columns_remaining = [
         "unique_actions",
@@ -98,9 +98,11 @@ class adsinsightStream(facebookStream):
     ]
 
     name = "adsinsights"
-    # TODO: switching from config.json to meltano.yml
-    account_id = self.config.get("account_id")
-    path = "{}/insights?level=ad&fields={}".format(account_id, columns)
+
+    #account_id = facebook_account()
+    path = "/insights?level=ad&fields={}".format(columns)
+    # schema_filepath = SCHEMAS_DIR / "ads_insights.json"
+
     replication_keys = ["date_start"]
     replication_method = "incremental"
 
@@ -168,6 +170,30 @@ class adsinsightStream(facebookStream):
     tap_stream_id = "adsinsights"
     # replication_key = "created_time"
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
 
 # ads stream
 class adsStream(facebookStream):
@@ -200,14 +226,15 @@ class adsStream(facebookStream):
         "recommendations",
     ]
 
-    #   TODO: MISSING DATA
+    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
 
     columns_remaining = ["adlabels", "recommendations"]
 
     name = "ads"
-    # TODO: switching from config.json to meltano.yml
-    account_id = self.config.get("account_id")
-    path = "{}/ads?fields={}".format(account_id, columns)
+
+    #account_id = facebook_account()
+    path = "/ads?fields={}".format(columns)
+
     primary_keys = ["id"]
     replication_keys = ["updated_time"]
     replication_method = "incremental"
@@ -367,6 +394,30 @@ class adsStream(facebookStream):
 
     tap_stream_id = "ads"
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
 
 # adsets stream
 class adsetsStream(facebookStream):
@@ -414,7 +465,7 @@ class adsetsStream(facebookStream):
         "status",
     ]
 
-    #   TODO: MISSING DATA
+    #   TODO: #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
 
     columns_remaining = [
         "adlabels",
@@ -443,9 +494,10 @@ class adsetsStream(facebookStream):
     ]
 
     name = "adsets"
-    # TODO: switching from config.json to meltano.yml
-    account_id = self.config.get("account_id")
-    path = "{}/adsets?fields={}".format(account_id, columns)
+
+    #account_id = facebook_account()
+    path = "/adsets?fields={}".format(columns)
+    # schema_filepath = SCHEMAS_DIR / "adsets.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -547,6 +599,30 @@ class adsetsStream(facebookStream):
 
     tap_stream_id = "adsets"
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
 
 # campaigns stream
 class campaignStream(facebookStream):
@@ -594,7 +670,7 @@ class campaignStream(facebookStream):
         "pacing_type",
     ]
 
-    #   TODO: MISSING DATA
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
     columns_remaining = [
         "ad_strategy_group_id",
         "ad_strategy_id",
@@ -607,9 +683,9 @@ class campaignStream(facebookStream):
     ]
 
     name = "campaigns"
-    # TODO: switching from config.json to meltano.yml
-    account_id = self.config.get("account_id")
-    path = "{}/campaigns?fields={}".format(account_id, columns)
+
+    #account_id = facebook_account()
+    path = "/campaigns?fields={}".format(columns)
     tap_stream_id = "campaigns"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
@@ -665,6 +741,30 @@ class campaignStream(facebookStream):
             ),
         ),
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
 
 class creativeStream(facebookStream):
     """
@@ -732,9 +832,8 @@ class creativeStream(facebookStream):
                "video_id"]
 
     name = "creatives"
-    # TODO: switching from config.json to meltano.yml
-    account_id = self.config.get("account_id")
-    path = "{}/adcreatives?fields={}".format(account_id, columns)
+    #account_id = facebook_account()
+    path = "/adcreatives?fields={}".format(columns)
     tap_stream_id = "creatives"
     replication_keys = ["id"]
     replication_method = "incremental"
@@ -792,3 +891,27 @@ class creativeStream(facebookStream):
         Property("video_id", StringType)
 
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params

@@ -17,9 +17,15 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class facebookStream(RESTStream):
     """facebook stream class."""
 
-    # TODO account ID parsed into URL within streams.py, consider moving to url_base
-    # path and fields will be added to this url in streams.py
-    url_base = "https://graph.facebook.com/v16.0/act_"
+    # add account id in the url
+    # path and fields will be added to this url in streams.pys
+
+    @property
+    def url_base(self):
+        version = self.config.get("api_version", "")
+        account_id = self.config.get("account_id", "")
+        base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
+        return base_url
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = (
