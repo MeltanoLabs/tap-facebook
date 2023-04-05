@@ -82,7 +82,7 @@ class adsinsightStream(facebookStream):
         "ctr",
     ]
 
-    #   TODO: MISSING DATA
+    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
 
     columns_remaining = [
         "unique_actions",
@@ -226,7 +226,7 @@ class adsStream(facebookStream):
         "recommendations",
     ]
 
-    #   TODO: MISSING DATA
+    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
 
     columns_remaining = ["adlabels", "recommendations"]
 
@@ -465,7 +465,7 @@ class adsetsStream(facebookStream):
         "status",
     ]
 
-    #   TODO: MISSING DATA
+    #   TODO: #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
 
     columns_remaining = [
         "adlabels",
@@ -670,7 +670,7 @@ class campaignStream(facebookStream):
         "pacing_type",
     ]
 
-    #   TODO: MISSING DATA
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
     columns_remaining = [
         "ad_strategy_group_id",
         "ad_strategy_id",
