@@ -23,7 +23,6 @@ IntegerType = th.IntegerType
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
-
 # ads insights stream
 class adsinsightStream(facebookStream):
     """
@@ -83,7 +82,7 @@ class adsinsightStream(facebookStream):
         "ctr",
     ]
 
-    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
+    #   TODO: MISSING DATA
 
     columns_remaining = [
         "unique_actions",
@@ -99,9 +98,11 @@ class adsinsightStream(facebookStream):
     ]
 
     name = "adsinsights"
+
     #account_id = facebook_account()
     path = "/insights?level=ad&fields={}".format(columns)
     # schema_filepath = SCHEMAS_DIR / "ads_insights.json"
+
     replication_keys = ["date_start"]
     replication_method = "incremental"
 
@@ -225,15 +226,16 @@ class adsStream(facebookStream):
         "recommendations",
     ]
 
-    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
+    #   TODO: MISSING DATA
 
     columns_remaining = ["adlabels", "recommendations"]
 
     name = "ads"
+
     #account_id = facebook_account()
     path = "/ads?fields={}".format(columns)
+
     primary_keys = ["id"]
-    # schema_filepath = SCHEMAS_DIR / "ads.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -463,7 +465,7 @@ class adsetsStream(facebookStream):
         "status",
     ]
 
-    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
+    #   TODO: MISSING DATA
 
     columns_remaining = [
         "adlabels",
@@ -492,6 +494,7 @@ class adsetsStream(facebookStream):
     ]
 
     name = "adsets"
+
     #account_id = facebook_account()
     path = "/adsets?fields={}".format(columns)
     # schema_filepath = SCHEMAS_DIR / "adsets.json"
@@ -592,7 +595,7 @@ class adsetsStream(facebookStream):
 
     ).to_dict()
 
-    #   TODO: ADD TARGETING COLUMNS TO ADSETS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
 
     tap_stream_id = "adsets"
 
@@ -667,7 +670,7 @@ class campaignStream(facebookStream):
         "pacing_type",
     ]
 
-    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
+    #   TODO: MISSING DATA
     columns_remaining = [
         "ad_strategy_group_id",
         "ad_strategy_id",
@@ -680,10 +683,10 @@ class campaignStream(facebookStream):
     ]
 
     name = "campaigns"
+
     #account_id = facebook_account()
     path = "/campaigns?fields={}".format(columns)
     tap_stream_id = "campaigns"
-    # schema_filepath = SCHEMAS_DIR / "campaigns.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -832,7 +835,6 @@ class creativeStream(facebookStream):
     #account_id = facebook_account()
     path = "/adcreatives?fields={}".format(columns)
     tap_stream_id = "creatives"
-    # schema_filepath = SCHEMAS_DIR / "creatives.json"
     replication_keys = ["id"]
     replication_method = "incremental"
 
