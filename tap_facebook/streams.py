@@ -9,8 +9,6 @@ from singer_sdk import typing as th  # JSON Schema typing helpers
 from tap_facebook.client import facebookStream
 from singer_sdk.streams import RESTStream
 
-from dotenv import load_dotenv
-
 import os
 import json
 
@@ -26,13 +24,6 @@ IntegerType = th.IntegerType
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
-load_dotenv(".env")
-
-def facebook_account():
-    with open(".secrets/config.json") as file:
-        config = json.load(file)
-    account = config.get("account_id")
-    return account
 
 # ads insights stream
 class adsinsightStream(facebookStream):
@@ -109,8 +100,8 @@ class adsinsightStream(facebookStream):
     ]
 
     name = "adsinsights"
-    account_id = facebook_account()
-    path = "{}/insights?level=ad&fields={}".format(account_id, columns)
+    #account_id = facebook_account()
+    path = "/insights?level=ad&fields={}".format(columns)
     # schema_filepath = SCHEMAS_DIR / "ads_insights.json"
     replication_keys = ["date_start"]
     replication_method = "incremental"
@@ -179,6 +170,30 @@ class adsinsightStream(facebookStream):
     tap_stream_id = "adsinsights"
     # replication_key = "created_time"
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
 
 # ads stream
 class adsStream(facebookStream):
@@ -216,8 +231,8 @@ class adsStream(facebookStream):
     columns_remaining = ["adlabels", "recommendations"]
 
     name = "ads"
-    account_id = facebook_account()
-    path = "{}/ads?fields={}".format(account_id, columns)
+    #account_id = facebook_account()
+    path = "/ads?fields={}".format(columns)
     primary_keys = ["id"]
     # schema_filepath = SCHEMAS_DIR / "ads.json"
     replication_keys = ["updated_time"]
@@ -378,6 +393,30 @@ class adsStream(facebookStream):
 
     tap_stream_id = "ads"
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
 
 # adsets stream
 class adsetsStream(facebookStream):
@@ -454,8 +493,8 @@ class adsetsStream(facebookStream):
     ]
 
     name = "adsets"
-    account_id = facebook_account()
-    path = "{}/adsets?fields={}".format(account_id, columns)
+    #account_id = facebook_account()
+    path = "/adsets?fields={}".format(columns)
     # schema_filepath = SCHEMAS_DIR / "adsets.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
@@ -558,6 +597,30 @@ class adsetsStream(facebookStream):
 
     tap_stream_id = "adsets"
 
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
 
 # campaigns stream
 class campaignStream(facebookStream):
@@ -618,8 +681,8 @@ class campaignStream(facebookStream):
     ]
 
     name = "campaigns"
-    account_id = facebook_account()
-    path = "{}/campaigns?fields={}".format(account_id, columns)
+    #account_id = facebook_account()
+    path = "/campaigns?fields={}".format(columns)
     tap_stream_id = "campaigns"
     # schema_filepath = SCHEMAS_DIR / "campaigns.json"
     replication_keys = ["updated_time"]
@@ -676,6 +739,30 @@ class campaignStream(facebookStream):
             ),
         ),
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
 
 class creativeStream(facebookStream):
     """
@@ -743,8 +830,8 @@ class creativeStream(facebookStream):
                "video_id"]
 
     name = "creatives"
-    account_id = facebook_account()
-    path = "{}/adcreatives?fields={}".format(account_id, columns)
+    #account_id = facebook_account()
+    path = "/adcreatives?fields={}".format(columns)
     tap_stream_id = "creatives"
     # schema_filepath = SCHEMAS_DIR / "creatives.json"
     replication_keys = ["id"]
@@ -803,3 +890,27 @@ class creativeStream(facebookStream):
         Property("video_id", StringType)
 
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args,
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns,
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
