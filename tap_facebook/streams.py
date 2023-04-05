@@ -9,7 +9,6 @@ from singer_sdk import typing as th  # JSON Schema typing helpers
 from tap_facebook.client import facebookStream
 from singer_sdk.streams import RESTStream
 
-import os
 import json
 
 # properties for instream schema
