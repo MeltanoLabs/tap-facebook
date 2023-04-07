@@ -24,7 +24,7 @@ plugins:
     - name: account_id
       value: ${TAP_FACEBOOK_ACCOUNT_ID}
     - name: api_version
-      value: ${TAP_FACEBOOK_VERSION}
+      value: 'v16.0'
     config:
       insights_buffer_days: 7
   - name: facebook-ads
