@@ -13,7 +13,7 @@ from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from os import environ
 
 import requests, json
-import backoff, 
+import backoff
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -32,7 +32,7 @@ class facebookStream(RESTStream):
         if version and account_id:
             base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
         else:
-            account_id = environ.get("account_id")
+            account_id = environ.get()
             base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)    
         return base_url
 
