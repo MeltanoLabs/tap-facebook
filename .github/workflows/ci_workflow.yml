@@ -5,6 +5,11 @@ name: Test tap-facebook
 
 on: [push]
 
+env:
+  access_token: ${{ secrets.access_token }}
+  account_id: ${{ secrets.account_id }}
+  api_version: ${{ secrets.api_version }}
+
 jobs:
   linting:
 
@@ -57,8 +62,5 @@ jobs:
       id: test_pytest
       continue-on-error: true
       run: |
-        export access_token=${{ secrets.access_token }}
-        export account_id=${{ secrets.account_id }}
-        export api_version=${{ secrets.api_version }}
         echo "$account_id"
         poetry run pytest --capture=no
