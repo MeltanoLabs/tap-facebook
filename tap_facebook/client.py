@@ -29,7 +29,7 @@ class facebookStream(RESTStream):
     def url_base(self):
         version = self.config.get("api_version", "")
         account_id = self.config.get("account_id", "")
-        if version and account_id:
+        if version is not None and account_id is not None:
             base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
         else:
             version = environ.get("API_VERSION")
@@ -51,7 +51,7 @@ class facebookStream(RESTStream):
         Returns,
             An authenticator instance.
         """
-        if self.config.get("access_token", ""):
+        if self.config.get("access_token", "") is not None:
             access_token = self.config.get("access_token", "")
         else:
             access_token = environ.get("ACCESS_TOKEN")    
