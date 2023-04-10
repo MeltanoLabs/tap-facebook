@@ -5,11 +5,6 @@ name: Test tap-facebook
 
 on: [push]
 
-env:
-  access_token: ${{ secrets.access_token }}
-  account_id: ${{ secrets.account_id }}
-  api_version: ${{ secrets.api_version }}
-
 jobs:
   linting:
 
@@ -61,6 +56,9 @@ jobs:
     - name: Test with pytest
       id: test_pytest
       continue-on-error: true
+      env:
+         access_token: ${{ secrets.access_token }}
+         account_id: ${{ secrets.account_id }}
+         api_version: ${{ secrets.api_version }}   
       run: |
-        echo "$account_id"
         poetry run pytest --capture=no
