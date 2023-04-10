@@ -54,10 +54,14 @@ jobs:
       run: |
         poetry install
     - name: Test with config
-      with:
+      env:
          access_token: ${{ secrets.access_token }}
          account_id: ${{ secrets.account_id }}
-         api_version: ${{ secrets.api_version }}      
+         api_version: ${{ secrets.api_version }}
+      run: |
+        poetry secret add access_token "$access_token"
+        poetry secret add account_id "$account_id"
+        poetry secret add api_version "$api_version"
     - name: Test with pytest
       env:
          access_token: ${{ secrets.access_token }}
