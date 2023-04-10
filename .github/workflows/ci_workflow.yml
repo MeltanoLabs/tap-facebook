@@ -53,11 +53,12 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install
-    - name: Test with pytest
+    - name: Test with config
       with:
          access_token: ${{ secrets.access_token }}
          account_id: ${{ secrets.account_id }}
-         api_version: ${{ secrets.api_version }}
+         api_version: ${{ secrets.api_version }}      
+    - name: Test with pytest
       env:
          access_token: ${{ secrets.access_token }}
          account_id: ${{ secrets.account_id }}
