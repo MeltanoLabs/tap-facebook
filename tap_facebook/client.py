@@ -7,8 +7,12 @@ from typing import Any, Callable, Iterable
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
+from urllib.parse import parse_qs, urlparse
+from dateutil.parser import parse
+from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 import requests, json
+import backoff
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -31,6 +35,8 @@ class facebookStream(RESTStream):
     next_page_token_jsonpath = (
         "$.paging.cursors.after"  # Or override `get_next_page_token`.
     )
+
+    tolerated_http_errors: List[int] = []
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -111,6 +117,62 @@ class facebookStream(RESTStream):
         """
         return None
 
+    def validate_response(self, response: requests.Response) -> None:
+        """Validate HTTP response.
+        Raises:
+            FatalAPIError: If the request is not retriable.
+            RetriableAPIError: If the request is retriable.
+        """
+        full_path = urlparse(response.url).path
+        if response.status_code in self.tolerated_http_errors:
+            msg = (
+                f"{response.status_code} Tolerated Status Code "
+                f"(Reason: {response.reason}) for path: {full_path}"
+            )
+            self.logger.info(msg)
+            return
+
+        if 400 <= response.status_code < 500:
+            msg = (
+                f"{response.status_code} Client Error: "
+                f"{str(response.content)} (Reason: {response.reason}) for path: {full_path}"
+            )
+            # Retry on reaching rate limit
+            if (
+                    response.status_code == 403
+                    and "rate limit exceeded" in str(response.content).lower()
+            ):
+                # Update token
+                self.authenticator.get_next_auth_token()
+                # Raise an error to force a retry with the new token.
+                raise RetriableAPIError(msg, response)
+
+            # Retry on reaching second rate limit
+            if (
+                    response.status_code == 403
+                    and "secondary rate limit" in str(response.content).lower()
+            ):
+                # Wait about a minute and retry
+                time.sleep(60 + 30 * random.random())
+                raise RetriableAPIError(msg, response)
+
+            # The GitHub API randomly returns 401 Unauthorized errors, so we try again.
+            if (
+                    response.status_code == 401
+                    # if the token is invalid, we are also told about it
+                    and not "bad credentials" in str(response.content).lower()
+            ):
+                raise RetriableAPIError(msg, response)
+
+            raise FatalAPIError(msg)
+
+        elif 500 <= response.status_code < 600:
+            msg = (
+                f"{response.status_code} Server Error: "
+                f"{str(response.content)} (Reason: {response.reason}) for path: {full_path}"
+            )
+            raise RetriableAPIError(msg, response)
+
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
@@ -121,3 +183,8 @@ class facebookStream(RESTStream):
             Each record from the source.
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
+
+    def backoff_wait_generator(self) -> Callable[..., Generator[int, Any, None]]:
+        return backoff.constant(interval=1)
+    
+

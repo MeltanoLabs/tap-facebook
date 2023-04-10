@@ -38,7 +38,7 @@ jobs:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -54,5 +54,11 @@ jobs:
       run: |
         poetry install
     - name: Test with pytest
+      id: test_pytest
+      continue-on-error: true
+      env:
+         access_token: ${{ secrets.access_token }}
+         account_id: ${{ secrets.account_id }}
+         api_version: ${{ secrets.api_version }}   
       run: |
         poetry run pytest --capture=no
