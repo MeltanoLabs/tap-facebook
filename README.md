@@ -44,7 +44,7 @@ Create a config.json file in the secrets folder of the tap-facebook-sdk director
 - [ ] `access_token:` access token for bearer authentication
 
 
-### Environment VAriables
+### Environment Variables
 
 Create a .env file and add the following variables to id:
 
@@ -57,7 +57,46 @@ Create a .env file and add the following variables to id:
 - [ ] `TARGET_SNOWFLAKE_ROLE:` snowflake role
 - [ ] `TARGET_SNOWFLAKE_FILE_FORMAT:` snowflake output file format
 - [ ] `TARGET_SNOWFLAKE_PRIMARY_KEY_REQUIRED` you can set this to false if not all tables have primary key
+- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account id
+- [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
 
+
+### Meltano Variables
+
+These are the variables you have in meltano template:
+
+- [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
+- [ ] `start_date:` start date
+- [ ] `end_date:` end_date 
+- [ ] `account_id:` account id from TAP_FACEBOOK_ACCOUNT_ID variable
+- [ ] `api_version:` api version
+- [ ] `TAP_FACEBOOK_SCHEMA:` streams schema
+
+
+### Replication Keys
+
+These are the replication keys we have for facebook streams:
+
+- [ ] `ads:` updated_time
+- [ ] `ads insights:` date_start
+- [ ] `adsets:` updated_time
+- [ ] `campaigns:` updated_time
+- [ ] `creative:` id
+
+### Primary Keys
+
+These are the primary keys we have for facebook streams:
+
+- [ ] `ads:` updated_time
+- [ ] `ads insights:` date_start
+- [ ] `adsets:` updated_time
+- [ ] `campaigns:` updated_time
+- [ ] `creative:` id
+
+
+### Authentication
+
+We have BearerTokenAuthenticator in client.py for authentication
 
 ## Usage
 
