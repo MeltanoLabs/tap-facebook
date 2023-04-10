@@ -10,9 +10,10 @@ from singer_sdk.streams import RESTStream
 from urllib.parse import parse_qs, urlparse
 from dateutil.parser import parse
 from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
+from os import environ
 
 import requests, json
-import backoff
+import backoff, 
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -31,8 +32,7 @@ class facebookStream(RESTStream):
         if version and account_id:
             base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
         else:
-            version = "v16.0"
-            account_id = "dhevdde"
+            account_id = environ.get("account_id")
             base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)    
         return base_url
 
