@@ -32,7 +32,7 @@ class facebookStream(RESTStream):
         if version and account_id:
             base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
         else:
-            account_id = environ.get()
+            account_id = environ.get("account_id")
             base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)    
         return base_url
 
