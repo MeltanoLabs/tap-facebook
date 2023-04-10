@@ -10,7 +10,6 @@ from singer_sdk.streams import RESTStream
 from urllib.parse import parse_qs, urlparse
 from dateutil.parser import parse
 from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
-from os import environ
 
 import requests, json
 import backoff
@@ -29,12 +28,7 @@ class facebookStream(RESTStream):
     def url_base(self):
         version = self.config.get("api_version", "")
         account_id = self.config.get("account_id", "")
-        if version and account_id:
-            base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
-        else:
-            account_id = environ.get("account_id")
-            version = environ.get("api_version")
-            base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)    
+        base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
         return base_url
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.

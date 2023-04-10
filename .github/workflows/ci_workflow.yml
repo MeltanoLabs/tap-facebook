@@ -61,5 +61,7 @@ jobs:
          account_id: ${{ secrets.account_id }}
          api_version: ${{ secrets.api_version }}   
       run: |
-        export account_id="ey23843824"
+        export access_token=${access_token}
+        export account_id=${account_id}
+        export api_version=${api_version}
         poetry run pytest --capture=no
