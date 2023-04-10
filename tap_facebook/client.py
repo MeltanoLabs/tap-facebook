@@ -51,9 +51,13 @@ class facebookStream(RESTStream):
         Returns,
             An authenticator instance.
         """
+        if self.config.get("access_token", ""):
+            access_token = self.config.get("access_token", "")
+        else:
+            access_token = environ.get("ACCESS_TOKEN")    
         return BearerTokenAuthenticator.create_for_stream(
             self,
-            token=self.config.get("access_token", ""),
+            token=access_token,
         )
 
     def get_next_page_token(
