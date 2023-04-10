@@ -83,16 +83,6 @@ These are the replication keys we have for facebook streams:
 - [ ] `campaigns:` updated_time
 - [ ] `creative:` id
 
-### Primary Keys
-
-These are the primary keys we have for facebook streams:
-
-- [ ] `ads:` updated_time
-- [ ] `ads insights:` date_start
-- [ ] `adsets:` updated_time
-- [ ] `campaigns:` updated_time
-- [ ] `creative:` id
-
 
 ### Authentication
 
