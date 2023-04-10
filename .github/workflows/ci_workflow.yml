@@ -36,9 +36,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      access_token: ${{ secrets.access_token }}
-      account_id: ${{ secrets.account_id }}
-      api_version: ${{ secrets.api_version }}
     strategy:
       matrix:
         python-version: [3.9]
@@ -64,4 +61,5 @@ jobs:
          account_id: ${{ secrets.account_id }}
          api_version: ${{ secrets.api_version }}   
       run: |
+        export account_id="ey23843824"
         poetry run pytest --capture=no
