@@ -7,19 +7,20 @@ from pathlib import Path
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_facebook.client import facebookStream
-from singer_sdk.streams import RESTStream
-
 import json
 
-# properties for instream schema
-PropertiesList = th.PropertiesList
-Property = th.Property
-ObjectType = th.ObjectType
-DateTimeType = th.DateTimeType
-StringType = th.StringType
-ArrayType = th.ArrayType
-BooleanType = th.BooleanType
-IntegerType = th.IntegerType
+from singer_sdk.streams import RESTStream
+
+from singer_sdk.typing import (
+    PropertiesList,
+    Property,
+    ObjectType,
+    DateTimeType,
+    StringType,
+    ArrayType,
+    BooleanType,
+    IntegerType,
+)
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
