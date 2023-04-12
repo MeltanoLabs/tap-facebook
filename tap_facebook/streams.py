@@ -178,11 +178,11 @@ class adsinsightStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -402,11 +402,11 @@ class adsStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -607,11 +607,11 @@ class adsetsStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -750,11 +750,11 @@ class campaignStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -900,11 +900,11 @@ class creativeStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}

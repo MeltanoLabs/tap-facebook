@@ -46,7 +46,7 @@ class Tapfacebook(Tap):
     def discover_streams(self) -> list[streams.facebookStream]:
         """Return a list of discovered streams.
 
-        Returns,
+        Returns:
             A list of discovered streams.
         """
         stream_list = [stream_class(tap=self) for stream_class in STREAM_TYPES]
