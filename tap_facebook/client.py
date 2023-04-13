@@ -173,6 +173,7 @@ class facebookStream(RESTStream):
             )
             raise RetriableAPIError(msg, response)
 
+    # TODO: CONFIRM WE DONT NEED THE PARSE_RESPONSE FUNCTION
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
