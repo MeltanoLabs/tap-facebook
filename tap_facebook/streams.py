@@ -100,9 +100,7 @@ class adsinsightStream(facebookStream):
 
     name = "adsinsights"
 
-    #account_id = facebook_account()
     path = "/insights?level=ad&fields={}".format(columns)
-    # schema_filepath = SCHEMAS_DIR / "ads_insights.json"
 
     replication_keys = ["date_start"]
     replication_method = "incremental"
@@ -233,7 +231,6 @@ class adsStream(facebookStream):
 
     name = "ads"
 
-    #account_id = facebook_account()
     path = "/ads?fields={}".format(columns)
 
     primary_keys = ["id"]
@@ -496,9 +493,7 @@ class adsetsStream(facebookStream):
 
     name = "adsets"
 
-    #account_id = facebook_account()
     path = "/adsets?fields={}".format(columns)
-    # schema_filepath = SCHEMAS_DIR / "adsets.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -685,7 +680,6 @@ class campaignStream(facebookStream):
 
     name = "campaigns"
 
-    #account_id = facebook_account()
     path = "/campaigns?fields={}".format(columns)
     tap_stream_id = "campaigns"
     replication_keys = ["updated_time"]
@@ -833,7 +827,6 @@ class creativeStream(facebookStream):
                "video_id"]
 
     name = "creatives"
-    #account_id = facebook_account()
     path = "/adcreatives?fields={}".format(columns)
     tap_stream_id = "creatives"
     replication_keys = ["id"]
