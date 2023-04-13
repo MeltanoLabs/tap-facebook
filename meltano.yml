@@ -26,26 +26,6 @@ plugins:
       value: 'v16.0'
     config:
       insights_buffer_days: 7
-  - name: facebook-ads
-    inherit_from: tap-facebook
-    select:
-    - ads.*
-  - name: facebook-ads-insights
-    inherit_from: tap-facebook
-    select:
-    - adsinsights.*
-  - name: facebook-adsets
-    inherit_from: tap-facebook
-    select:
-    - adsets.*
-  - name: facebook-campaigns
-    inherit_from: tap-facebook
-    select:
-    - campaigns.*
-  - name: facebook-creatives
-    inherit_from: tap-facebook
-    select:
-    - creatives.*
   loaders:
   - name: target-csv
     variant: hotgluexyz
