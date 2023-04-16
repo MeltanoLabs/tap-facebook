@@ -13,6 +13,7 @@ from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 import requests, json
 import backoff
+import time
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -139,12 +140,25 @@ class facebookStream(RESTStream):
             )
             # Retry on reaching rate limit
             if (
-                    response.status_code == 403
-                    and "rate limit exceeded" in str(response.content).lower()
+                    response.status_code == 400
+                    and "too many calls" in str(response.content).lower()
             ):
                 # Update token
-                self.authenticator.get_next_auth_token()
+                #self.authenticator.get_next_auth_token()
                 # Raise an error to force a retry with the new token.
+
+                waitTime = 100
+                self.logger.info(
+                    f"API Limit reached, waiting {waitTime} seconds and will try again."
+                )
+                if waitTime > 120:
+                    self.logger.warning(
+                        "Wait time is more than 2 minutes, Waiting 60s and trying again."
+                    )
+                    time.sleep(60)
+                else:
+                    time.sleep(waitTime)
+
                 raise RetriableAPIError(msg, response)
 
             # Retry on reaching second rate limit
@@ -187,4 +201,12 @@ class facebookStream(RESTStream):
     def backoff_wait_generator(self) -> Callable[..., Generator[int, Any, None]]:
         return backoff.constant(interval=1)
     
+    def backoff_max_tries(self) -> int:
+        """The number of attempts before giving up when retrying requests.
 
+        Setting to None will retry indefinetely.
+
+        Returns:
+            int: limit
+        """
+        return 1000
