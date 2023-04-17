@@ -147,15 +147,15 @@ class facebookStream(RESTStream):
                 #self.authenticator.get_next_auth_token()
                 # Raise an error to force a retry with the new token.
 
-                waitTime = 100
+                waitTime = 200
                 self.logger.info(
                     f"API Limit reached, waiting {waitTime} seconds and will try again."
                 )
                 if waitTime > 120:
                     self.logger.warning(
-                        "Wait time is more than 2 minutes, Waiting 60s and trying again."
+                        "Wait time is more than 2 minutes, Waiting 200s and trying again."
                     )
-                    time.sleep(60)
+                    time.sleep(200)
                 else:
                     time.sleep(waitTime)
 
