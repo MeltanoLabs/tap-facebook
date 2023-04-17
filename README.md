@@ -48,15 +48,6 @@ Create a config.json file in the secrets folder of the tap-facebook-sdk director
 
 Create a .env file and add the following variables to id:
 
-- [ ] `TARGET_SNOWFLAKE_PASSWORD:` snowflake password
-- [ ] `TARGET_SNOWFLAKE_ACCOUNT:` snowflake accound id
-- [ ] `TARGET_SNOWFLAKE_WAREHOUSE:` snowflake warehouse
-- [ ] `TARGET_SNOWFLAKE_USER:` snowflake user
-- [ ] `TARGET_SNOWFLAKE_DATABASE:` snowflake database
-- [ ] `TARGET_SNOWFLAKE_SCHEMA:` snowflake schema
-- [ ] `TARGET_SNOWFLAKE_ROLE:` snowflake role
-- [ ] `TARGET_SNOWFLAKE_FILE_FORMAT:` snowflake output file format
-- [ ] `TARGET_SNOWFLAKE_PRIMARY_KEY_REQUIRED` you can set this to false if not all tables have primary key
 - [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account id
 - [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
 
@@ -70,7 +61,6 @@ These are the variables you have in meltano template:
 - [ ] `end_date:` end_date 
 - [ ] `account_id:` account id from TAP_FACEBOOK_ACCOUNT_ID variable
 - [ ] `api_version:` api version
-- [ ] `TAP_FACEBOOK_SCHEMA:` streams schema
 
 
 ### Replication Keys

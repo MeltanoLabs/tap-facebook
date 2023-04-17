@@ -13,7 +13,6 @@ plugins:
     - discover
     settings:
     - name: access_token
-      value: ${TAP_FACEBOOK_ACCESS_TOKEN}
       kind: password
     - name: start_date
       value: '2023-03-01T00:00:00Z'
@@ -22,63 +21,8 @@ plugins:
       value: '2023-03-31T00:00:00Z'
       kind: date_iso8601
     - name: account_id
-      value: ${TAP_FACEBOOK_ACCOUNT_ID}
+      kind: string
     - name: api_version
       value: 'v16.0'
     config:
       insights_buffer_days: 7
-  - name: facebook-ads
-    inherit_from: tap-facebook
-    load_schema: $TAP_FACEBOOK_SCHEMA
-    select:
-    - ads.*
-  - name: facebook-ads-insights
-    inherit_from: tap-facebook
-    load_schema: $TAP_FACEBOOK_SCHEMA
-    select:
-    - adsinsights.*
-  - name: facebook-adsets
-    inherit_from: tap-facebook
-    load_schema: $TAP_FACEBOOK_SCHEMA
-    select:
-    - adsets.*
-  - name: facebook-campaigns
-    inherit_from: tap-facebook
-    load_schema: $TAP_FACEBOOK_SCHEMA
-    select:
-    - campaigns.*
-  - name: facebook-creatives
-    inherit_from: tap-facebook
-    load_schema: $TAP_FACEBOOK_SCHEMA
-    select:
-    - creatives.*
-  loaders:
-  - name: target-csv
-    variant: hotgluexyz
-    pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
-    config:
-      destination_path: $MELTANO_OUTPUT_PATH
-  - name: target-snowflake
-    variant: transferwise
-    pip_url: pipelinewise-target-snowflake
-    config:
-      batch_size: 5
-  - name: target-jsonl
-    variant: andyh1203
-    pip_url: target-jsonl
-    config:
-      destination_path: $MELTANO_PROJECT_ROOT
-      do_timestamp_file: true
-      custom_name: $MELTANO_OUTPUT_FILE
-environments:
-    - name: dev
-      config:
-        plugins:
-          loaders:
-            - name: target-csv
-            - name: target-snowflake
-              config:
-                default_target_schema: $TARGET_SNOWFLAKE_SCHEMA
-                primary_key_required: false
-    - name: staging
-    - name: prod

@@ -7,19 +7,20 @@ from pathlib import Path
 from singer_sdk import typing as th  # JSON Schema typing helpers
 
 from tap_facebook.client import facebookStream
-from singer_sdk.streams import RESTStream
-
 import json
 
-# properties for instream schema
-PropertiesList = th.PropertiesList
-Property = th.Property
-ObjectType = th.ObjectType
-DateTimeType = th.DateTimeType
-StringType = th.StringType
-ArrayType = th.ArrayType
-BooleanType = th.BooleanType
-IntegerType = th.IntegerType
+from singer_sdk.streams import RESTStream
+
+from singer_sdk.typing import (
+    PropertiesList,
+    Property,
+    ObjectType,
+    DateTimeType,
+    StringType,
+    ArrayType,
+    BooleanType,
+    IntegerType,
+)
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -82,7 +83,7 @@ class adsinsightStream(facebookStream):
         "ctr",
     ]
 
-    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSINSIGHTS
 
     columns_remaining = [
         "unique_actions",
@@ -99,9 +100,7 @@ class adsinsightStream(facebookStream):
 
     name = "adsinsights"
 
-    #account_id = facebook_account()
     path = "/insights?level=ad&fields={}".format(columns)
-    # schema_filepath = SCHEMAS_DIR / "ads_insights.json"
 
     replication_keys = ["date_start"]
     replication_method = "incremental"
@@ -177,11 +176,11 @@ class adsinsightStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -226,13 +225,12 @@ class adsStream(facebookStream):
         "recommendations",
     ]
 
-    #   TODO: FIND OUT HOW TO GET DATA FOR THESE COLUMNS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS
 
     columns_remaining = ["adlabels", "recommendations"]
 
     name = "ads"
 
-    #account_id = facebook_account()
     path = "/ads?fields={}".format(columns)
 
     primary_keys = ["id"]
@@ -401,11 +399,11 @@ class adsStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -465,7 +463,7 @@ class adsetsStream(facebookStream):
         "status",
     ]
 
-    #   TODO: #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
+    # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
 
     columns_remaining = [
         "adlabels",
@@ -495,9 +493,7 @@ class adsetsStream(facebookStream):
 
     name = "adsets"
 
-    #account_id = facebook_account()
     path = "/adsets?fields={}".format(columns)
-    # schema_filepath = SCHEMAS_DIR / "adsets.json"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -595,7 +591,6 @@ class adsetsStream(facebookStream):
 
     ).to_dict()
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
 
     tap_stream_id = "adsets"
 
@@ -606,11 +601,11 @@ class adsetsStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -670,7 +665,7 @@ class campaignStream(facebookStream):
         "pacing_type",
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN CAMPAIGNS
     columns_remaining = [
         "ad_strategy_group_id",
         "ad_strategy_id",
@@ -684,7 +679,6 @@ class campaignStream(facebookStream):
 
     name = "campaigns"
 
-    #account_id = facebook_account()
     path = "/campaigns?fields={}".format(columns)
     tap_stream_id = "campaigns"
     replication_keys = ["updated_time"]
@@ -749,11 +743,11 @@ class campaignStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -832,7 +826,6 @@ class creativeStream(facebookStream):
                "video_id"]
 
     name = "creatives"
-    #account_id = facebook_account()
     path = "/adcreatives?fields={}".format(columns)
     tap_stream_id = "creatives"
     replication_keys = ["id"]
@@ -899,11 +892,11 @@ class creativeStream(facebookStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}

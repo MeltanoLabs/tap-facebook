@@ -33,7 +33,7 @@ class facebookStream(RESTStream):
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = (
-        "$.paging.cursors.after"  # Or override `get_next_page_token`.
+        "$.paging.cursors.after"
     )
 
     tolerated_http_errors: List[int] = []
@@ -42,7 +42,7 @@ class facebookStream(RESTStream):
     def authenticator(self) -> BearerTokenAuthenticator:
         """Return a new authenticator object.
 
-        Returns,
+        Returns:
             An authenticator instance.
         """
         return BearerTokenAuthenticator.create_for_stream(
@@ -57,11 +57,11 @@ class facebookStream(RESTStream):
     ) -> Any | None:
         """Return a token for identifying next page or None if no more pages.
 
-        Args,
+        Args:
             response: The HTTP ``requests.Response`` object.
             previous_token: The previous page token value.
 
-        Returns,
+        Returns:
             The next pagination token.
         """
         if self.next_page_token_jsonpath:
@@ -82,11 +82,11 @@ class facebookStream(RESTStream):
     ) -> dict[str, Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary of URL query parameters.
         """
         params: dict = {}
@@ -108,11 +108,11 @@ class facebookStream(RESTStream):
 
         By default, no payload will be sent (return None).
 
-        Args,
+        Args:
             context: The stream context.
             next_page_token: The next page index or value.
 
-        Returns,
+        Returns:
             A dictionary with the JSON body for a POST requests.
         """
         return None
@@ -173,13 +173,14 @@ class facebookStream(RESTStream):
             )
             raise RetriableAPIError(msg, response)
 
+    # TODO: CONFIRM WE DONT NEED THE PARSE_RESPONSE FUNCTION
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result records.
 
-        Args,
+        Args:
             response: The HTTP ``requests.Response`` object.
 
-        Yields,
+        Yields:
             Each record from the source.
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
