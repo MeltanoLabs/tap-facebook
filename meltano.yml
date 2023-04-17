@@ -26,33 +26,3 @@ plugins:
       value: 'v16.0'
     config:
       insights_buffer_days: 7
-  loaders:
-  - name: target-csv
-    variant: hotgluexyz
-    pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
-    config:
-      destination_path: $MELTANO_OUTPUT_PATH
-  - name: target-snowflake
-    variant: transferwise
-    pip_url: pipelinewise-target-snowflake
-    config:
-      batch_size: 5
-  - name: target-jsonl
-    variant: andyh1203
-    pip_url: target-jsonl
-    config:
-      destination_path: $MELTANO_PROJECT_ROOT
-      do_timestamp_file: true
-      custom_name: $MELTANO_OUTPUT_FILE
-environments:
-    - name: dev
-      config:
-        plugins:
-          loaders:
-            - name: target-csv
-            - name: target-snowflake
-              config:
-                default_target_schema: $TARGET_SNOWFLAKE_SCHEMA
-                primary_key_required: false
-    - name: staging
-    - name: prod
