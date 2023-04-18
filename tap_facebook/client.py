@@ -140,44 +140,28 @@ class facebookStream(RESTStream):
             )
             # Retry on reaching rate limit
             if (
-                    response.status_code == 400
-                    and "too many calls" in str(response.content).lower()
+                response.status_code == 400
+                and "too many calls" in str(response.content).lower()
             ):
                 # Update token
-                #self.authenticator.get_next_auth_token()
+                # self.authenticator.get_next_auth_token()
                 # Raise an error to force a retry with the new token.
 
-                waitTime = 200
+                waitTime = 400
                 self.logger.info(
                     f"API Limit reached, waiting {waitTime} seconds and will try again."
                 )
                 if waitTime > 120:
                     self.logger.warning(
-                        "Wait time is more than 2 minutes, Waiting 200s and trying again."
+                        "Wait time is more than 2 minutes, Waiting 400s and trying again."
                     )
-                    time.sleep(200)
+                    time.sleep(400)
                 else:
                     time.sleep(waitTime)
 
                 raise RetriableAPIError(msg, response)
 
-            # Retry on reaching second rate limit
-            if (
-                    response.status_code == 403
-                    and "secondary rate limit" in str(response.content).lower()
-            ):
-                # Wait about a minute and retry
-                time.sleep(60 + 30 * random.random())
-                raise RetriableAPIError(msg, response)
-
-            # The GitHub API randomly returns 401 Unauthorized errors, so we try again.
-            if (
-                    response.status_code == 401
-                    # if the token is invalid, we are also told about it
-                    and not "bad credentials" in str(response.content).lower()
-            ):
-                raise RetriableAPIError(msg, response)
-
+            print("Hello")
             raise FatalAPIError(msg)
 
         elif 500 <= response.status_code < 600:
@@ -200,7 +184,7 @@ class facebookStream(RESTStream):
 
     def backoff_wait_generator(self) -> Callable[..., Generator[int, Any, None]]:
         return backoff.constant(interval=1)
-    
+
     def backoff_max_tries(self) -> int:
         """The number of attempts before giving up when retrying requests.
 
