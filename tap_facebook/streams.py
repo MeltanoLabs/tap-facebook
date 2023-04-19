@@ -387,6 +387,7 @@ class adsStream(facebookStream):
         Property("configured_status", StringType),
         Property("conversion_domain", StringType),
         Property("conversion_specs", StringType),
+        Property("placement_specific_instagram_advertising_policies", StringType),
 
     ).to_dict()
 
