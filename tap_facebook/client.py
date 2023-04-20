@@ -151,13 +151,7 @@ class facebookStream(RESTStream):
                 self.logger.info(
                     f"API Limit reached, waiting {waitTime} seconds and will try again."
                 )
-                if waitTime > 120:
-                    self.logger.warning(
-                        "Wait time is more than 2 minutes, Waiting 400s and trying again."
-                    )
-                    time.sleep(400)
-                else:
-                    time.sleep(waitTime)
+                time.sleep(waitTime)
 
                 raise RetriableAPIError(msg, response)
 
