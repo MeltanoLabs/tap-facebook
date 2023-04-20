@@ -12,10 +12,11 @@ from tap_facebook.streams import (
     adsinsightStream,
     adsStream,
     campaignStream,
-    creativeStream
+    creativeStream,
+    adlabelsStream
 )
 
-STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream, creativeStream]
+STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream, creativeStream, adlabelsStream]
 
 
 class Tapfacebook(Tap):

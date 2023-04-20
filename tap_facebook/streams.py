@@ -389,6 +389,7 @@ class adsStream(facebookStream):
         Property("configured_status", StringType),
         Property("conversion_domain", StringType),
         Property("conversion_specs", StringType),
+        Property("placement_specific_instagram_advertising_policies", StringType),
 
     ).to_dict()
 
@@ -910,3 +911,69 @@ class creativeStream(facebookStream):
             params["order_by"] = self.replication_key
 
         return params
+    
+class adlabelsStream(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    columns = ["id",
+               "account",
+               "created_time",
+               "updated_time"]
+
+    name = "adlabels"
+    path = "/adlabels?fields={}".format(columns)
+    tap_stream_id = "adlabels"
+    replication_keys = ["updated_time"]
+    replication_method = "incremental"
+
+    schema = PropertiesList(
+        Property("id", StringType),
+        
+        Property(
+            "account",
+                ObjectType(
+                    Property("account_id", StringType),
+                    Property("id", StringType),
+                )
+        ),
+
+        Property("created_time", StringType),
+        Property("updated_time", StringType)
+        
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params    
+    
