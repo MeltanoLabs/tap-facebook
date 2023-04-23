@@ -143,17 +143,18 @@ class facebookStream(RESTStream):
                 response.status_code == 400
                 and "too many calls" in str(response.content).lower()
             ):
-                # Update token
-                # self.authenticator.get_next_auth_token()
-                # Raise an error to force a retry with the new token.
-
-                waitTime = 400
-                self.logger.info(
-                    f"API Limit reached, waiting {waitTime} seconds and will try again."
-                )
-                time.sleep(waitTime)
 
                 raise RetriableAPIError(msg, response)
+
+            def backoff_wait_generator(self) -> Callable[..., Generator[int, Any, None]]:
+                def _backoff_on_rate_limit(RetriableAPIError):
+                    content = RetriableAPIError.response.text
+                    if "too many calls" in content.lower():
+                        print
+                        self.authenticator.get_next_auth_token()
+                        return 1
+
+                return self.backoff_runtime(value=_backoff_on_rate_limit)
 
             print("Hello")
             raise FatalAPIError(msg)
@@ -176,8 +177,6 @@ class facebookStream(RESTStream):
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
-    def backoff_wait_generator(self) -> Callable[..., Generator[int, Any, None]]:
-        return backoff.constant(interval=1)
 
     def backoff_max_tries(self) -> int:
         """The number of attempts before giving up when retrying requests.
