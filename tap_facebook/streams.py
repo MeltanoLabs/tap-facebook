@@ -85,7 +85,7 @@ class adsinsightStream(facebookStream):
         "ctr",
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSINSIGHTS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSINSIGHTS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
 
     columns_remaining = [
         "unique_actions",
@@ -227,7 +227,7 @@ class adsStream(facebookStream):
         "recommendations",
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
 
     columns_remaining = ["adlabels", "recommendations"]
 
@@ -466,7 +466,7 @@ class adsetsStream(facebookStream):
         "status",
     ]
 
-    # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
+    # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
 
     columns_remaining = [
         "adlabels",
@@ -668,7 +668,7 @@ class campaignStream(facebookStream):
         "pacing_type",
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN CAMPAIGNS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN CAMPAIGNS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
     columns_remaining = [
         "ad_strategy_group_id",
         "ad_strategy_id",
