@@ -155,7 +155,6 @@ class facebookStream(RESTStream):
 
                 return self.backoff_runtime(value=_backoff_on_rate_limit)
 
-            print("Hello")
             raise FatalAPIError(msg)
 
         elif 500 <= response.status_code < 600:
