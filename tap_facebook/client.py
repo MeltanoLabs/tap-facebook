@@ -13,7 +13,6 @@ from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
 import requests, json
 import backoff
-import time
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
