@@ -150,7 +150,6 @@ class facebookStream(RESTStream):
                 def _backoff_on_rate_limit(RetriableAPIError):
                     content = RetriableAPIError.response.text
                     if "too many calls" in content.lower():
-                        print
                         self.authenticator.get_next_auth_token()
                         return 1
 
