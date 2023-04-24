@@ -179,7 +179,7 @@ class facebookStream(RESTStream):
     def backoff_max_tries(self) -> int:
         """The number of attempts before giving up when retrying requests.
 
-        Setting to None will retry indefinetely.
+        Setting to None will retry indefinitely.
 
         Returns:
             int: limit
