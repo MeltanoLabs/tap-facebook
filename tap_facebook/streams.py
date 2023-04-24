@@ -1079,7 +1079,8 @@ class AdaccountsStream(facebookStream):
                "media_agency",
                "partner",
                "salesforce_invoice_group_id",
-               "business_zip"]
+               "business_zip",
+               "tax_id"]
 
     name = "adaccounts"
     path = "/adaccounts?fields={}".format(columns)
@@ -1169,7 +1170,8 @@ class AdaccountsStream(facebookStream):
         Property("media_agency", StringType),
         Property("partner", StringType),
         Property("salesforce_invoice_group_id", StringType),
-        Property("business_zip", StringType)
+        Property("business_zip", StringType),
+        Property("tax_id", StringType)
         
     ).to_dict()
 
