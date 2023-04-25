@@ -40,7 +40,7 @@ tap-facebook --about
 
 ### Authentication
 
-We have BearerTokenAuthenticator in client.py for authentication
+A Facebook access token is required to make API requests. (See Facebook API docs for more info)
 
 ## Usage
 
