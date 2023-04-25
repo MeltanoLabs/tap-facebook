@@ -6,7 +6,6 @@ Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Target
 
 ## Installation
 
-
 ```bash
 pipx install git+https://github.com/MeltanoLabs/tap-facebook-sdk.git
 ```
@@ -47,7 +46,12 @@ We have BearerTokenAuthenticator in client.py for authentication
 
 ### API Limitation - Rate Limits
 
-Unless your
+Hitting the rate limit for the Facebook API while making requests will return the following error:
+
+```400 Client Error: b'{"error":{"message":"(#80004) There have been too many calls to this ad-account. Wait a bit and try again```
+
+This error is handled using the Backoff Library, and the program will cease for a random amount of time before 
+attempting to call the API again
 
 You can easily run `tap-facebook` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
