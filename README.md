@@ -15,7 +15,22 @@ pipx install git+https://github.com/MeltanoLabs/tap-facebook-sdk.git
 
 ### Accepted Config Options
 
-- [ ] `Developer TODO:` Provide a list of config options accepted by the tap.
+This tap requires the following environmental variables to be set in ```.env```
+
+- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account id
+- [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
+
+
+### Meltano Variables
+
+The following config values need to be set in order to use with Meltano. These can be set in `meltano.yml`, via
+```meltano config tap-facebook set --interactive```, or via the env var mappings shown above.
+
+- [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
+- [ ] `start_date:` start date
+- [ ] `end_date:` end_date 
+- [ ] `account_id:` account id from TAP_FACEBOOK_ACCOUNT_ID variable
+- [ ] `api_version:` api version
 
 A full list of supported settings and capabilities for this
 tap is available by running:
@@ -24,57 +39,15 @@ tap is available by running:
 tap-facebook --about
 ```
 
-### Configure using environment variables
-
-This Singer tap will automatically import any environment variables within the working directory's
-`.env` if the `--config=ENV` is provided, such that config values will be considered if a matching
-environment variable is set either in the terminal context or in the `.env` file.
-
-
-### Configure using config.json
-
-Create a config.json file in the secrets folder of the tap-facebook-sdk directory, add the following keys to the config.json:
-
-- [ ] `start_date:` start date for facebook api
-- [ ] `account_id:` account id
-- [ ] `access_token:` access token for bearer authentication
-
-
-### Environment Variables
-
-Create a .env file and add the following variables to id:
-
-- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account id
-- [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
-
-
-### Meltano Variables
-
-These are the variables you have in meltano template:
-
-- [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
-- [ ] `start_date:` start date
-- [ ] `end_date:` end_date 
-- [ ] `account_id:` account id from TAP_FACEBOOK_ACCOUNT_ID variable
-- [ ] `api_version:` api version
-
-
-### Replication Keys
-
-These are the replication keys we have for facebook streams:
-
-- [ ] `ads:` updated_time
-- [ ] `ads insights:` date_start
-- [ ] `adsets:` updated_time
-- [ ] `campaigns:` updated_time
-- [ ] `creative:` id
-
-
 ### Authentication
 
 We have BearerTokenAuthenticator in client.py for authentication
 
 ## Usage
+
+### API Limitation - Rate Limits
+
+Unless your
 
 You can easily run `tap-facebook` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
@@ -86,9 +59,9 @@ tap-facebook --help
 tap-facebook --config CONFIG --discover > ./catalog.json
 ```
 
-## Developer Resources
+## Contributing
 
-- [ ] `Developer TODO:` As a first step, scan the entire project for the text "`TODO:`" and complete any recommended steps, deleting the "TODO" references once completed.
+This project uses parent-child streams. Learn more about them [here](https://gitlab.com/meltano/sdk/-/blob/main/docs/parent_streams.md).
 
 ### Initialize your Development Environment
 
