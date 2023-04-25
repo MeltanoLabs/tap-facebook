@@ -2,7 +2,7 @@
 
 `tap-facebook` is a Singer tap for facebook.
 
-Built with the [Meltano Tap SDK](https://sdk.meltano.com) for Singer Taps.
+Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Targets.
 
 ## Installation
 
