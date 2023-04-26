@@ -591,7 +591,24 @@ class adsetsStream(facebookStream):
         Property("daily_spend_cap", StringType),
         Property("instagram_actor_id", StringType),
         Property("review_feedback", StringType),
-        Property("rf_prediction_id", StringType)
+        Property("rf_prediction_id", StringType),
+        Property("promoted_object_application_id", StringType),
+        Property("promoted_object_custom_conversion_id", StringType),
+        Property("promoted_object_custom_event_str", StringType),
+        Property("promoted_object_custom_event_type", StringType),
+        Property("promoted_object_event_id", StringType),
+        Property("promoted_object_object_store_url", StringType),
+        Property("promoted_object_offer_id", StringType),
+        Property("promoted_object_offline_conversion_data_set_id", StringType),
+        Property("promoted_object_page_id", StringType),
+        Property("promoted_object_pixel_aggregation_rule", StringType),
+        Property("promoted_object_pixel_id", StringType),
+        Property("promoted_object_pixel_rule", StringType),
+        Property("promoted_object_place_page_set_id", StringType),
+        Property("promoted_object_product_catalog_id", StringType),
+        Property("promoted_object_product_set_id", StringType),
+        Property("promoted_object_retention_days", StringType),
+        Property("promoted_object_application_type", StringType)
 
     ).to_dict()
 
@@ -667,6 +684,10 @@ class campaignStream(facebookStream):
         "topline_id",
         "boosted_object_id",
         "pacing_type",
+        "budget_rebalance_flag",
+        "bid_startegy",
+        "lifetime_budget",
+        "daily_budget"
     ]
 
     #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN CAMPAIGNS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
@@ -739,6 +760,46 @@ class campaignStream(facebookStream):
                 )
             ),
         ),
+        Property("budget_rebalance_flag", BooleanType),
+        Property("bid_strategy", StringType),
+
+        Property(
+            "promoted_object",
+            ObjectType(
+                Property("custom_event_type", StringType),
+                Property("pixel_id", StringType),
+                Property("pixel_rule", StringType),
+                Property("page_id", StringType),
+                Property("object_store_url", StringType),
+                Property("application_id", StringType),
+                Property("product_set_id", StringType),
+                Property("offer_id", StringType),
+            ),
+        ),
+
+        Property("promoted_object_application_id", StringType),
+        Property("promoted_object_custom_conversion_id", StringType),
+        Property("promoted_object_custom_event_str", StringType),
+        Property("promoted_object_custom_event_type", StringType),
+        Property("promoted_object_event_id", StringType),
+        Property("promoted_object_object_store_url", StringType),
+        Property("promoted_object_offer_id", StringType),
+        Property("promoted_object_offline_conversion_data_set_id", StringType),
+        Property("promoted_object_page_id", StringType),
+        Property("promoted_object_pixel_aggregation_rule", StringType),
+        Property("promoted_object_pixel_id", StringType),
+        Property("promoted_object_pixel_rule", StringType),
+        Property("promoted_object_place_page_set_id", StringType),
+        Property("promoted_object_product_catalog_id", StringType),
+        Property("promoted_object_product_set_id", StringType),
+        Property("promoted_object_retention_days", StringType),
+        Property("promoted_object_application_type", StringType),
+        Property("ad_strategy_group_id", StringType),
+        Property("ad_strategy_id", StringType),
+        Property("lifetime_budget", StringType),
+        Property("last_budget_toggling_time", StringType),
+        Property("daily_budget", StringType),
+        Property("special_ad_category_country", StringType)
     ).to_dict()
 
     def get_url_params(
