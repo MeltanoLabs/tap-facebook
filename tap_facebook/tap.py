@@ -13,10 +13,11 @@ from tap_facebook.streams import (
     adsStream,
     campaignStream,
     creativeStream,
-    adlabelsStream
+    adlabelsStream,
+    AdaccountsStream
 )
 
-STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream, creativeStream, adlabelsStream]
+STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream, creativeStream,adlabelsStream, AdaccountsStream]
 
 
 class Tapfacebook(Tap):
@@ -42,6 +43,11 @@ class Tapfacebook(Tap):
             "end_date",
             th.DateTimeType,
             description="The latest record date to sync",
+        ),
+        th.Property(
+            "add_record_metadata",
+            th.BooleanType,
+            description="The token to authenticate against the API service",
         ),
     ).to_dict()
 
