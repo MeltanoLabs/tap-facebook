@@ -44,11 +44,6 @@ class Tapfacebook(Tap):
             th.DateTimeType,
             description="The latest record date to sync",
         ),
-        th.Property(
-            "add_record_metadata",
-            th.BooleanType,
-            description="The token to authenticate against the API service",
-        ),
     ).to_dict()
 
     def discover_streams(self) -> list[streams.facebookStream]:
