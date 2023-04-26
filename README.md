@@ -40,15 +40,15 @@ environment variable is set either in the terminal context or in the `.env` file
 Create a config.json file in the secrets folder of the tap-facebook-sdk directory, add the following keys to the config.json:
 
 - [ ] `start_date:` start date for facebook api
-- [ ] `account_id:` account id
+- [ ] `account_id:` account ID
 - [ ] `access_token:` access token for bearer authentication
 
 
 ### Environment Variables
 
-Create a .env file and add the following variables to id:
+Create a .env file and add the following variables to ID:
 
-- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account id
+- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account ID
 - [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
 
 
@@ -59,7 +59,7 @@ These are the variables you have in meltano template:
 - [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
 - [ ] `start_date:` start date
 - [ ] `end_date:` end_date 
-- [ ] `account_id:` account id from TAP_FACEBOOK_ACCOUNT_ID variable
+- [ ] `account_id:` account ID from TAP_FACEBOOK_ACCOUNT_ID variable
 - [ ] `api_version:` api version
 
 
@@ -71,7 +71,7 @@ These are the replication keys we have for facebook streams:
 - [ ] `ads insights:` date_start
 - [ ] `adsets:` updated_time
 - [ ] `campaigns:` updated_time
-- [ ] `creative:` id
+- [ ] `creative:` ID
 
 
 ### Authentication
