@@ -40,7 +40,7 @@ tap-facebook --about
 
 ### Authentication
 
-A Facebook access token is required to make API requests. (See Facebook API docs for more info)
+A Facebook access token is required to make API requests. (See [Facebook API](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/) docs for more info)
 
 ## Usage
 
@@ -50,8 +50,9 @@ Hitting the rate limit for the Facebook API while making requests will return th
 
 ```400 Client Error: b'{"error":{"message":"(#80004) There have been too many calls to this ad-account. Wait a bit and try again```
 
-This error is handled using the Backoff Library, and the program will cease for a random amount of time before 
+This error is handled using the [Backoff Library](https://github.com/litl/backoff), and the program will cease for a random amount of time before 
 attempting to call the API again
+
 
 You can easily run `tap-facebook` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
