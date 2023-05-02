@@ -24,8 +24,6 @@ from singer_sdk.typing import (
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
-## TODO: ADD ACCOUNTS STREAM AND SCHEMA
-
 # ads insights stream
 class adsinsightStream(facebookStream):
     """
