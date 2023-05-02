@@ -1094,7 +1094,7 @@ class AdaccountsStream(facebookStream):
         Property("timezone_id", IntegerType),
         Property("business_name", StringType),
         Property("account_status", StringType),
-        Property("age", IntegerType),
+        Property("age", StringType),
         Property("amount_spent", IntegerType),
         Property("balance", IntegerType),
         Property("business_city", StringType),
