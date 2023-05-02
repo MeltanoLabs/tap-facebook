@@ -146,15 +146,6 @@ class facebookStream(RESTStream):
 
                 raise RetriableAPIError(msg, response)
 
-            def backoff_wait_generator(self) -> Callable[..., Generator[int, Any, None]]:
-                def _backoff_on_rate_limit(RetriableAPIError):
-                    content = RetriableAPIError.response.text
-                    if "too many calls" in content.lower():
-                        self.authenticator.get_next_auth_token()
-                        return 1
-
-                return self.backoff_runtime(value=_backoff_on_rate_limit)
-
             raise FatalAPIError(msg)
 
         elif 500 <= response.status_code < 600:
@@ -176,7 +167,6 @@ class facebookStream(RESTStream):
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
-
     def backoff_max_tries(self) -> int:
         """The number of attempts before giving up when retrying requests.
 
@@ -185,4 +175,4 @@ class facebookStream(RESTStream):
         Returns:
             int: limit
         """
-        return 1000
+        return 20
