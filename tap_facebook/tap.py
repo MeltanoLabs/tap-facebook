@@ -28,13 +28,17 @@ class Tapfacebook(Tap):
 
     name = "tap-facebook"
 
-    ##TODO ADD "api_version" TO PROPERTY LIST
     # add parameters you have in config.json
     config_jsonschema = th.PropertiesList(
         th.Property(
             "access_token",
             th.StringType,
             description="The token to authenticate against the API service",
+        ),
+        th.Property(
+            "api_version",
+            th.StringType,
+            description="The API version",
         ),
         th.Property("account_id", th.StringType, description="Account ID"),
         th.Property(
