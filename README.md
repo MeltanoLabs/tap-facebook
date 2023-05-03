@@ -2,21 +2,36 @@
 
 `tap-facebook` is a Singer tap for facebook.
 
-Built with the [Meltano Tap SDK](https://sdk.meltano.com) for Singer Taps.
+Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Targets.
 
 ## Installation
 
-- [ ] `Developer TODO:` Update the below as needed to correctly describe the install procedure. For instance, if you do not have a PyPi repo, or if you want users to directly install from your git repo, you can modify this step as appropriate.
-
 ```bash
-pipx install tap-facebook
+pipx install git+https://github.com/MeltanoLabs/tap-facebook-sdk.git
 ```
 
 ## Configuration
 
 ### Accepted Config Options
 
-- [ ] `Developer TODO:` Provide a list of config options accepted by the tap.
+
+This tap requires the following environment variables to be set in ```.env```
+
+
+- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account ID
+- [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
+
+
+### Meltano Variables
+
+The following config values need to be set in order to use with Meltano. These can be set in `meltano.yml`, via
+```meltano config tap-facebook set --interactive```, or via the env var mappings shown above.
+
+- [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
+- [ ] `start_date:` start date
+- [ ] `end_date:` end_date 
+- [ ] `account_id:` account ID from TAP_FACEBOOK_ACCOUNT_ID variable
+- [ ] `api_version:` api version
 
 A full list of supported settings and capabilities for this
 tap is available by running:
@@ -25,60 +40,31 @@ tap is available by running:
 tap-facebook --about
 ```
 
-### Configure using environment variables
-
-This Singer tap will automatically import any environment variables within the working directory's
-`.env` if the `--config=ENV` is provided, such that config values will be considered if a matching
-environment variable is set either in the terminal context or in the `.env` file.
-
-### Source Authentication and Authorization
-
-- [ ] `Developer TODO:` If your tap requires special access on the source system, or any special authentication requirements, provide those here.
-
-### Configure using config.json
-
-Create a config.json file in the secrets folder of the tap-facebook-sdk directory, add the following keys to the config.json:
-
-- [ ] `start_date:` start date for facebook api
-- [ ] `account_id:` account ID
-- [ ] `access_token:` access token for bearer authentication
-
-
-### Environment Variables
-
-Create a .env file and add the following variables to ID:
-
-- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account ID
-- [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
-
-
-### Meltano Variables
-
-These are the variables you have in meltano template:
-
-- [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
-- [ ] `start_date:` start date
-- [ ] `end_date:` end_date 
-- [ ] `account_id:` account ID from TAP_FACEBOOK_ACCOUNT_ID variable
-- [ ] `api_version:` api version
-
-
-### Replication Keys
-
-These are the replication keys we have for facebook streams:
-
-- [ ] `ads:` updated_time
-- [ ] `ads insights:` date_start
-- [ ] `adsets:` updated_time
-- [ ] `campaigns:` updated_time
-- [ ] `creative:` ID
-
-
 ### Authentication
 
-We have BearerTokenAuthenticator in client.py for authentication
+A Facebook access token is required to make API requests. (See [Facebook API](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/) docs for more info)
+
 
 ## Usage
+
+### API Limitation - Rate Limits
+
+Hitting the rate limit for the Facebook API while making requests will return the following error:
+
+```400 Client Error: b'{"error":{"message":"(#80004) There have been too many calls to this ad-account. Wait a bit and try again```
+
+This error is handled using the [Backoff Library](https://github.com/litl/backoff), and the program will cease for a random amount of time before 
+attempting to call the API again
+
+### Metadata Columns
+
+- [ ] `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
+
+### Elastic License 2.0
+
+The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software.
+
+
 
 You can easily run `tap-facebook` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
@@ -90,9 +76,9 @@ tap-facebook --help
 tap-facebook --config CONFIG --discover > ./catalog.json
 ```
 
-## Developer Resources
+## Contributing
 
-- [ ] `Developer TODO:` As a first step, scan the entire project for the text "`TODO:`" and complete any recommended steps, deleting the "TODO" references once completed.
+This project uses parent-child streams. Learn more about them [here](https://gitlab.com/meltano/sdk/-/blob/main/docs/parent_streams.md).
 
 ### Initialize your Development Environment
 
