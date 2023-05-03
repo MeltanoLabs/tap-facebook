@@ -12,10 +12,15 @@ from tap_facebook.streams import (
     adsinsightStream,
     adsStream,
     campaignStream,
-    creativeStream
+    creativeStream,
+    adlabelsStream,
+
+    AdaccountsStream,
+    CustomConversions,
+    CustomAudiences
 )
 
-STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream, creativeStream]
+STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream, creativeStream,adlabelsStream, AdaccountsStream, CustomConversions, CustomAudiences]
 
 
 class Tapfacebook(Tap):
@@ -29,6 +34,11 @@ class Tapfacebook(Tap):
             "access_token",
             th.StringType,
             description="The token to authenticate against the API service",
+        ),
+        th.Property(
+            "api_version",
+            th.StringType,
+            description="The API version",
         ),
         th.Property("account_id", th.StringType, description="Account ID"),
         th.Property(

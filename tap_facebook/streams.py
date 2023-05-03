@@ -80,10 +80,10 @@ class adsinsightStream(facebookStream):
         "impressions",
         "unique_ctr",
         "cost_per_inline_link_click",
-        "ctr",
+        "ctr"
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSINSIGHTS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSINSIGHTS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
 
     columns_remaining = [
         "unique_actions",
@@ -136,7 +136,7 @@ class adsinsightStream(facebookStream):
         ),
         Property("inline_post_engagement", StringType),
         Property("campaign_name", StringType),
-        Property("inline_link_clicks", StringType),
+        Property("inline_link_clicks", IntegerType),
         Property("campaign_id", StringType),
         Property("cpc", StringType),
         Property("ad_name", StringType),
@@ -153,17 +153,27 @@ class adsinsightStream(facebookStream):
         Property("unique_clicks", StringType),
         Property("social_spend", StringType),
         Property("canvas_avg_view_percent", StringType),
-        Property("account_id", StringType),
+        Property("account_id", IntegerType),
         Property("date_start", DateTimeType),
         Property("objective", StringType),
         Property("quality_ranking", StringType),
         Property("engagement_rate_ranking", StringType),
         Property("conversion_rate_ranking", StringType),
-        Property("impressions", StringType),
+        Property("impressions", IntegerType),
         Property("unique_ctr", StringType),
         Property("cost_per_inline_link_click", StringType),
         Property("ctr", StringType),
-        Property("reach", StringType),
+        Property("reach", IntegerType),
+
+        Property(
+            "actions",
+            ArrayType(
+                ObjectType(
+                    Property("action_type", StringType),
+                    Property("value", StringType)
+                )
+            ),
+        ),
     ).to_dict()
 
     tap_stream_id = "adsinsights"
@@ -189,7 +199,9 @@ class adsinsightStream(facebookStream):
             params["after"] = next_page_token
         if self.replication_key:
             params["sort"] = "asc"
-            params["order_by"] = self.replication_key
+            params["order_by"] = self.replication_key 
+
+        params["action_attribution_windows"] = ['7d_click','1d_view']       
 
         return params
 
@@ -225,7 +237,7 @@ class adsStream(facebookStream):
         "recommendations",
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
 
     columns_remaining = ["adlabels", "recommendations"]
 
@@ -233,7 +245,7 @@ class adsStream(facebookStream):
 
     path = "/ads?fields={}".format(columns)
 
-    primary_keys = ["id"]
+    primary_keys = ["id", "updated_time"]
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -387,6 +399,7 @@ class adsStream(facebookStream):
         Property("configured_status", StringType),
         Property("conversion_domain", StringType),
         Property("conversion_specs", StringType),
+        Property("placement_specific_instagram_advertising_policies", StringType),
 
     ).to_dict()
 
@@ -463,7 +476,7 @@ class adsetsStream(facebookStream):
         "status",
     ]
 
-    # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS
+    # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
 
     columns_remaining = [
         "adlabels",
@@ -492,8 +505,9 @@ class adsetsStream(facebookStream):
     ]
 
     name = "adsets"
-
+    
     path = "/adsets?fields={}".format(columns)
+    primary_keys = ["id", "updated_time"]
     replication_keys = ["updated_time"]
     replication_method = "incremental"
 
@@ -587,7 +601,24 @@ class adsetsStream(facebookStream):
         Property("daily_spend_cap", StringType),
         Property("instagram_actor_id", StringType),
         Property("review_feedback", StringType),
-        Property("rf_prediction_id", StringType)
+        Property("rf_prediction_id", StringType),
+        Property("promoted_object_application_id", IntegerType),
+        Property("promoted_object_custom_conversion_id", IntegerType),
+        Property("promoted_object_custom_event_str", StringType),
+        Property("promoted_object_custom_event_type", StringType),
+        Property("promoted_object_event_id", IntegerType),
+        Property("promoted_object_object_store_url", StringType),
+        Property("promoted_object_offer_id", IntegerType),
+        Property("promoted_object_offline_conversion_data_set_id", IntegerType),
+        Property("promoted_object_page_id", IntegerType),
+        Property("promoted_object_pixel_aggregation_rule", StringType),
+        Property("promoted_object_pixel_id", IntegerType),
+        Property("promoted_object_pixel_rule", StringType),
+        Property("promoted_object_place_page_set_id", IntegerType),
+        Property("promoted_object_product_catalog_id", IntegerType),
+        Property("promoted_object_product_set_id", IntegerType),
+        Property("promoted_object_retention_days", StringType),
+        Property("promoted_object_application_type", StringType),
 
     ).to_dict()
 
@@ -663,23 +694,24 @@ class campaignStream(facebookStream):
         "topline_id",
         "boosted_object_id",
         "pacing_type",
+        "budget_rebalance_flag",
+        "bid_strategy",
+        "lifetime_budget",
+        "daily_budget",
+        "last_budget_toggling_time"
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN CAMPAIGNS
+    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN CAMPAIGNS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
     columns_remaining = [
-        "ad_strategy_group_id",
-        "ad_strategy_id",
         "adlabels",
-        "daily_budget",
         "issues_info",
-        "last_budget_toggling_time",
-        "lifetime_budget",
         "recommendations",
     ]
 
     name = "campaigns"
 
     path = "/campaigns?fields={}".format(columns)
+    primary_keys = ["id", "updated_time"]
     tap_stream_id = "campaigns"
     replication_keys = ["updated_time"]
     replication_method = "incremental"
@@ -696,8 +728,8 @@ class campaignStream(facebookStream):
     schema = PropertiesList(
         Property("name", StringType),
         Property("objective", StringType),
-        Property("id", StringType),
-        Property("account_id", StringType),
+        Property("id", IntegerType),
+        Property("account_id", IntegerType),
         Property("effective_status", StringType),
         Property("buying_type", StringType),
         Property("can_create_brand_lift_study", BooleanType),
@@ -708,15 +740,15 @@ class campaignStream(facebookStream):
         Property("primary_attribution", StringType),
         Property("smart_promotion_type", StringType),
         Property("pacing_type", ArrayType),
-        Property("source_campaign_id", StringType),
-        Property("boosted_object_id", StringType),
+        Property("source_campaign_id", IntegerType),
+        Property("boosted_object_id", IntegerType),
         Property("special_ad_categories", ArrayType),
         Property("special_ad_category", StringType),
         Property("status", StringType),
-        Property("topline_id", StringType),
-        Property("spend_cap", StringType),
+        Property("topline_id", IntegerType),
+        Property("spend_cap", IntegerType),
         Property("budget_remaining", StringType),
-        Property("daily_budget", StringType),
+        Property("daily_budget", IntegerType),
         Property("start_time", StringType),
         Property("stop_time", StringType),
         Property("updated_time", StringType),
@@ -734,6 +766,46 @@ class campaignStream(facebookStream):
                 )
             ),
         ),
+        Property("budget_rebalance_flag", BooleanType),
+        Property("bid_strategy", StringType),
+
+        Property(
+            "promoted_object",
+            ObjectType(
+                Property("custom_event_type", StringType),
+                Property("pixel_id", StringType),
+                Property("pixel_rule", StringType),
+                Property("page_id", StringType),
+                Property("object_store_url", StringType),
+                Property("application_id", StringType),
+                Property("product_set_id", StringType),
+                Property("offer_id", StringType),
+            ),
+        ),
+
+        Property("promoted_object_application_id", IntegerType),
+        Property("promoted_object_custom_conversion_id", IntegerType),
+        Property("promoted_object_custom_event_str", StringType),
+        Property("promoted_object_custom_event_type", StringType),
+        Property("promoted_object_event_id", IntegerType),
+        Property("promoted_object_object_store_url", StringType),
+        Property("promoted_object_offer_id", IntegerType),
+        Property("promoted_object_offline_conversion_data_set_id", IntegerType),
+        Property("promoted_object_page_id", IntegerType),
+        Property("promoted_object_pixel_aggregation_rule", StringType),
+        Property("promoted_object_pixel_id", IntegerType),
+        Property("promoted_object_pixel_rule", StringType),
+        Property("promoted_object_place_page_set_id", IntegerType),
+        Property("promoted_object_product_catalog_id", IntegerType),
+        Property("promoted_object_product_set_id", IntegerType),
+        Property("promoted_object_retention_days", StringType),
+        Property("promoted_object_application_type", StringType),
+        Property("ad_strategy_group_id", IntegerType),
+        Property("ad_strategy_id", IntegerType),
+        Property("lifetime_budget", IntegerType),
+        Property("last_budget_toggling_time", StringType),
+        Property("daily_budget", IntegerType),
+        Property("special_ad_category_country", ArrayType)
     ).to_dict()
 
     def get_url_params(
@@ -908,3 +980,465 @@ class creativeStream(facebookStream):
             params["order_by"] = self.replication_key
 
         return params
+    
+class adlabelsStream(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    columns = ["id",
+               "account",
+               "created_time",
+               "updated_time"]
+
+    name = "adlabels"
+    path = "/adlabels?fields={}".format(columns)
+    primary_keys = ["id", "updated_time"]
+    tap_stream_id = "adlabels"
+    replication_keys = ["updated_time"]
+    replication_method = "incremental"
+
+    schema = PropertiesList(
+        Property("id", StringType),
+        
+        Property(
+            "account",
+                ObjectType(
+                    Property("account_id", StringType),
+                    Property("id", StringType),
+                )
+        ),
+
+        Property("created_time", StringType),
+        Property("updated_time", StringType)
+        
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
+class AdaccountsStream(facebookStream):
+    """
+    https://developers.facebook.com/docs/graph-api/reference/user/accounts/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    @property
+    def url_base(self):
+        version = self.config.get("api_version", "")
+        base_url = "https://graph.facebook.com/{}/me".format(version)
+        return base_url
+
+    columns = ["account_id",
+               "business_name",
+               "account_status",
+               "age",
+               "amount_spent",
+               "balance",
+               "business_city",
+               "business_country_code",
+               "business_street",
+               "business_street2",
+               "can_create_brand_lift_study",
+               "capabilities",
+               "created_time",
+               "currency",
+               "disable_reason",
+               "end_advertiser",
+               "end_advertiser_name",
+               "has_advertiser_opted_in_odax",
+               "has_migrated_permissions",
+               "id",
+               "is_attribution_spec_system_default",
+               "is_direct_deals_enabled",
+               "is_in_3ds_authorization_enabled_market",
+               "is_notifications_enabled",
+               "is_personal",
+               "is_prepay_account",
+               "is_tax_id_required",
+               "min_campaign_group_spend_cap",
+               "min_daily_budget",
+               "name",
+               "offsite_pixels_tos_accepted",
+               "owner",
+               "spend_cap",
+               "tax_id_status",
+               "tax_id_type",
+               "timezone_id",
+               "timezone_name",
+               "timezone_offset_hours_utc",
+               "agency_client_declaration_agency_representing_client",
+               "agency_client_declaration_client_based_in_france",
+               "agency_client_declaration_client_city",
+               "agency_client_declaration_client_country_code",
+               "agency_client_declaration_client_email_address",
+               "agency_client_declaration_client_name",
+               "agency_client_declaration_client_postal_code",
+               "agency_client_declaration_client_province",
+               "agency_client_declaration_client_street",
+               "agency_client_declaration_client_street2",
+               "agency_client_declaration_has_written_mandate_from_advertiser",
+               "agency_client_declaration_is_client_paying_invoices",
+               "business_manager_block_offline_analytics",
+               "business_manager_created_by",
+               "business_manager_created_time",
+               "business_manager_extended_updated_time",
+               "business_manager_is_hidden",
+               "business_manager_link",
+               "business_manager_name",
+               "business_manager_payment_account_id",
+               "business_manager_primary_page",
+               "business_manager_profile_picture_uri",
+               "business_manager_timezone_id",
+               "business_manager_two_factor_type",
+               "business_manager_updated_by",
+               "business_manager_update_time",
+               "business_manager_verification_status",
+               "business_manager_vertical",
+               "business_manager_vertical_id",
+               "business_manager_manager_id",
+               "extended_credit_invoice_group_id",
+               "extended_credit_invoice_group_auto_enroll",
+               "extended_credit_invoice_group_customer_po_number",
+               "extended_credit_invoice_group_email",
+               "extended_credit_invoice_group_emails",
+               "extended_credit_invoice_group_name",
+               "business_state",
+               "io_number",
+               "media_agency",
+               "partner",
+               "salesforce_invoice_group_id",
+               "business_zip",
+               "tax_id"]
+
+    name = "adaccounts"
+    path = "/adaccounts?fields={}".format(columns)
+    tap_stream_id = "adaccounts"
+    primary_keys = ["created_time"]
+    replication_keys = ["created_time"]
+    replication_method = "incremental"
+
+    schema = PropertiesList(
+        Property("account_id", StringType),
+        Property("timezone_id", IntegerType),
+        Property("business_name", StringType),
+        Property("account_status", StringType),
+        Property("age", StringType),
+        Property("amount_spent", IntegerType),
+        Property("balance", IntegerType),
+        Property("business_city", StringType),
+        Property("business_country_code", StringType),
+        Property("business_street", StringType),
+        Property("business_street2", StringType),
+        Property("can_create_brand_lift_study", BooleanType),
+        Property("capabilities", ArrayType(StringType)),
+        Property("created_time", StringType),
+        Property("currency", StringType),
+        Property("disable_reason", StringType),
+        Property("end_advertiser", IntegerType),
+        Property("end_advertiser_name", StringType),
+        Property("has_advertiser_opted_in_odax", BooleanType),
+        Property("has_migrated_permissions", BooleanType),
+        Property("id", StringType),
+        Property("is_attribution_spec_system_default", BooleanType),
+        Property("is_direct_deals_enabled", BooleanType),
+        Property("is_in_3ds_authorization_enabled_market", BooleanType),
+        Property("is_notifications_enabled", BooleanType),
+        Property("is_personal", StringType),
+        Property("is_prepay_account", BooleanType),
+        Property("is_tax_id_required", BooleanType),
+        Property("min_campaign_group_spend_cap", IntegerType),
+        Property("min_daily_budget", IntegerType),
+        Property("name", StringType),
+        Property("offsite_pixels_tos_accepted", BooleanType),
+        Property("owner", StringType),
+        Property("spend_cap", IntegerType),
+        Property("tax_id_status", StringType),
+        Property("tax_id_type", StringType),
+        Property("timezone_id", StringType),
+        Property("timezone_name", StringType),
+        Property("timezone_offset_hours_utc", IntegerType),
+        Property("agency_client_declaration_agency_representing_client", IntegerType),
+        Property("agency_client_declaration_client_based_in_france", IntegerType),
+        Property("agency_client_declaration_client_city", StringType),
+        Property("agency_client_declaration_client_country_code", StringType),
+        Property("agency_client_declaration_client_email_address", StringType),
+        Property("agency_client_declaration_client_name", StringType),
+        Property("agency_client_declaration_client_postal_code", StringType),
+        Property("agency_client_declaration_client_province", StringType),
+        Property("agency_client_declaration_client_street", StringType),
+        Property("agency_client_declaration_client_street2", StringType),
+        Property("agency_client_declaration_has_written_mandate_from_advertiser", IntegerType),
+        Property("agency_client_declaration_is_client_paying_invoices", IntegerType),
+        Property("business_manager_block_offline_analytics", BooleanType),
+        Property("business_manager_created_by", StringType),
+        Property("business_manager_created_time", StringType),
+        Property("business_manager_extended_updated_time", StringType),
+        Property("business_manager_is_hidden", BooleanType),
+        Property("business_manager_link", StringType),
+        Property("business_manager_name", StringType),
+        Property("business_manager_payment_account_id", IntegerType),
+        Property("business_manager_primary_page", StringType),
+        Property("business_manager_profile_picture_uri", StringType),
+        Property("business_manager_timezone_id", IntegerType),
+        Property("business_manager_two_factor_type", StringType),
+        Property("business_manager_updated_by", StringType),
+        Property("business_manager_update_time", StringType),
+        Property("business_manager_verification_status", StringType),
+        Property("business_manager_vertical", StringType),
+        Property("business_manager_vertical_id", IntegerType),
+        Property("business_manager_manager_id", IntegerType),
+        Property("extended_credit_invoice_group_id", IntegerType),
+        Property("extended_credit_invoice_group_auto_enroll", BooleanType),
+        Property("extended_credit_invoice_group_customer_po_number", StringType),
+        Property("extended_credit_invoice_group_email", StringType),
+        Property("extended_credit_invoice_group_emails", StringType),
+        Property("extended_credit_invoice_group_name", StringType),
+        Property("business_state", StringType),
+        Property("io_number", IntegerType),
+        Property("media_agency", StringType),
+        Property("partner", StringType),
+        Property("salesforce_invoice_group_id", StringType),
+        Property("business_zip", StringType),
+        Property("tax_id", StringType)
+        
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+
+        return params
+
+class CustomConversions(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    columns = ["account_id",
+               "id",
+               "creation_time",
+               "name",
+               "business",
+               "is_archived",
+               "is_unavailable",
+               "last_fired_time"
+               ]
+
+    name = "customconversions"
+    path = "/customconversions?fields={}".format(columns)
+    tap_stream_id = "customconversions"
+    primary_keys = ["id"]
+    replication_keys = ["creation_time"]
+    replication_method = "incremental"
+
+    schema = PropertiesList(
+        Property("account_id", IntegerType),
+        Property("id", IntegerType),
+        Property("name", StringType),
+        Property("creation_time", StringType),
+        Property("business", StringType),
+        Property("is_archived", BooleanType),
+        Property("is_unavailable", BooleanType),
+        Property("last_fired_time", StringType)
+        
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+    
+class CustomAudiences(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    columns = ["account_id",
+               "id",
+               "approximate_count_lower_bound",
+               "approximate_count_upper_bound",
+               "time_updated",
+               "time_created",
+               "customer_file_source",
+               "data_source",
+               "delivery_status",
+               "description",
+               "external_event_source",
+               "is_value_based",
+               "operation_status",
+               "permission_for_actions",
+               "retention_days",
+               "rule"
+               ]
+
+    name = "customaudiences"
+    path = "/customaudiences?fields={}".format(columns)
+    tap_stream_id = "customaudiences"
+    primary_keys = ["id"]
+    replication_keys = ["time_updated"]
+    replication_method = "incremental"
+    
+
+    schema = PropertiesList(
+        Property("account_id", IntegerType),
+        Property("id", IntegerType),
+        Property("approximate_count_lower_bound", IntegerType),
+        Property("approximate_count_upper_bound", IntegerType),
+        Property("time_updated", StringType),
+        Property("time_created", StringType),
+        Property("time_content_updated", StringType),
+        Property("customer_file_source", StringType),
+        Property("data_source", StringType),
+        Property("delivery_status", StringType),
+        Property("description", StringType),
+        Property("external_event_source_automatic_matching_fields", StringType),
+        Property("external_event_source_can_proxy", BooleanType),
+        Property("external_event_source_code", StringType),
+        Property("external_event_source_creation_time", DateTimeType),
+        Property("external_event_source_data_use_setting", StringType),
+        Property("external_event_source_enable_automatic_matching", BooleanType),
+        Property("external_event_source_first_party_cookie_status", StringType),
+        Property("external_event_source_id", IntegerType),
+        Property("external_event_source_is_created_by_business", BooleanType),
+        Property("external_event_source_is_crm", BooleanType),
+        Property("external_event_source_is_unavailable", BooleanType),
+        Property("external_event_source_last_fired_time", DateTimeType),
+        Property("external_event_source_name", StringType),
+        Property("external_event_source", StringType),
+        Property("lookalike_country", StringType),
+        Property("lookalike_is_financial_service", BooleanType),
+        Property("lookalike_origin_event_name", StringType),
+        Property("lookalike_origin_event_source_name", StringType),
+        Property("lookalike_product_set_name", StringType),
+        Property("lookalike_ratio", StringType),
+        Property("lookalike_starting_ratio", StringType),
+        Property("lookalike_type", StringType),
+        Property("is_value_based", BooleanType),
+        Property("operation_status", IntegerType),
+        Property("permission_for_actions", StringType),
+        Property("pixel_id", IntegerType),
+        Property("retention_days", IntegerType),
+        Property("rule", StringType),
+        Property("subtype", StringType),
+        Property("rule_aggregation", StringType),
+        
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params    

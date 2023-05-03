@@ -117,6 +117,7 @@ class facebookStream(RESTStream):
         """
         return None
 
+    ##TODO: ADD ERROR HANDLING FOR API RATE LIMIT - WORKING IN API-LIMIT-HANDLING BRANCH
     def validate_response(self, response: requests.Response) -> None:
         """Validate HTTP response.
         Raises:
@@ -139,29 +140,10 @@ class facebookStream(RESTStream):
             )
             # Retry on reaching rate limit
             if (
-                    response.status_code == 403
-                    and "rate limit exceeded" in str(response.content).lower()
+                response.status_code == 400
+                and "too many calls" in str(response.content).lower()
             ):
-                # Update token
-                self.authenticator.get_next_auth_token()
-                # Raise an error to force a retry with the new token.
-                raise RetriableAPIError(msg, response)
 
-            # Retry on reaching second rate limit
-            if (
-                    response.status_code == 403
-                    and "secondary rate limit" in str(response.content).lower()
-            ):
-                # Wait about a minute and retry
-                time.sleep(60 + 30 * random.random())
-                raise RetriableAPIError(msg, response)
-
-            # The GitHub API randomly returns 401 Unauthorized errors, so we try again.
-            if (
-                    response.status_code == 401
-                    # if the token is invalid, we are also told about it
-                    and not "bad credentials" in str(response.content).lower()
-            ):
                 raise RetriableAPIError(msg, response)
 
             raise FatalAPIError(msg)
@@ -185,7 +167,12 @@ class facebookStream(RESTStream):
         """
         yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
-    def backoff_wait_generator(self) -> Callable[..., Generator[int, Any, None]]:
-        return backoff.constant(interval=1)
-    
+    def backoff_max_tries(self) -> int:
+        """The number of attempts before giving up when retrying requests.
 
+        Setting to None will retry indefinitely.
+
+        Returns:
+            int: limit
+        """
+        return 20

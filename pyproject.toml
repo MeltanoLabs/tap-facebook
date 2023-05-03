@@ -2,7 +2,7 @@
 name = "tap-facebook"
 version = "0.0.1"
 description = "`tap-facebook` is a Singer tap for facebook, built with the Meltano SDK for Singer Taps."
-authors = ["Monika Rajput"]
+authors = ["Meltano"]
 keywords = [
     "ELT",
     "facebook",

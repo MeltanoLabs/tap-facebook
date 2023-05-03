@@ -14,9 +14,11 @@ pipx install git+https://github.com/MeltanoLabs/tap-facebook-sdk.git
 
 ### Accepted Config Options
 
+
 This tap requires the following environment variables to be set in ```.env```
 
-- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account id
+
+- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account ID
 - [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
 
 
@@ -28,7 +30,7 @@ The following config values need to be set in order to use with Meltano. These c
 - [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
 - [ ] `start_date:` start date
 - [ ] `end_date:` end_date 
-- [ ] `account_id:` account id from TAP_FACEBOOK_ACCOUNT_ID variable
+- [ ] `account_id:` account ID from TAP_FACEBOOK_ACCOUNT_ID variable
 - [ ] `api_version:` api version
 
 A full list of supported settings and capabilities for this
@@ -41,6 +43,7 @@ tap-facebook --about
 ### Authentication
 
 A Facebook access token is required to make API requests. (See [Facebook API](https://developers.facebook.com/docs/facebook-login/guides/access-tokens/) docs for more info)
+
 
 ## Usage
 
