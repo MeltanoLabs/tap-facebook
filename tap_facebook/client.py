@@ -155,18 +155,6 @@ class facebookStream(RESTStream):
             )
             raise RetriableAPIError(msg, response)
 
-    # TODO: CONFIRM WE DONT NEED THE PARSE_RESPONSE FUNCTION
-    def parse_response(self, response: requests.Response) -> Iterable[dict]:
-        """Parse the response and return an iterator of result records.
-
-        Args:
-            response: The HTTP ``requests.Response`` object.
-
-        Yields:
-            Each record from the source.
-        """
-        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
-
     def backoff_max_tries(self) -> int:
         """The number of attempts before giving up when retrying requests.
 
