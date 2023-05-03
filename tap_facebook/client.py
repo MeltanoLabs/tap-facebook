@@ -32,9 +32,7 @@ class facebookStream(RESTStream):
         return base_url
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = (
-        "$.paging.cursors.after"
-    )
+    next_page_token_jsonpath = "$.paging.cursors.after"
 
     tolerated_http_errors: List[int] = []
 
@@ -143,7 +141,6 @@ class facebookStream(RESTStream):
                 response.status_code == 400
                 and "too many calls" in str(response.content).lower()
             ):
-
                 raise RetriableAPIError(msg, response)
 
             raise FatalAPIError(msg)
