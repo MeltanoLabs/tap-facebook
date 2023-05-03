@@ -53,6 +53,15 @@ Hitting the rate limit for the Facebook API while making requests will return th
 This error is handled using the [Backoff Library](https://github.com/litl/backoff), and the program will cease for a random amount of time before 
 attempting to call the API again
 
+### Metadata Columns
+
+- [ ] `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
+
+### Elastic License 2.0
+
+The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software.
+
+
 
 You can easily run `tap-facebook` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
