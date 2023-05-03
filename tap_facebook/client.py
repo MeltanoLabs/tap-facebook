@@ -143,6 +143,12 @@ class facebookStream(RESTStream):
             ):
                 raise RetriableAPIError(msg, response)
 
+            elif (
+                response.status_code == 400
+                and "request limit reached" in str(response.content).lower()
+            ):
+                raise RetriableAPIError(msg, response)
+
             raise FatalAPIError(msg)
 
         elif 500 <= response.status_code < 600:
