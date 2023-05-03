@@ -36,6 +36,9 @@ The following config values need to be set in order to use with Meltano. These c
 A full list of supported settings and capabilities for this
 tap is available by running:
 
+```bash
+tap-facebook --about
+```
 
 ### Metadata Columns
 
