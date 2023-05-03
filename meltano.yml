@@ -26,3 +26,5 @@ plugins:
       value: 'v16.0'
     config:
       insights_buffer_days: 7
+environments:
+- name: dev      
