@@ -36,9 +36,24 @@ The following config values need to be set in order to use with Meltano. These c
 A full list of supported settings and capabilities for this
 tap is available by running:
 
-```bash
-tap-facebook --about
-```
+
+### Metadata Columns
+
+- [ ] `add_metadata_columns:` We can add metadata columns to LinkedIn records, we have to update meltano.yml and set this variable to true for the loader.
+
+
+### Elastic License 2.0
+
+The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software.
+
+
+### Attribution Window
+
+Attribution Window is time period during which conversions might be credited to ads, we can have this time period between 1 day to 7 days for clicks and views
+
+- [ ] `action_attribution_windows:` We can add these variable to params, it will have a list type value which takes in 1d-7d clicks and 1d-7d views values. We have added      
+this variable in get_url_params function of ads insights stream
+
 
 ### Authentication
 

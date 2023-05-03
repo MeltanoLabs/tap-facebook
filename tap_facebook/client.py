@@ -32,9 +32,7 @@ class facebookStream(RESTStream):
         return base_url
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = (
-        "$.paging.cursors.after"
-    )
+    next_page_token_jsonpath = "$.paging.cursors.after"
 
     tolerated_http_errors: List[int] = []
 
@@ -143,7 +141,12 @@ class facebookStream(RESTStream):
                 response.status_code == 400
                 and "too many calls" in str(response.content).lower()
             ):
+                raise RetriableAPIError(msg, response)
 
+            elif (
+                response.status_code == 400
+                and "request limit reached" in str(response.content).lower()
+            ):
                 raise RetriableAPIError(msg, response)
 
             raise FatalAPIError(msg)
@@ -154,18 +157,6 @@ class facebookStream(RESTStream):
                 f"{str(response.content)} (Reason: {response.reason}) for path: {full_path}"
             )
             raise RetriableAPIError(msg, response)
-
-    # TODO: CONFIRM WE DONT NEED THE PARSE_RESPONSE FUNCTION
-    def parse_response(self, response: requests.Response) -> Iterable[dict]:
-        """Parse the response and return an iterator of result records.
-
-        Args:
-            response: The HTTP ``requests.Response`` object.
-
-        Yields:
-            Each record from the source.
-        """
-        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
 
     def backoff_max_tries(self) -> int:
         """The number of attempts before giving up when retrying requests.
