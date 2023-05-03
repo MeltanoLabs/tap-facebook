@@ -20,7 +20,7 @@ from tap_facebook.streams import (
     CustomAudiences
 )
 
-STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream, creativeStream,adlabelsStream, AdaccountsStream, CustomConversions, CustomAudiences]
+STREAM_TYPES = [adsinsightStream, adsStream, adsetsStream, campaignStream, creativeStream, adlabelsStream, AdaccountsStream, CustomConversions]
 
 
 class Tapfacebook(Tap):
