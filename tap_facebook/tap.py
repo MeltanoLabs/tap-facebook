@@ -28,6 +28,7 @@ STREAM_TYPES = [
     adlabelsStream,
     AdaccountsStream,
     CustomConversions,
+    CustomAudiences,
 ]
 
 
