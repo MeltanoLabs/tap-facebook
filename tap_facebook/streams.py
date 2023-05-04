@@ -1377,7 +1377,7 @@ class CustomAudiencesInternal(facebookStream):
         "customer_file_source",
         "data_source",
         "delivery_status",
-        "description"
+        "description",
     ]
 
     name = "customaudiencesinternal"
@@ -1454,7 +1454,7 @@ class CustomAudiencesInternal(facebookStream):
             params["order_by"] = self.replication_key
 
         return params
-    
+
 
 class CustomAudiences(CustomAudiencesInternal):
     """
@@ -1480,7 +1480,7 @@ class CustomAudiences(CustomAudiencesInternal):
         "pixel_id",
         "retention_days",
         "subtype",
-        "rule_aggregation"
+        "rule_aggregation",
     ]
 
     name = "customaudiences"
@@ -1513,10 +1513,18 @@ class CustomAudiences(CustomAudiencesInternal):
             params["order_by"] = self.replication_key
 
         return params
-    
+
     def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
-        custom_audience_stream = CustomAudiencesInternal(self._tap, schema={"properties": {}})
-        custom_audience_records = [self.merge_dicts(x, y) for x, y in zip(list(custom_audience_stream.get_records(context)), list(super().get_records(context)))]
+        custom_audience_stream = CustomAudiencesInternal(
+            self._tap, schema={"properties": {}}
+        )
+        custom_audience_records = [
+            self.merge_dicts(x, y)
+            for x, y in zip(
+                list(custom_audience_stream.get_records(context)),
+                list(super().get_records(context)),
+            )
+        ]
 
         return custom_audience_records
 
@@ -1529,4 +1537,3 @@ class CustomAudiences(CustomAudiencesInternal):
         for dictionary in dict_args:
             result.update(dictionary)
         return result
-    
