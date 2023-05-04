@@ -250,7 +250,7 @@ class adsStream(facebookStream):
 
     schema = PropertiesList(
         Property("bid_type", StringType),
-        Property("account_id", StringType),
+        Property("account_id", IntegerType),
         Property("campaign_id", StringType),
         Property("adset_id", StringType),
         Property(
@@ -280,7 +280,7 @@ class adsStream(facebookStream):
             "creative",
             ObjectType(Property("creative_id", StringType), Property("id", StringType)),
         ),
-        Property("id", StringType),
+        Property("id", IntegerType),
         Property("updated_time", StringType),
         Property("created_time", StringType),
         Property("name", StringType),
@@ -423,6 +423,7 @@ class adsStream(facebookStream):
         Property("conversion_domain", StringType),
         Property("conversion_specs", StringType),
         Property("placement_specific_instagram_advertising_policies", StringType),
+        Property("recommendation_data", ArrayType(Property("items", StringType))),
     ).to_dict()
 
     tap_stream_id = "ads"
@@ -563,8 +564,8 @@ class adsetsStream(facebookStream):
                 Property("offer_id", StringType),
             ),
         ),
-        Property("id", StringType),
-        Property("account_id", StringType),
+        Property("id", IntegerType),
+        Property("account_id", IntegerType),
         Property("updated_time", StringType),
         Property("daily_budget", StringType),
         Property("budget_remaining", StringType),
@@ -1013,7 +1014,7 @@ class adlabelsStream(facebookStream):
     tap_stream_id = stream id
     """
 
-    columns = ["id", "account", "created_time", "updated_time"]
+    columns = ["id", "account", "created_time", "updated_time", "name"]
 
     name = "adlabels"
     path = "/adlabels?fields={}".format(columns)
@@ -1023,16 +1024,17 @@ class adlabelsStream(facebookStream):
     replication_method = "incremental"
 
     schema = PropertiesList(
-        Property("id", StringType),
+        Property("id", IntegerType),
         Property(
             "account",
             ObjectType(
-                Property("account_id", StringType),
-                Property("id", StringType),
+                Property("account_id", IntegerType),
+                Property("id", IntegerType),
             ),
         ),
         Property("created_time", StringType),
         Property("updated_time", StringType),
+        Property("name", StringType),
     ).to_dict()
 
     def get_url_params(
