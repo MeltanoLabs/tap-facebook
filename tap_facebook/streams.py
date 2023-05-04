@@ -1353,7 +1353,7 @@ class CustomConversions(facebookStream):
         return params
 
 
-class CustomAudiences(facebookStream):
+class CustomAudiencesInternal(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1377,18 +1377,12 @@ class CustomAudiences(facebookStream):
         "customer_file_source",
         "data_source",
         "delivery_status",
-        "description",
-        "external_event_source",
-        "is_value_based",
-        "operation_status",
-        "permission_for_actions",
-        "retention_days",
-        "rule",
+        "description"
     ]
 
-    name = "customaudiences"
+    name = "customaudiencesinternal"
     path = "/customaudiences?fields={}".format(columns)
-    tap_stream_id = "customaudiences"
+    tap_stream_id = "customaudiencesinternal"
     primary_keys = ["id"]
     replication_keys = ["time_updated"]
     replication_method = "incremental"
@@ -1428,7 +1422,7 @@ class CustomAudiences(facebookStream):
         Property("lookalike_starting_ratio", StringType),
         Property("lookalike_type", StringType),
         Property("is_value_based", BooleanType),
-        Property("operation_status", IntegerType),
+        Property("operation_status", StringType),
         Property("permission_for_actions", StringType),
         Property("pixel_id", IntegerType),
         Property("retention_days", IntegerType),
@@ -1460,3 +1454,79 @@ class CustomAudiences(facebookStream):
             params["order_by"] = self.replication_key
 
         return params
+    
+
+class CustomAudiences(CustomAudiencesInternal):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    # Add rule column
+
+    columns = [
+        "time_content_updated",
+        "is_value_based",
+        "operation_status",
+        "permission_for_actions",
+        "pixel_id",
+        "retention_days",
+        "subtype",
+        "rule_aggregation"
+    ]
+
+    name = "customaudiences"
+    path = "/customaudiences?fields={}".format(columns)
+    tap_stream_id = "customaudiences"
+    primary_keys = ["id"]
+    replication_keys = ["time_content_updated"]
+    replication_method = "incremental"
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+    
+    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
+        custom_audience_stream = CustomAudiencesInternal(self._tap, schema={"properties": {}})
+        custom_audience_records = [self.merge_dicts(x, y) for x, y in zip(list(custom_audience_stream.get_records(context)), list(super().get_records(context)))]
+
+        return custom_audience_records
+
+    def merge_dicts(self, *dict_args):
+        """
+        Given any number of dictionaries, shallow copy and merge into a new dict,
+        precedence goes to key-value pairs in latter dictionaries.
+        """
+        result = {}
+        for dictionary in dict_args:
+            result.update(dictionary)
+        return result
+    
