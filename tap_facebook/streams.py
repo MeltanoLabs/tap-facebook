@@ -424,6 +424,26 @@ class adsStream(facebookStream):
         Property("conversion_specs", StringType),
         Property("placement_specific_instagram_advertising_policies", StringType),
         Property("recommendation_data", ArrayType(Property("items", StringType))),
+        Property("application", ArrayType(Property("items", StringType))), 
+        Property("dataset", ArrayType(Property("items", StringType))),
+        Property("event", ArrayType(Property("items", StringType))),
+        Property("event_creator", ArrayType(Property("items", StringType))),
+        Property("event_type", ArrayType(Property("items", StringType))),
+        Property("fb_pixel", ArrayType(Property("items", StringType))),
+        Property("fb_pixel_event", ArrayType(Property("items", StringType))),
+        Property("leadgen", ArrayType(Property("items", StringType))),
+        Property("object", ArrayType(Property("items", StringType))),
+        Property("object_domain", ArrayType(Property("items", StringType))),
+        Property("offer", ArrayType(Property("items", StringType))),
+        Property("offer_creator", ArrayType(Property("items", StringType))),
+        Property("offsite_pixel", ArrayType(Property("items", StringType))),
+        Property("page_parent", ArrayType(Property("items", StringType))),
+        Property("post_object", ArrayType(Property("items", StringType))),
+        Property("post_object_wall", ArrayType(Property("items", StringType))),
+        Property("question", ArrayType(Property("items", StringType))),
+        Property("question_creator", ArrayType(Property("items", StringType))),
+        Property("response", ArrayType(Property("items", StringType))),
+        Property("subtype", ArrayType(Property("items", StringType))),
     ).to_dict()
 
     tap_stream_id = "ads"
@@ -1475,23 +1495,12 @@ class CustomAudiences(CustomAudiencesInternal):
     # Add rule column
 
     columns = [
-        "time_content_updated",
-        "is_value_based",
-        "operation_status",
-        "permission_for_actions",
-        "pixel_id",
-        "retention_days",
-        "subtype",
-        "rule_aggregation",
-        "name"
+        "rule"
     ]
 
     name = "customaudiences"
     path = "/customaudiences?fields={}".format(columns)
     tap_stream_id = "customaudiences"
-    primary_keys = ["id"]
-    replication_keys = ["time_content_updated"]
-    replication_method = "incremental"
 
     def get_url_params(
         self,
@@ -1516,20 +1525,4 @@ class CustomAudiences(CustomAudiencesInternal):
             params["order_by"] = self.replication_key
 
         return params
-    
-    def get_records(self, context: dict | None) -> Iterable[dict[str, Any]]:
-        custom_audience_stream = CustomAudiencesInternal(self._tap, schema={"properties": {}})
-        custom_audience_records = [self.merge_dicts(x, y) for x, y in zip(list(custom_audience_stream.get_records(context)), list(super().get_records(context)))]
-
-        return custom_audience_records
-
-    def merge_dicts(self, *dict_args):
-        """
-        Given any number of dictionaries, shallow copy and merge into a new dict,
-        precedence goes to key-value pairs in latter dictionaries.
-        """
-        result = {}
-        for dictionary in dict_args:
-            result.update(dictionary)
-        return result
     
