@@ -421,7 +421,7 @@ class adsStream(facebookStream):
         Property("global_ads_about_social_issues_elections_or_politics", StringType),
         Property("configured_status", StringType),
         Property("conversion_domain", StringType),
-        Property("conversion_specs", StringType),
+        Property("conversion_specs", ArrayType(Property("items", StringType))),
         Property("placement_specific_instagram_advertising_policies", StringType),
         Property("recommendation_data", ArrayType(Property("items", StringType))),
         Property("application", ArrayType(Property("items", StringType))), 
