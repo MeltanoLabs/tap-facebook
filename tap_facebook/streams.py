@@ -26,7 +26,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 # ads insights stream
-class adsinsightStream(facebookStream):
+class adsInsightStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/insights.
     """
@@ -236,7 +236,7 @@ class adsStream(facebookStream):
         "recommendations",
         "configured_status",
         "conversion_domain",
-        "bid_amount"
+        "bid_amount",
     ]
 
     #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
@@ -427,7 +427,7 @@ class adsStream(facebookStream):
         Property("conversion_specs", ArrayType(Property("items", StringType))),
         Property("placement_specific_instagram_advertising_policies", StringType),
         Property("recommendation_data", ArrayType(Property("items", StringType))),
-        Property("application", ArrayType(Property("items", StringType))), 
+        Property("application", ArrayType(Property("items", StringType))),
         Property("dataset", ArrayType(Property("items", StringType))),
         Property("event", ArrayType(Property("items", StringType))),
         Property("event_creator", ArrayType(Property("items", StringType))),
@@ -523,7 +523,7 @@ class adsetsStream(facebookStream):
         "bid_amount",
         "bid_strategy",
         "targeting",
-        "bid_info"
+        "bid_info",
     ]
 
     # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
@@ -668,7 +668,6 @@ class adsetsStream(facebookStream):
         Property("promoted_object_application_type", StringType),
         Property("bid_amount", StringType),
         Property("bid_strategy", StringType),
-
         Property(
             "targeting",
             ObjectType(
@@ -684,7 +683,6 @@ class adsetsStream(facebookStream):
                 Property("device_platforms", ArrayType(StringType)),
             ),
         ),
-        
         Property("targeting_app_install_state", StringType),
         Property("targeting_audience_network_positions", ArrayType(StringType)),
         Property("targeting_behaviors", ArrayType(StringType)),
@@ -693,14 +691,24 @@ class adsetsStream(facebookStream):
         Property("targeting_education_majors", ArrayType(StringType)),
         Property("targeting_education_schools", ArrayType(StringType)),
         Property("targeting_education_statuses", ArrayType(StringType)),
-        Property("targeting_effective_audience_network_positions", ArrayType(StringType)),
+        Property(
+            "targeting_effective_audience_network_positions", ArrayType(StringType)
+        ),
         Property("targeting_excluded_connections", ArrayType(StringType)),
         Property("targeting_excluded_geo_locations_countries", ArrayType(StringType)),
-        Property("targeting_excluded_geo_locations_country_groups", ArrayType(StringType)),
-        Property("targeting_excluded_geo_locations_custom_locations", ArrayType(StringType)),
-        Property("targeting_excluded_geo_locations_electoral_district", ArrayType(StringType)),
+        Property(
+            "targeting_excluded_geo_locations_country_groups", ArrayType(StringType)
+        ),
+        Property(
+            "targeting_excluded_geo_locations_custom_locations", ArrayType(StringType)
+        ),
+        Property(
+            "targeting_excluded_geo_locations_electoral_district", ArrayType(StringType)
+        ),
         Property("targeting_excluded_geo_locations_geo_markets", ArrayType(StringType)),
-        Property("targeting_excluded_geo_locations_location_types", ArrayType(StringType)),
+        Property(
+            "targeting_excluded_geo_locations_location_types", ArrayType(StringType)
+        ),
         Property("targeting_excluded_geo_locations_places", ArrayType(StringType)),
         Property("targeting_excluded_geo_locations_regions", ArrayType(StringType)),
         Property("targeting_excluded_geo_locations_cities", ArrayType(StringType)),
@@ -1095,7 +1103,7 @@ class creativeStream(facebookStream):
         return params
 
 
-class adlabelsStream(facebookStream):
+class adLabelsStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
     """
@@ -1157,7 +1165,7 @@ class adlabelsStream(facebookStream):
         return params
 
 
-class AdaccountsStream(facebookStream):
+class adAccountsStream(facebookStream):
     """
     https://developers.facebook.com/docs/graph-api/reference/user/accounts/
     """
@@ -1380,7 +1388,7 @@ class AdaccountsStream(facebookStream):
         return params
 
 
-class CustomConversions(facebookStream):
+class customConversions(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1448,7 +1456,7 @@ class CustomConversions(facebookStream):
         return params
 
 
-class CustomAudiencesInternal(facebookStream):
+class customAudiencesInternal(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1472,7 +1480,7 @@ class CustomAudiencesInternal(facebookStream):
         "customer_file_source",
         "data_source",
         "delivery_status",
-        "description"
+        "description",
     ]
 
     name = "customaudiencesinternal"
@@ -1551,9 +1559,9 @@ class CustomAudiencesInternal(facebookStream):
             params["order_by"] = self.replication_key
 
         return params
-    
 
-class CustomAudiences(CustomAudiencesInternal):
+
+class customAudiences(customAudiencesInternal):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1569,9 +1577,7 @@ class CustomAudiences(CustomAudiencesInternal):
 
     # Add rule column
 
-    columns = [
-        "rule"
-    ]
+    columns = ["rule"]
 
     name = "customaudiences"
     path = "/customaudiences?fields={}".format(columns)
@@ -1600,4 +1606,3 @@ class CustomAudiences(CustomAudiencesInternal):
             params["order_by"] = self.replication_key
 
         return params
-    
