@@ -234,6 +234,9 @@ class adsStream(facebookStream):
         "tracking_specs",
         "conversion_specs",
         "recommendations",
+        "configured_status",
+        "conversion_domain",
+        "bid_amount"
     ]
 
     #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
@@ -519,7 +522,8 @@ class adsetsStream(facebookStream):
         "status",
         "bid_amount",
         "bid_strategy",
-        "targeting"
+        "targeting",
+        "bid_info"
     ]
 
     # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
