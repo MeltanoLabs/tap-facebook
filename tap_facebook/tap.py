@@ -17,6 +17,8 @@ from tap_facebook.streams import (
     adAccountsStream,
     customConversions,
     customAudiences,
+    adImages,
+    adVideos,
 )
 
 STREAM_TYPES = [
@@ -29,6 +31,8 @@ STREAM_TYPES = [
     adAccountsStream,
     customConversions,
     customAudiences,
+    adImages,
+    adVideos,
 ]
 
 

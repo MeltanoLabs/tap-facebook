@@ -1606,3 +1606,215 @@ class customAudiences(customAudiencesInternal):
             params["order_by"] = self.replication_key
 
         return params
+
+
+class adImages(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-image/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    columns = [
+        "id",
+        "account_id",
+        "created_time",
+        "creatives",
+        "hash",
+        "height",
+        "is_associated_creatives_in_adgroups",
+        "name",
+        "original_height",
+        "original_width",
+        "permalink_url",
+        "status",
+        "updated_time",
+        "url",
+        "url_128",
+        "width",
+    ]
+
+    name = "adimages"
+    path = "/adimages?fields={}".format(columns)
+    tap_stream_id = "images"
+    replication_keys = ["id"]
+    replication_method = "incremental"
+
+    schema = PropertiesList(
+        Property("id", StringType),
+        Property("account_id", StringType),
+        Property("created_time", StringType),
+        Property("creatives", StringType),
+        Property("hash", StringType),
+        Property("height", StringType),
+        Property("is_associated_creatives_in_adgroups", StringType),
+        Property("name", StringType),
+        Property("original_height", StringType),
+        Property("original_width", StringType),
+        Property("permalink_url", StringType),
+        Property("status", StringType),
+        Property("updated_time", StringType),
+        Property("url", StringType),
+        Property("url_128", StringType),
+        Property("width", StringType),
+
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
+class adVideos(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-image/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    columns = [
+        "id",
+        "updated_time",
+        "account_id",
+        "ad_breaks",
+        "backdated_time",
+        "backdated_time_granularity",
+        "content_category",
+        "content_tags",
+        "created_time",
+        "custom_labels",
+        "description",
+        "embed_html",
+        "embeddable",
+        "event",
+        "format",
+        "from_object",
+        "icon",
+        "is_crosspost_video",
+        "is_crossposting_eligible",
+        "is_episode",
+        "is_instagram_eligible",
+        #"is_reference_only",
+        "length",
+        "live_status",
+        #"music_video_copyright",
+        "permalink_url",
+        "place",
+        "post_views",
+        "premiere_living_room_status",
+        "privacy",
+        "published",
+        "scheduled_publish_time",
+        "source",
+        "status_processing_progress",
+        "status_value",
+        "title",
+        "universal_video_id",
+        "views",
+    ]
+
+    name = "advideos"
+    path = "/advideos?fields={}".format(columns)
+    tap_stream_id = "videos"
+    replication_keys = ["id"]
+    replication_method = "incremental"
+
+    schema = PropertiesList(
+        Property("id", StringType),
+        Property("account_id", StringType),
+        Property("account_id", StringType),
+        Property("ad_breaks", StringType),
+        Property("backdated_time", StringType),
+        Property("backdated_time_granularity", StringType),
+        Property("content_category", StringType),
+        Property("content_tags", StringType),
+        Property("created_time", StringType),
+        Property("custom_labels", StringType),
+        Property("description", StringType),
+        Property("embed_html", StringType),
+        Property("embeddable", StringType),
+        Property("event", StringType),
+        Property("format", StringType),
+        Property("from_object", StringType),
+        Property("icon", StringType),
+        Property("is_crosspost_video", StringType),
+        Property("is_crossposting_eligible", StringType),
+        Property("is_episode", StringType),
+        Property("is_instagram_eligible", StringType),
+        Property("is_reference_only", StringType),
+        Property("length", StringType),
+        Property("live_status", StringType),
+        Property("music_video_copyright", StringType),
+        Property("permalink_url", StringType),
+        Property("place", StringType),
+        Property("post_views", StringType),
+        Property("premiere_living_room_status", StringType),
+        Property("privacy", StringType),
+        Property("published", StringType),
+        Property("scheduled_publish_time", StringType),
+        Property("source", StringType),
+        Property("status_processing_progress", StringType),
+        Property("status_value", StringType),
+        Property("title", StringType),
+        Property("universal_video_id", StringType),
+        Property("views", StringType),
+
+
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
