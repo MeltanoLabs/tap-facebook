@@ -6,15 +6,10 @@ from singer_sdk.testing import get_standard_tap_tests
 
 from tap_facebook.tap import Tapfacebook
 
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-facebook_config = {
-    "start_date": os.getenv("TAP_FACEBOOK_START_DATE"),
-    "access_token":os.getenv("TAP_FACEBOOK_ACCESS_TOKEN"),
-    "account_id":os.getenv("TAP_FACEBOOK_ACCOUNT_ID"),
+SAMPLE_CONFIG = {
+    "start_date": "2023-03-01T00:00:00Z",
+    "access_token": "abc123",
+    "account_id":  "1000",
     "api_version":"v16.0"
 }
 
@@ -22,7 +17,7 @@ facebook_config = {
 # Run standard built-in tap tests from the SDK:
 def test_standard_tap_tests():
     """Run standard tap tests from the SDK."""
-    tests = get_standard_tap_tests(Tapfacebook, config=facebook_config)
+    tests = get_standard_tap_tests(Tapfacebook, config=SAMPLE_CONFIG)
     for test in tests:
         test()
 
