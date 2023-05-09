@@ -200,7 +200,7 @@ class adsInsightStream(facebookStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        params["action_attribution_windows"] = ["7d_click", "1d_view"]
+        params["action_attribution_windows"] = '["1d_view","7d_click"]'
 
         return params
 
@@ -236,7 +236,7 @@ class adsStream(facebookStream):
         "recommendations",
         "configured_status",
         "conversion_domain",
-        "bid_amount",
+        "bid_amount"
     ]
 
     #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
@@ -471,7 +471,7 @@ class adsStream(facebookStream):
             params["after"] = next_page_token
         if self.replication_key:
             params["sort"] = "asc"
-            params["order_by"] = self.replication_key
+            params["order_by"] = self.replication_key   
 
         return params
 
@@ -1026,7 +1026,7 @@ class creativeStream(facebookStream):
     replication_method = "incremental"
 
     schema = PropertiesList(
-        Property("id", StringType),
+        Property("id", IntegerType),
         Property("account_id", StringType),
         Property("actor_id", StringType),
         Property("applink_treatment", StringType),
@@ -1048,15 +1048,15 @@ class creativeStream(facebookStream):
         Property("enable_direct_install", BooleanType),
         Property("image_hash", StringType),
         Property("image_url", StringType),
-        Property("instagram_actor_id", StringType),
+        Property("instagram_actor_id", IntegerType),
         Property("instagram_permalink_url", StringType),
-        Property("instagram_story_id", StringType),
+        Property("instagram_story_id", IntegerType),
         Property("link_destination_display_url", StringType),
-        Property("link_og_id", StringType),
+        Property("link_og_id", IntegerType),
         Property("link_url", StringType),
         Property("messenger_sponsored_message", StringType),
         Property("name", StringType),
-        Property("object_id", StringType),
+        Property("object_id", IntegerType),
         Property("object_store_url", StringType),
         Property("object_story_id", StringType),
         Property("object_story_spec", StringType),
@@ -1064,18 +1064,52 @@ class creativeStream(facebookStream):
         Property("object_url", StringType),
         Property("page_link", StringType),
         Property("page_message", StringType),
-        Property("place_page_set_id", StringType),
+        Property("place_page_set_id", IntegerType),
         Property("platform_customizations", StringType),
-        Property("playable_asset_id", StringType),
-        Property("source_instagram_media_id", StringType),
+        Property("playable_asset_id", IntegerType),
+        Property("source_instagram_media_id", IntegerType),
         Property("status", StringType),
         Property("template_url", StringType),
-        Property("thumbnail_id", StringType),
+        Property("thumbnail_id", IntegerType),
         Property("thumbnail_url", StringType),
         Property("title", StringType),
         Property("url_tags", StringType),
         Property("use_page_actor_override", BooleanType),
-        Property("video_id", StringType),
+        Property("video_id", IntegerType),
+        Property("TEMPLATE_APP_LINK_SPEC_ANDROID", ArrayType(StringType)),
+        Property("TEMPLATE_APP_LINK_SPEC_IOS", ArrayType(StringType)),
+        Property("TEMPLATE_APP_LINK_SPEC_IPAD", ArrayType(StringType)),
+        Property("TEMPLATE_APP_LINK_SPEC_IPHONE", ArrayType(StringType)),
+        Property("TEMPLATE_CAPTION", StringType),
+        Property("TEMPLATE_CHILD_ATTACHMENTS", ArrayType(StringType)),
+        Property("TEMPLATE_DESCRIPTION", StringType),
+        Property("TEMPLATE_LINK", StringType),
+        Property("TEMPLATE_MESSAGE", StringType),
+        Property("TEMPLATE_PAGE_LINK", StringType),
+        Property("TEMPLATE_URL_SPEC_ANDROID_APP_NAME", StringType),
+        Property("TEMPLATE_URL_SPEC_ANDROID_PACKAGE", StringType),
+        Property("TEMPLATE_URL_SPEC_ANDROID_URL", StringType),
+        Property("TEMPLATE_URL_SPEC_CONFIG_APP_ID", StringType),
+        Property("TEMPLATE_URL_SPEC_IOS_APP_NAME", StringType),
+        Property("TEMPLATE_URL_SPEC_IOS_APP_STORE_ID", StringType),
+        Property("TEMPLATE_URL_SPEC_IOS_URL", StringType),
+        Property("TEMPLATE_URL_SPEC_IPAD_APP_NAME", StringType),
+        Property("TEMPLATE_URL_SPEC_IPAD_APP_STORE_ID", StringType),
+        Property("TEMPLATE_URL_SPEC_IPAD_URL", StringType),
+        Property("TEMPLATE_URL_SPEC_IPHONE_APP_NAME", StringType),
+        Property("TEMPLATE_URL_SPEC_IPHONE_APP_STORE_ID", StringType),
+        Property("TEMPLATE_URL_SPEC_IPHONE_URL", StringType),
+        Property("TEMPLATE_URL_SPEC_WEB_SHOULD_FALLBACK", StringType),
+        Property("TEMPLATE_URL_SPEC_WEB_URL", StringType),
+        Property("TEMPLATE_URL_SPEC_WINDOWS_PHONE_APP_ID", StringType),
+        Property("TEMPLATE_URL_SPEC_WINDOWS_PHONE_APP_NAME", StringType),
+        Property("TEMPLATE_URL_SPEC_WINDOWS_PHONE_URL", StringType),
+        Property("PLATFORM_CUSTOMIZATIONS_INSTAGRAM_CAPTION_IDS", ArrayType(StringType)),
+        Property("PLATFORM_CUSTOMIZATIONS_INSTAGRAM_IMAGE_HASH", StringType),
+        Property("PLATFORM_CUSTOMIZATIONS_INSTAGRAM_IMAGE_URL", StringType),
+        Property("PLATFORM_CUSTOMIZATIONS_INSTAGRAM_VIDEO_ID", IntegerType),
+        Property("OBJECT_STORY_LINK_DATA_CAPTION", StringType),
+        Property("OBJECT_STORY_LINK_DATA_DESCRIPTION", StringType)
     ).to_dict()
 
     def get_url_params(
