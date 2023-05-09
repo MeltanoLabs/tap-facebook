@@ -138,10 +138,11 @@ class facebookStream(RESTStream):
             )
             # Retry on reaching rate limit
             if (
-                    (response.status_code == 400
+                response.status_code == 400
                 and "too many calls" in str(response.content).lower()
-            ) or (response.status_code == 400
-                and "request limit reached" in str(response.content).lower())
+            ) or (
+                response.status_code == 400
+                and "request limit reached" in str(response.content).lower()
             ):
                 raise RetriableAPIError(msg, response)
 

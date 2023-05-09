@@ -4,6 +4,32 @@
 
 Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Targets.
 
+## Capabilities
+
+* `catalog`
+* `state`
+* `discover`
+* `about`
+* `stream-maps`
+* `schema-flattening`
+
+## Settings
+
+| Setting             | Required | Default | Description |
+|:--------------------|:--------:|:-------:|:------------|
+| access_token        |   True   |  None   | The token to authenticate against the API service |
+| api_version         |  False   |  v16.0  | The API version |
+| account_id          |   True   |  None   | Account ID  |
+| start_date          |  False   |  None   | The earliest record date to sync |
+| end_date            |  False   |  None   | The latest record date to sync |
+| stream_maps         |  False   |  None   | Config object for stream maps capability. |
+| stream_map_config   |  False   |  None   | User-defined config values to be used within map expressions. |
+| flattening_enabled  |  False   |  None   | 'True' to enable schema flattening and automatically expand nested properties. |
+| flattening_max_depth|  False   |  None   | The max depth to flatten schemas. |
+
+A full list of supported settings and capabilities is available by running: `tap-facebook --about`
+
+
 ## Installation
 
 ```bash
@@ -11,16 +37,6 @@ pipx install git+https://github.com/MeltanoLabs/tap-facebook-sdk.git
 ```
 
 ## Configuration
-
-### Accepted Config Options
-
-
-This tap requires the following environment variables to be set in ```.env```
-
-
-- [ ] `TAP_FACEBOOK_ACCOUNT_ID` facebook account ID
-- [ ] `TAP_FACEBOOK_ACCESS_TOKEN` facebook access token
-
 
 ### Meltano Variables
 
@@ -32,9 +48,6 @@ The following config values need to be set in order to use with Meltano. These c
 - [ ] `end_date:` end_date 
 - [ ] `account_id:` account ID from TAP_FACEBOOK_ACCOUNT_ID variable
 - [ ] `api_version:` api version
-
-A full list of supported settings and capabilities for this
-tap is available by running:
 
 ```bash
 tap-facebook --about

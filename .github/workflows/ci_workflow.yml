@@ -23,7 +23,7 @@ jobs:
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.1.8
+        version: 1.4.2
     - name: Install dependencies
       run: |
         poetry install
@@ -49,16 +49,16 @@ jobs:
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.1.11
+        version: 1.4.2
     - name: Install dependencies
       run: |
         poetry install
     - name: Test with pytest
       id: test_pytest
-      continue-on-error: true
+      continue-on-error: false
       env:
-         access_token: ${{ secrets.access_token }}
-         account_id: ${{ secrets.account_id }}
-         api_version: ${{ secrets.api_version }}   
+         TAP_FACEBOOK_ACCESS_TOKEN: ${{ secrets.access_token }}
+         TAP_FACEBOOK_ACCOUNT_ID: ${{ secrets.account_id }}
+         TAP_FACEBOOK_API_VERSION: ${{ secrets.api_version }}
       run: |
         poetry run pytest --capture=no

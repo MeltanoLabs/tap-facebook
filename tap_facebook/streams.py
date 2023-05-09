@@ -26,7 +26,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 # ads insights stream
-class adsInsightStream(facebookStream):
+class AdsInsightStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/insights.
     """
@@ -200,13 +200,13 @@ class adsInsightStream(facebookStream):
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
 
-        params["action_attribution_windows"] = ["7d_click", "1d_view"]
+        params["action_attribution_windows"] = '["1d_view","7d_click"]'
 
         return params
 
 
 # ads stream
-class adsStream(facebookStream):
+class AdsStream(facebookStream):
     """
     columns: columns which will be added to fields parameter in api
     name: stream name
@@ -477,7 +477,7 @@ class adsStream(facebookStream):
 
 
 # adsets stream
-class adsetsStream(facebookStream):
+class AdsetsStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/
     """
@@ -772,7 +772,7 @@ class adsetsStream(facebookStream):
 
 
 # campaigns stream
-class campaignStream(facebookStream):
+class CampaignStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group.
     """
@@ -952,7 +952,7 @@ class campaignStream(facebookStream):
         return params
 
 
-class creativeStream(facebookStream):
+class CreativeStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
     """
@@ -1026,7 +1026,7 @@ class creativeStream(facebookStream):
     replication_method = "incremental"
 
     schema = PropertiesList(
-        Property("id", StringType),
+        Property("id", IntegerType),
         Property("account_id", StringType),
         Property("actor_id", StringType),
         Property("applink_treatment", StringType),
@@ -1048,15 +1048,15 @@ class creativeStream(facebookStream):
         Property("enable_direct_install", BooleanType),
         Property("image_hash", StringType),
         Property("image_url", StringType),
-        Property("instagram_actor_id", StringType),
+        Property("instagram_actor_id", IntegerType),
         Property("instagram_permalink_url", StringType),
-        Property("instagram_story_id", StringType),
+        Property("instagram_story_id", IntegerType),
         Property("link_destination_display_url", StringType),
-        Property("link_og_id", StringType),
+        Property("link_og_id", IntegerType),
         Property("link_url", StringType),
         Property("messenger_sponsored_message", StringType),
         Property("name", StringType),
-        Property("object_id", StringType),
+        Property("object_id", IntegerType),
         Property("object_store_url", StringType),
         Property("object_story_id", StringType),
         Property("object_story_spec", StringType),
@@ -1064,18 +1064,56 @@ class creativeStream(facebookStream):
         Property("object_url", StringType),
         Property("page_link", StringType),
         Property("page_message", StringType),
-        Property("place_page_set_id", StringType),
+        Property("place_page_set_id", IntegerType),
         Property("platform_customizations", StringType),
-        Property("playable_asset_id", StringType),
-        Property("source_instagram_media_id", StringType),
+        Property("playable_asset_id", IntegerType),
+        Property("source_instagram_media_id", IntegerType),
         Property("status", StringType),
         Property("template_url", StringType),
-        Property("thumbnail_id", StringType),
+        Property("thumbnail_id", IntegerType),
         Property("thumbnail_url", StringType),
         Property("title", StringType),
         Property("url_tags", StringType),
         Property("use_page_actor_override", BooleanType),
-        Property("video_id", StringType),
+        Property("video_id", IntegerType),
+        Property("template_app_link_spec_android", ArrayType(StringType)),
+        Property("template_app_link_spec_ios", ArrayType(StringType)),
+        Property("template_app_link_spec_ipad", ArrayType(StringType)),
+        Property("template_app_link_spec_iphone", ArrayType(StringType)),
+        Property("template_caption", StringType),
+        Property("template_child_attachments", ArrayType(StringType)),
+        Property("template_description", StringType),
+        Property("template_link", StringType),
+        Property("template_message", StringType),
+        Property("template_page_link", StringType),
+        Property("template_url_spec_android_app_name", StringType),
+        Property("template_url_spec_android_package", StringType),
+        Property("template_url_spec_android_url", StringType),
+        Property("template_url_spec_config_app_id", StringType),
+        Property("template_url_spec_ios_app_name", StringType),
+        Property("template_url_spec_ios_app_store_id", StringType),
+        Property("template_url_spec_ios_url", StringType),
+        Property("template_url_spec_ipad_app_name", StringType),
+        Property("template_url_spec_ipad_app_store_id", StringType),
+        Property("template_url_spec_ipad_url", StringType),
+        Property("template_url_spec_iphone_app_name", StringType),
+        Property("template_url_spec_iphone_app_store_id", StringType),
+        Property("template_url_spec_iphone_url", StringType),
+        Property("template_url_spec_web_should_fallback", StringType),
+        Property("template_url_spec_web_url", StringType),
+        Property("template_url_spec_windows_phone_app_id", StringType),
+        Property("template_url_spec_windows_phone_app_name", StringType),
+        Property("template_url_spec_windows_phone_url", StringType),
+        Property(
+            "platform_customizations_instagram_caption_ids", ArrayType(StringType)
+        ),
+        Property("platform_customizations_instagram_image_hash", StringType),
+        Property("platform_customizations_instagram_image_url", StringType),
+        Property("platform_customizations_instagram_video_id", IntegerType),
+        Property("object_story_link_data_caption", StringType),
+        Property("object_story_link_data_description", StringType),
+        Property("product_set_id", StringType),
+        Property("carousel_ad_link", StringType),
     ).to_dict()
 
     def get_url_params(
@@ -1103,7 +1141,7 @@ class creativeStream(facebookStream):
         return params
 
 
-class adLabelsStream(facebookStream):
+class AdLabelsStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
     """
@@ -1165,7 +1203,7 @@ class adLabelsStream(facebookStream):
         return params
 
 
-class adAccountsStream(facebookStream):
+class AdAccountsStream(facebookStream):
     """
     https://developers.facebook.com/docs/graph-api/reference/user/accounts/
     """
@@ -1388,7 +1426,7 @@ class adAccountsStream(facebookStream):
         return params
 
 
-class customConversions(facebookStream):
+class CustomConversions(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1456,7 +1494,7 @@ class customConversions(facebookStream):
         return params
 
 
-class customAudiencesInternal(facebookStream):
+class CustomAudiencesInternal(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1561,7 +1599,7 @@ class customAudiencesInternal(facebookStream):
         return params
 
 
-class customAudiences(customAudiencesInternal):
+class CustomAudiences(CustomAudiencesInternal):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1608,7 +1646,7 @@ class customAudiences(customAudiencesInternal):
         return params
 
 
-class adImages(facebookStream):
+class AdImages(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-image/
     """
@@ -1691,7 +1729,7 @@ class adImages(facebookStream):
         return params
 
 
-class adVideos(facebookStream):
+class AdVideos(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-image/
     """
