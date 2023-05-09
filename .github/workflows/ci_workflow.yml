@@ -55,7 +55,7 @@ jobs:
         poetry install
     - name: Test with pytest
       id: test_pytest
-      continue-on-error: true
+      continue-on-error: false
       env:
          access_token: ${{ secrets.access_token }}
          account_id: ${{ secrets.account_id }}
