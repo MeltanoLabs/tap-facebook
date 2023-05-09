@@ -7,7 +7,7 @@ keywords = [
     "ELT",
     "facebook",
 ]
-license = "Apache 2.0"
+license = "Elastic-2.0"
 
 [tool.poetry.dependencies]
 python = "<3.11,>=3.7.1"
