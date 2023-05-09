@@ -17,15 +17,15 @@ Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Target
 
 | Setting             | Required | Default | Description |
 |:--------------------|:--------:|:-------:|:------------|
-| access_token        | False    | None    | The token to authenticate against the API service |
-| api_version         | False    | None    | The API version |
-| account_id          | False    | None    | Account ID  |
-| start_date          | False    | None    | The earliest record date to sync |
-| end_date            | False    | None    | The latest record date to sync |
-| stream_maps         | False    | None    | Config object for stream maps capability. |
-| stream_map_config   | False    | None    | User-defined config values to be used within map expressions. |
-| flattening_enabled  | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
-| flattening_max_depth| False    | None    | The max depth to flatten schemas. |
+| access_token        |   True   |  None   | The token to authenticate against the API service |
+| api_version         |  False   |  v16.0  | The API version |
+| account_id          |   True   |  None   | Account ID  |
+| start_date          |  False   |  None   | The earliest record date to sync |
+| end_date            |  False   |  None   | The latest record date to sync |
+| stream_maps         |  False   |  None   | Config object for stream maps capability. |
+| stream_map_config   |  False   |  None   | User-defined config values to be used within map expressions. |
+| flattening_enabled  |  False   |  None   | 'True' to enable schema flattening and automatically expand nested properties. |
+| flattening_max_depth|  False   |  None   | The max depth to flatten schemas. |
 
 A full list of supported settings and capabilities is available by running: `tap-facebook --about`
 
