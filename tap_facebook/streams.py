@@ -1664,7 +1664,6 @@ class adImages(facebookStream):
         Property("url", StringType),
         Property("url_128", StringType),
         Property("width", IntegerType),
-
     ).to_dict()
 
     def get_url_params(
@@ -1690,6 +1689,7 @@ class adImages(facebookStream):
             params["order_by"] = self.replication_key
 
         return params
+
 
 class adVideos(facebookStream):
     """
@@ -1727,10 +1727,10 @@ class adVideos(facebookStream):
         "is_crossposting_eligible",
         "is_episode",
         "is_instagram_eligible",
-        #"is_reference_only",
+        # "is_reference_only",
         "length",
         "live_status",
-        #"music_video_copyright",
+        # "music_video_copyright",
         "permalink_url",
         "place",
         "post_views",
@@ -1791,8 +1791,6 @@ class adVideos(facebookStream):
         Property("universal_video_id", StringType),
         Property("updated_time", StringType),
         Property("views", IntegerType),
-
-
     ).to_dict()
 
     def get_url_params(
