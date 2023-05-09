@@ -26,7 +26,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 # ads insights stream
-class adsinsightStream(facebookStream):
+class adsInsightStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/insights.
     """
@@ -236,7 +236,7 @@ class adsStream(facebookStream):
         "recommendations",
         "configured_status",
         "conversion_domain",
-        "bid_amount"
+        "bid_amount",
     ]
 
     #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
@@ -427,7 +427,7 @@ class adsStream(facebookStream):
         Property("conversion_specs", ArrayType(Property("items", StringType))),
         Property("placement_specific_instagram_advertising_policies", StringType),
         Property("recommendation_data", ArrayType(Property("items", StringType))),
-        Property("application", ArrayType(Property("items", StringType))), 
+        Property("application", ArrayType(Property("items", StringType))),
         Property("dataset", ArrayType(Property("items", StringType))),
         Property("event", ArrayType(Property("items", StringType))),
         Property("event_creator", ArrayType(Property("items", StringType))),
@@ -523,7 +523,7 @@ class adsetsStream(facebookStream):
         "bid_amount",
         "bid_strategy",
         "targeting",
-        "bid_info"
+        "bid_info",
     ]
 
     # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
@@ -668,7 +668,6 @@ class adsetsStream(facebookStream):
         Property("promoted_object_application_type", StringType),
         Property("bid_amount", StringType),
         Property("bid_strategy", StringType),
-
         Property(
             "targeting",
             ObjectType(
@@ -684,7 +683,6 @@ class adsetsStream(facebookStream):
                 Property("device_platforms", ArrayType(StringType)),
             ),
         ),
-        
         Property("targeting_app_install_state", StringType),
         Property("targeting_audience_network_positions", ArrayType(StringType)),
         Property("targeting_behaviors", ArrayType(StringType)),
@@ -693,14 +691,24 @@ class adsetsStream(facebookStream):
         Property("targeting_education_majors", ArrayType(StringType)),
         Property("targeting_education_schools", ArrayType(StringType)),
         Property("targeting_education_statuses", ArrayType(StringType)),
-        Property("targeting_effective_audience_network_positions", ArrayType(StringType)),
+        Property(
+            "targeting_effective_audience_network_positions", ArrayType(StringType)
+        ),
         Property("targeting_excluded_connections", ArrayType(StringType)),
         Property("targeting_excluded_geo_locations_countries", ArrayType(StringType)),
-        Property("targeting_excluded_geo_locations_country_groups", ArrayType(StringType)),
-        Property("targeting_excluded_geo_locations_custom_locations", ArrayType(StringType)),
-        Property("targeting_excluded_geo_locations_electoral_district", ArrayType(StringType)),
+        Property(
+            "targeting_excluded_geo_locations_country_groups", ArrayType(StringType)
+        ),
+        Property(
+            "targeting_excluded_geo_locations_custom_locations", ArrayType(StringType)
+        ),
+        Property(
+            "targeting_excluded_geo_locations_electoral_district", ArrayType(StringType)
+        ),
         Property("targeting_excluded_geo_locations_geo_markets", ArrayType(StringType)),
-        Property("targeting_excluded_geo_locations_location_types", ArrayType(StringType)),
+        Property(
+            "targeting_excluded_geo_locations_location_types", ArrayType(StringType)
+        ),
         Property("targeting_excluded_geo_locations_places", ArrayType(StringType)),
         Property("targeting_excluded_geo_locations_regions", ArrayType(StringType)),
         Property("targeting_excluded_geo_locations_cities", ArrayType(StringType)),
@@ -1095,7 +1103,7 @@ class creativeStream(facebookStream):
         return params
 
 
-class adlabelsStream(facebookStream):
+class adLabelsStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
     """
@@ -1157,7 +1165,7 @@ class adlabelsStream(facebookStream):
         return params
 
 
-class AdaccountsStream(facebookStream):
+class adAccountsStream(facebookStream):
     """
     https://developers.facebook.com/docs/graph-api/reference/user/accounts/
     """
@@ -1380,7 +1388,7 @@ class AdaccountsStream(facebookStream):
         return params
 
 
-class CustomConversions(facebookStream):
+class customConversions(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1448,7 +1456,7 @@ class CustomConversions(facebookStream):
         return params
 
 
-class CustomAudiencesInternal(facebookStream):
+class customAudiencesInternal(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1472,7 +1480,7 @@ class CustomAudiencesInternal(facebookStream):
         "customer_file_source",
         "data_source",
         "delivery_status",
-        "description"
+        "description",
     ]
 
     name = "customaudiencesinternal"
@@ -1551,9 +1559,9 @@ class CustomAudiencesInternal(facebookStream):
             params["order_by"] = self.replication_key
 
         return params
-    
 
-class CustomAudiences(CustomAudiencesInternal):
+
+class customAudiences(customAudiencesInternal):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1569,9 +1577,7 @@ class CustomAudiences(CustomAudiencesInternal):
 
     # Add rule column
 
-    columns = [
-        "rule"
-    ]
+    columns = ["rule"]
 
     name = "customaudiences"
     path = "/customaudiences?fields={}".format(columns)
@@ -1600,4 +1606,213 @@ class CustomAudiences(CustomAudiencesInternal):
             params["order_by"] = self.replication_key
 
         return params
-    
+
+
+class adImages(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-image/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    columns = [
+        "id",
+        "account_id",
+        "created_time",
+        "creatives",
+        "hash",
+        "height",
+        "is_associated_creatives_in_adgroups",
+        "name",
+        "original_height",
+        "original_width",
+        "permalink_url",
+        "status",
+        "updated_time",
+        "url",
+        "url_128",
+        "width",
+    ]
+
+    name = "adimages"
+    path = "/adimages?fields={}".format(columns)
+    tap_stream_id = "images"
+    replication_keys = ["id"]
+    replication_method = "incremental"
+
+    schema = PropertiesList(
+        Property("id", StringType),
+        Property("account_id", StringType),
+        Property("created_time", StringType),
+        Property("creatives", StringType),
+        Property("hash", StringType),
+        Property("height", IntegerType),
+        Property("is_associated_creatives_in_adgroups", BooleanType),
+        Property("name", StringType),
+        Property("original_height", IntegerType),
+        Property("original_width", IntegerType),
+        Property("permalink_url", StringType),
+        Property("status", StringType),
+        Property("updated_time", StringType),
+        Property("url", StringType),
+        Property("url_128", StringType),
+        Property("width", IntegerType),
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
+
+
+class adVideos(facebookStream):
+    """
+    https://developers.facebook.com/docs/marketing-api/reference/ad-image/
+    """
+
+    """
+    columns: columns which will be added to fields parameter in api
+    name: stream name
+    account_id: facebook account
+    path: path which will be added to api url in client.py
+    schema: instream schema
+    tap_stream_id = stream id
+    """
+
+    columns = [
+        "id",
+        "updated_time",
+        "account_id",
+        "ad_breaks",
+        "backdated_time",
+        "backdated_time_granularity",
+        "content_category",
+        "content_tags",
+        "created_time",
+        "custom_labels",
+        "description",
+        "embed_html",
+        "embeddable",
+        "event",
+        "format",
+        "from_object",
+        "icon",
+        "is_crosspost_video",
+        "is_crossposting_eligible",
+        "is_episode",
+        "is_instagram_eligible",
+        # "is_reference_only",
+        "length",
+        "live_status",
+        # "music_video_copyright",
+        "permalink_url",
+        "place",
+        "post_views",
+        "premiere_living_room_status",
+        "privacy",
+        "published",
+        "scheduled_publish_time",
+        "source",
+        "status_processing_progress",
+        "status_value",
+        "title",
+        "universal_video_id",
+        "views",
+    ]
+
+    name = "advideos"
+    path = "/advideos?fields={}".format(columns)
+    tap_stream_id = "videos"
+    replication_keys = ["id"]
+    replication_method = "incremental"
+
+    schema = PropertiesList(
+        Property("id", StringType),
+        Property("account_id", IntegerType),
+        Property("ad_breaks", StringType),
+        Property("backdated_time", DateTimeType),
+        Property("backdated_time_granularity", StringType),
+        Property("content_category", StringType),
+        Property("content_tags", StringType),
+        Property("created_time", StringType),
+        Property("custom_labels", StringType),
+        Property("description", StringType),
+        Property("embed_html", StringType),
+        Property("embeddable", BooleanType),
+        Property("event", StringType),
+        Property("format", StringType),
+        Property("from_object", StringType),
+        Property("icon", StringType),
+        Property("is_crosspost_video", BooleanType),
+        Property("is_crossposting_eligible", BooleanType),
+        Property("is_episode", BooleanType),
+        Property("is_instagram_eligible", BooleanType),
+        Property("is_reference_only", BooleanType),
+        Property("length", IntegerType),
+        Property("live_status", StringType),
+        Property("music_video_copyright", StringType),
+        Property("permalink_url", StringType),
+        Property("place", StringType),
+        Property("post_views", IntegerType),
+        Property("premiere_living_room_status", StringType),
+        Property("privacy", StringType),
+        Property("published", BooleanType),
+        Property("scheduled_publish_time", DateTimeType),
+        Property("source", StringType),
+        Property("status_processing_progress", IntegerType),
+        Property("status_value", StringType),
+        Property("title", StringType),
+        Property("universal_video_id", StringType),
+        Property("updated_time", StringType),
+        Property("views", IntegerType),
+    ).to_dict()
+
+    def get_url_params(
+        self,
+        context: dict | None,
+        next_page_token: Any | None,
+    ) -> dict[str, Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {}
+        params["limit"] = 25
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        if self.replication_key:
+            params["sort"] = "asc"
+            params["order_by"] = self.replication_key
+
+        return params
