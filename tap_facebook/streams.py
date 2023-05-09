@@ -26,7 +26,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 # ads insights stream
-class adsInsightStream(facebookStream):
+class AdsInsightStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/insights.
     """
@@ -206,7 +206,7 @@ class adsInsightStream(facebookStream):
 
 
 # ads stream
-class adsStream(facebookStream):
+class AdsStream(facebookStream):
     """
     columns: columns which will be added to fields parameter in api
     name: stream name
@@ -477,7 +477,7 @@ class adsStream(facebookStream):
 
 
 # adsets stream
-class adsetsStream(facebookStream):
+class AdsetsStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/
     """
@@ -772,7 +772,7 @@ class adsetsStream(facebookStream):
 
 
 # campaigns stream
-class campaignStream(facebookStream):
+class CampaignStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group.
     """
@@ -952,7 +952,7 @@ class campaignStream(facebookStream):
         return params
 
 
-class creativeStream(facebookStream):
+class CreativeStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
     """
@@ -1141,7 +1141,7 @@ class creativeStream(facebookStream):
         return params
 
 
-class adLabelsStream(facebookStream):
+class AdLabelsStream(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-creative/
     """
@@ -1203,7 +1203,7 @@ class adLabelsStream(facebookStream):
         return params
 
 
-class adAccountsStream(facebookStream):
+class AdAccountsStream(facebookStream):
     """
     https://developers.facebook.com/docs/graph-api/reference/user/accounts/
     """
@@ -1426,7 +1426,7 @@ class adAccountsStream(facebookStream):
         return params
 
 
-class customConversions(facebookStream):
+class CustomConversions(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1494,7 +1494,7 @@ class customConversions(facebookStream):
         return params
 
 
-class customAudiencesInternal(facebookStream):
+class CustomAudiencesInternal(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1599,7 +1599,7 @@ class customAudiencesInternal(facebookStream):
         return params
 
 
-class customAudiences(customAudiencesInternal):
+class CustomAudiences(CustomAudiencesInternal):
     """
     https://developers.facebook.com/docs/marketing-api/reference/custom-audience/
     """
@@ -1646,7 +1646,7 @@ class customAudiences(customAudiencesInternal):
         return params
 
 
-class adImages(facebookStream):
+class AdImages(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-image/
     """
@@ -1729,7 +1729,7 @@ class adImages(facebookStream):
         return params
 
 
-class adVideos(facebookStream):
+class AdVideos(facebookStream):
     """
     https://developers.facebook.com/docs/marketing-api/reference/ad-image/
     """
