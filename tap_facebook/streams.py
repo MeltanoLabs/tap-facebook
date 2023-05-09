@@ -236,7 +236,7 @@ class adsStream(facebookStream):
         "recommendations",
         "configured_status",
         "conversion_domain",
-        "bid_amount"
+        "bid_amount",
     ]
 
     #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS, COLUMNS ARE REPORTED AS NULL AND NOT CRITICAL TO REPORTS
@@ -471,7 +471,7 @@ class adsStream(facebookStream):
             params["after"] = next_page_token
         if self.replication_key:
             params["sort"] = "asc"
-            params["order_by"] = self.replication_key   
+            params["order_by"] = self.replication_key
 
         return params
 
@@ -1104,14 +1104,16 @@ class creativeStream(facebookStream):
         Property("template_url_spec_windows_phone_app_id", StringType),
         Property("template_url_spec_windows_phone_app_name", StringType),
         Property("template_url_spec_windows_phone_url", StringType),
-        Property("platform_customizations_instagram_caption_ids", ArrayType(StringType)),
+        Property(
+            "platform_customizations_instagram_caption_ids", ArrayType(StringType)
+        ),
         Property("platform_customizations_instagram_image_hash", StringType),
         Property("platform_customizations_instagram_image_url", StringType),
         Property("platform_customizations_instagram_video_id", IntegerType),
         Property("object_story_link_data_caption", StringType),
         Property("object_story_link_data_description", StringType),
         Property("product_set_id", StringType),
-        Property("carousel_ad_link", StringType)
+        Property("carousel_ad_link", StringType),
     ).to_dict()
 
     def get_url_params(

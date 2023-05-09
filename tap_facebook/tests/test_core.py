@@ -9,8 +9,8 @@ from tap_facebook.tap import Tapfacebook
 SAMPLE_CONFIG = {
     "start_date": "2023-03-01T00:00:00Z",
     "access_token": "abc123",
-    "account_id":  "1000",
-    "api_version":"v16.0"
+    "account_id": "1000",
+    "api_version": "v16.0",
 }
 
 
