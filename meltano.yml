@@ -1,4 +1,5 @@
 version: 1
+default_environment: dev
 send_anonymous_usage_stats: true
 project_id: tap-facebook
 plugins:
@@ -10,69 +11,20 @@ plugins:
     - state
     - catalog
     - discover
+    settings:
+    - name: access_token
+      kind: password
+    - name: start_date
+      value: '2023-03-01T00:00:00Z'
+      kind: date_iso8601
+    - name: end_date
+      value: '2023-03-31T00:00:00Z'
+      kind: date_iso8601
+    - name: account_id
+      kind: string
+    - name: api_version
+      value: 'v16.0'
     config:
-      start_date: MELTANO_START_DATE
-      account_id: MELTANO_ACCOUNT_ID
       insights_buffer_days: 7
-      access_token: MELTANO_ACCESS_TOKEN
-  - name: facebook-ads
-    inherit_from: tap-facebook
-    config:
-      start_date: MELTANO_START_DATE
-    load_schema: MELTANO_FACEBOOK
-    select:
-    - ads.*
-  - name: facebook-ads-insights
-    inherit_from: tap-facebook
-    config:
-      start_date: MELTANO_START_DATE
-    select:
-    - adsinsights.*
-  - name: facebook-adsets
-    inherit_from: tap-facebook
-    config:
-      start_date: MELTANO_START_DATE
-    select:
-    - adsets.*
-  - name: facebook-campaigns
-    inherit_from: tap-facebook
-    config:
-      start_date: MELTANO_START_DATE
-    select:
-    - campaigns.*
-  - name: facebook-adhistory
-    inherit_from: tap-facebook
-    config:
-      start_date: MELTANO_START_DATE
-    select:
-    - ad_history.*
-  - name: facebook-campaignhistory
-    inherit_from: tap-facebook
-    config:
-      start_date: MELTANO_START_DATE
-    select:
-    - campaign_history.*
-  - name: facebook-adsethistory
-    inherit_from: tap-facebook
-    config:
-      start_date: MELTANO_START_DATE
-    select:
-    - ad_set_history.*
-  loaders:
-  - name: target-csv
-    variant: hotgluexyz
-    pip_url: git+https://github.com/hotgluexyz/target-csv.git@0.3.3
-    config:
-      destination_path: MELTANO_OUTPUT_PATH
-  - name: target-snowflake
-    variant: transferwise
-    pip_url: pipelinewise-target-snowflake
-    config:
-      batch_size: 5
-  - name: target-jsonl
-    variant: andyh1203
-    pip_url: target-jsonl
-    config:
-      destination_path: $MELTANO_PROJECT_ROOT
-      do_timestamp_file: true
-      custom_name: MELTANO_OUTPUT_FILE
+environments:
+- name: dev      

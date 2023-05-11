@@ -23,7 +23,7 @@ jobs:
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.1.8
+        version: 1.4.2
     - name: Install dependencies
       run: |
         poetry install
@@ -38,7 +38,7 @@ jobs:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.9]
 
     steps:
     - uses: actions/checkout@v2
@@ -49,10 +49,16 @@ jobs:
     - name: Install Poetry
       uses: snok/install-poetry@v1
       with:
-        version: 1.1.11
+        version: 1.4.2
     - name: Install dependencies
       run: |
         poetry install
     - name: Test with pytest
+      id: test_pytest
+      continue-on-error: false
+      env:
+         TAP_FACEBOOK_ACCESS_TOKEN: ${{ secrets.access_token }}
+         TAP_FACEBOOK_ACCOUNT_ID: ${{ secrets.account_id }}
+         TAP_FACEBOOK_API_VERSION: ${{ secrets.api_version }}
       run: |
         poetry run pytest --capture=no

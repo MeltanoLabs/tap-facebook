@@ -4,12 +4,15 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Callable, Iterable
-
-import requests
-import json
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
+from urllib.parse import parse_qs, urlparse
+from dateutil.parser import parse
+from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
+
+import requests, json
+import backoff
 
 _Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -18,24 +21,20 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 class facebookStream(RESTStream):
     """facebook stream class."""
 
-    # open config.json to read account id
-    with open(".secrets/config.json") as config_json:
-        config = json.load(config_json)
-
-    # get account id from config.json
-    account_id = config['account_id']
-
     # add account id in the url
-    url_base = "https://graph.facebook.com/v16.0/act_{}".format(account_id)
+    # path and fields will be added to this url in streams.pys
 
-    # OR use a dynamic url_base:
-    # @property
-    # def url_base(self) -> str:
-    #     """Return the API URL root, configurable via tap settings."""
-    #     return self.config["api_url"]
+    @property
+    def url_base(self):
+        version = self.config.get("api_version", "")
+        account_id = self.config.get("account_id", "")
+        base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
+        return base_url
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.paging.cursors.after"  # Or override `get_next_page_token`.
+    next_page_token_jsonpath = "$.paging.cursors.after"
+
+    tolerated_http_errors: List[int] = []
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -116,25 +115,52 @@ class facebookStream(RESTStream):
         """
         return None
 
-    def parse_response(self, response: requests.Response) -> Iterable[dict]:
-        """Parse the response and return an iterator of result records.
-
-        Args:
-            response: The HTTP ``requests.Response`` object.
-
-        Yields:
-            Each record from the source.
+    ##TODO: ADD ERROR HANDLING FOR API RATE LIMIT - WORKING IN API-LIMIT-HANDLING BRANCH
+    def validate_response(self, response: requests.Response) -> None:
+        """Validate HTTP response.
+        Raises:
+            FatalAPIError: If the request is not retriable.
+            RetriableAPIError: If the request is retriable.
         """
-        yield from extract_jsonpath(self.records_jsonpath, input=response.json())
+        full_path = urlparse(response.url).path
+        if response.status_code in self.tolerated_http_errors:
+            msg = (
+                f"{response.status_code} Tolerated Status Code "
+                f"(Reason: {response.reason}) for path: {full_path}"
+            )
+            self.logger.info(msg)
+            return
 
-    def post_process(self, row: dict, context: dict | None = None) -> dict | None:
-        """As needed, append or transform raw data to match expected structure.
+        if 400 <= response.status_code < 500:
+            msg = (
+                f"{response.status_code} Client Error: "
+                f"{str(response.content)} (Reason: {response.reason}) for path: {full_path}"
+            )
+            # Retry on reaching rate limit
+            if (
+                response.status_code == 400
+                and "too many calls" in str(response.content).lower()
+            ) or (
+                response.status_code == 400
+                and "request limit reached" in str(response.content).lower()
+            ):
+                raise RetriableAPIError(msg, response)
 
-        Args:
-            row: An individual record from the stream.
-            context: The stream context.
+            raise FatalAPIError(msg)
+
+        elif 500 <= response.status_code < 600:
+            msg = (
+                f"{response.status_code} Server Error: "
+                f"{str(response.content)} (Reason: {response.reason}) for path: {full_path}"
+            )
+            raise RetriableAPIError(msg, response)
+
+    def backoff_max_tries(self) -> int:
+        """The number of attempts before giving up when retrying requests.
+
+        Setting to None will retry indefinitely.
 
         Returns:
-            The updated record dictionary, or ``None`` to skip the record.
+            int: limit
         """
-        return row
+        return 20
