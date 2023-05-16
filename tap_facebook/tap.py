@@ -2,23 +2,23 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
-# streams
-from tap_facebook import streams
 from tap_facebook.streams import (
+    AdAccountsStream,
+    AdImages,
+    AdLabelsStream,
     AdsetsStream,
     AdsInsightStream,
     AdsStream,
+    AdVideos,
     CampaignStream,
     CreativeStream,
-    AdLabelsStream,
-    AdAccountsStream,
-    CustomConversions,
     CustomAudiences,
-    AdImages,
-    AdVideos,
+    CustomConversions,
 )
 
 STREAM_TYPES = [
@@ -34,6 +34,9 @@ STREAM_TYPES = [
     AdImages,
     AdVideos,
 ]
+
+if t.TYPE_CHECKING:
+    from tap_facebook import streams
 
 
 class Tapfacebook(Tap):
@@ -66,15 +69,13 @@ class Tapfacebook(Tap):
         ),
     ).to_dict()
 
-    def discover_streams(self) -> list[streams.facebookStream]:
+    def discover_streams(self) -> list[streams.FacebookStream]:
         """Return a list of discovered streams.
 
         Returns:
             A list of discovered streams.
         """
-        stream_list = [stream_class(tap=self) for stream_class in STREAM_TYPES]
-
-        return stream_list
+        return [stream_class(tap=self) for stream_class in STREAM_TYPES]
 
 
 if __name__ == "__main__":

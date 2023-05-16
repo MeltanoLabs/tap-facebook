@@ -1,12 +1,18 @@
 """facebook Authentication."""
 
+from __future__ import annotations
+
+import typing as t
 
 from singer_sdk.authenticators import OAuthAuthenticator, SingletonMeta
+
+if t.TYPE_CHECKING:
+    from tap_facebook.client import FacebookStream
 
 
 # The SingletonMeta metaclass makes your streams reuse the same authenticator instance.
 # If this behaviour interferes with your use-case, you can remove the metaclass.
-class facebookAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
+class FacebookAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
     """Authenticator class for facebook."""
 
     @property
@@ -23,7 +29,10 @@ class facebookAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
         }
 
     @classmethod
-    def create_for_stream(cls, stream) -> "facebookAuthenticator":
+    def create_for_stream(
+        cls: type[FacebookAuthenticator],
+        stream: FacebookStream,
+    ) -> FacebookAuthenticator:
         return cls(
             stream=stream,
             auth_endpoint="TODO: OAuth Endpoint URL",
