@@ -20,6 +20,7 @@ from singer_sdk.typing import (
     ArrayType,
     BooleanType,
     IntegerType,
+    NumberType,
 )
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
@@ -1319,7 +1320,7 @@ class AdAccountsStream(facebookStream):
         Property("timezone_id", IntegerType),
         Property("business_name", StringType),
         Property("account_status", StringType),
-        Property("age", StringType),
+        Property("age", NumberType),
         Property("amount_spent", IntegerType),
         Property("balance", IntegerType),
         Property("business_city", StringType),
