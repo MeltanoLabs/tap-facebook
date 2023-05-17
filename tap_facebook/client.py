@@ -2,39 +2,38 @@
 
 from __future__ import annotations
 
+import typing as t
+from http import HTTPStatus
 from pathlib import Path
-from typing import Any, Callable, Iterable
+from urllib.parse import urlparse
+
 from singer_sdk.authenticators import BearerTokenAuthenticator
+from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
-from urllib.parse import parse_qs, urlparse
-from dateutil.parser import parse
-from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 
-import requests, json
-import backoff
+if t.TYPE_CHECKING:
+    import requests
 
-_Auth = Callable[[requests.PreparedRequest], requests.PreparedRequest]
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
-class facebookStream(RESTStream):
+class FacebookStream(RESTStream):
     """facebook stream class."""
 
     # add account id in the url
     # path and fields will be added to this url in streams.pys
 
     @property
-    def url_base(self):
+    def url_base(self) -> str:
         version = self.config.get("api_version", "")
         account_id = self.config.get("account_id", "")
-        base_url = "https://graph.facebook.com/{}/act_{}".format(version, account_id)
-        return base_url
+        return f"https://graph.facebook.com/{version}/act_{account_id}"
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
-    next_page_token_jsonpath = "$.paging.cursors.after"
+    next_page_token_jsonpath = "$.paging.cursors.after"  # noqa: S105
 
-    tolerated_http_errors: List[int] = []
+    tolerated_http_errors: list[int] = []
 
     @property
     def authenticator(self) -> BearerTokenAuthenticator:
@@ -51,8 +50,8 @@ class facebookStream(RESTStream):
     def get_next_page_token(
         self,
         response: requests.Response,
-        previous_token: Any | None,
-    ) -> Any | None:
+        previous_token: t.Any | None,  # noqa: ARG002
+    ) -> t.Any | None:
         """Return a token for identifying next page or None if no more pages.
 
         Args:
@@ -64,7 +63,8 @@ class facebookStream(RESTStream):
         """
         if self.next_page_token_jsonpath:
             all_matches = extract_jsonpath(
-                self.next_page_token_jsonpath, response.json()
+                self.next_page_token_jsonpath,
+                response.json(),
             )
             first_match = next(iter(all_matches), None)
             next_page_token = first_match
@@ -75,9 +75,9 @@ class facebookStream(RESTStream):
 
     def get_url_params(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
-    ) -> dict[str, Any]:
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,
+    ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
 
         Args:
@@ -99,8 +99,8 @@ class facebookStream(RESTStream):
 
     def prepare_request_payload(
         self,
-        context: dict | None,
-        next_page_token: Any | None,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,  # noqa: ARG002
     ) -> dict | None:
         """Prepare the data payload for the REST API request.
 
@@ -118,6 +118,7 @@ class facebookStream(RESTStream):
     ##TODO: ADD ERROR HANDLING FOR API RATE LIMIT - WORKING IN API-LIMIT-HANDLING BRANCH
     def validate_response(self, response: requests.Response) -> None:
         """Validate HTTP response.
+
         Raises:
             FatalAPIError: If the request is not retriable.
             RetriableAPIError: If the request is retriable.
@@ -131,27 +132,31 @@ class facebookStream(RESTStream):
             self.logger.info(msg)
             return
 
-        if 400 <= response.status_code < 500:
+        if (
+            HTTPStatus.BAD_REQUEST
+            <= response.status_code
+            < HTTPStatus.INTERNAL_SERVER_ERROR
+        ):
             msg = (
                 f"{response.status_code} Client Error: "
-                f"{str(response.content)} (Reason: {response.reason}) for path: {full_path}"
+                f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"
             )
             # Retry on reaching rate limit
             if (
-                response.status_code == 400
+                response.status_code == HTTPStatus.BAD_REQUEST
                 and "too many calls" in str(response.content).lower()
             ) or (
-                response.status_code == 400
+                response.status_code == HTTPStatus.BAD_REQUEST
                 and "request limit reached" in str(response.content).lower()
             ):
                 raise RetriableAPIError(msg, response)
 
             raise FatalAPIError(msg)
 
-        elif 500 <= response.status_code < 600:
+        if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
             msg = (
                 f"{response.status_code} Server Error: "
-                f"{str(response.content)} (Reason: {response.reason}) for path: {full_path}"
+                f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"
             )
             raise RetriableAPIError(msg, response)
 

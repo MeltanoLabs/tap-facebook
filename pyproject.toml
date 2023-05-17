@@ -36,3 +36,21 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 # CLI declaration
 tap-facebook = 'tap_facebook.tap:Tapfacebook.cli'
+
+[tool.ruff]
+ignore = ["ANN101", "DJ", "PD", "D101", "D102"]
+line-length = 100
+select = ["ALL"]
+target-version = "py37"
+
+[tool.ruff.flake8-import-conventions]
+banned-from = ["typing"]
+
+[tool.ruff.flake8-import-conventions.extend-aliases]
+typing = "t"
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["ANN201"]
+
+[tool.ruff.pydocstyle]
+convention = "google"

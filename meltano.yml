@@ -27,4 +27,4 @@ plugins:
     config:
       insights_buffer_days: 7
 environments:
-- name: dev      
+- name: dev
