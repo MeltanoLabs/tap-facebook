@@ -1,7 +1,7 @@
 """Tests standard tap features using the built-in SDK tests library."""
 
 
-from singer_sdk.testing import get_tap_test_class
+from singer_sdk.testing import SuiteConfig, get_tap_test_class
 
 from tap_facebook.tap import Tapfacebook
 
@@ -10,4 +10,10 @@ SAMPLE_CONFIG = {
     "api_version": "v16.0",
 }
 
-TestTapFacebook = get_tap_test_class(Tapfacebook, config=SAMPLE_CONFIG)
+TestTapFacebook = get_tap_test_class(
+    Tapfacebook,
+    config=SAMPLE_CONFIG,
+    suite_config=SuiteConfig(
+        max_records_limit=20,
+    ),
+)
