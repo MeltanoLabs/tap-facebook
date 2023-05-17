@@ -45,7 +45,7 @@ The following config values need to be set in order to use with Meltano. These c
 
 - [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
 - [ ] `start_date:` start date
-- [ ] `end_date:` end_date 
+- [ ] `end_date:` end_date
 - [ ] `account_id:` account ID from TAP_FACEBOOK_ACCOUNT_ID variable
 - [ ] `api_version:` api version
 
@@ -67,7 +67,7 @@ The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensa
 
 Attribution Window is time period during which conversions might be credited to ads, we can have this time period between 1 day to 7 days for clicks and views
 
-- [ ] `action_attribution_windows:` We can add these variable to params, it will have a list type value which takes in 1d-7d clicks and 1d-7d views values. We have added      
+- [ ] `action_attribution_windows:` We can add these variable to params, it will have a list type value which takes in 1d-7d clicks and 1d-7d views values. We have added
 this variable in get_url_params function of ads insights stream
 
 
@@ -84,7 +84,7 @@ Hitting the rate limit for the Facebook API while making requests will return th
 
 ```400 Client Error: b'{"error":{"message":"(#80004) There have been too many calls to this ad-account. Wait a bit and try again```
 
-This error is handled using the [Backoff Library](https://github.com/litl/backoff), and the program will cease for a random amount of time before 
+This error is handled using the [Backoff Library](https://github.com/litl/backoff), and the program will cease for a random amount of time before
 attempting to call the API again
 
 ### Metadata Columns
@@ -162,5 +162,5 @@ meltano elt tap-facebook target-jsonl
 
 ### SDK Dev Guide
 
-See the [dev guide](https://sdk.meltano.com/en/latest/dev_guide.html) for more instructions on how to use the SDK to 
+See the [dev guide](https://sdk.meltano.com/en/latest/dev_guide.html) for more instructions on how to use the SDK to
 develop your own taps and targets.
