@@ -11,6 +11,7 @@ from singer_sdk.typing import (
     BooleanType,
     DateTimeType,
     IntegerType,
+    NumberType,
     ObjectType,
     PropertiesList,
     Property,
@@ -151,7 +152,7 @@ class AdsInsightStream(FacebookStream):
         Property("unique_clicks", StringType),
         Property("social_spend", StringType),
         Property("canvas_avg_view_percent", StringType),
-        Property("account_id", IntegerType),
+        Property("account_id", StringType),
         Property("date_start", DateTimeType),
         Property("objective", StringType),
         Property("quality_ranking", StringType),
@@ -252,7 +253,7 @@ class AdsStream(FacebookStream):
 
     schema = PropertiesList(
         Property("bid_type", StringType),
-        Property("account_id", IntegerType),
+        Property("account_id", StringType),
         Property("campaign_id", StringType),
         Property("adset_id", StringType),
         Property(
@@ -598,7 +599,7 @@ class AdsetsStream(FacebookStream):
             ),
         ),
         Property("id", IntegerType),
-        Property("account_id", IntegerType),
+        Property("account_id", StringType),
         Property("updated_time", StringType),
         Property("daily_budget", StringType),
         Property("budget_remaining", StringType),
@@ -860,7 +861,7 @@ class CampaignStream(FacebookStream):
         Property("name", StringType),
         Property("objective", StringType),
         Property("id", IntegerType),
-        Property("account_id", IntegerType),
+        Property("account_id", StringType),
         Property("effective_status", StringType),
         Property("buying_type", StringType),
         Property("can_create_brand_lift_study", BooleanType),
@@ -1176,7 +1177,7 @@ class AdLabelsStream(FacebookStream):
         Property(
             "account",
             ObjectType(
-                Property("account_id", IntegerType),
+                Property("account_id", StringType),
                 Property("id", IntegerType),
             ),
         ),
@@ -1323,7 +1324,7 @@ class AdAccountsStream(FacebookStream):
         Property("timezone_id", IntegerType),
         Property("business_name", StringType),
         Property("account_status", StringType),
-        Property("age", StringType),
+        Property("age", NumberType),
         Property("amount_spent", IntegerType),
         Property("balance", IntegerType),
         Property("business_city", StringType),
@@ -1462,7 +1463,7 @@ class CustomConversions(FacebookStream):
     replication_method = "incremental"
 
     schema = PropertiesList(
-        Property("account_id", IntegerType),
+        Property("account_id", StringType),
         Property("id", IntegerType),
         Property("name", StringType),
         Property("creation_time", StringType),
@@ -1530,7 +1531,7 @@ class CustomAudiencesInternal(FacebookStream):
     replication_method = "incremental"
 
     schema = PropertiesList(
-        Property("account_id", IntegerType),
+        Property("account_id", StringType),
         Property("id", IntegerType),
         Property("approximate_count_lower_bound", IntegerType),
         Property("approximate_count_upper_bound", IntegerType),
@@ -1787,7 +1788,7 @@ class AdVideos(FacebookStream):
 
     schema = PropertiesList(
         Property("id", StringType),
-        Property("account_id", IntegerType),
+        Property("account_id", StringType),
         Property("ad_breaks", StringType),
         Property("backdated_time", DateTimeType),
         Property("backdated_time_granularity", StringType),
