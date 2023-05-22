@@ -18,7 +18,6 @@ class FacebookAuthenticator(OAuthAuthenticator, metaclass=SingletonMeta):
     @property
     def oauth_request_body(self) -> dict:
         """Define the OAuth request body for the facebook API."""
-        # TODO: Define the request body needed for the API.
         return {
             "resource": "https://analysis.windows.net/powerbi/api",
             "scope": self.oauth_scopes,
