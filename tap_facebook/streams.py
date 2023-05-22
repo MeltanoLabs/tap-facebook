@@ -20,6 +20,8 @@ from singer_sdk.typing import (
 
 from tap_facebook.client import FacebookStream
 
+from datetime import datetime
+
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
@@ -36,135 +38,45 @@ class AdsInsightStream(FacebookStream):
     tap_stream_id = stream id
     """
 
-    columns = [
-        "account_id",
-        "ad_id",
-        "adset_id",
-        "campaign_id",
-        "ad_name",
-        "adset_name",
-        "campaign_name",
-        "date_start",
-        "date_stop",
-        "clicks",
-        "website_ctr",
-        "unique_inline_link_click_ctr",
-        "frequency",
-        "account_name",
-        "unique_inline_link_clicks",
-        "cost_per_unique_action_type",
-        "inline_post_engagement",
-        "inline_link_clicks",
-        "cpc",
-        "cost_per_unique_inline_link_click",
-        "cpm",
-        "canvas_avg_view_time",
-        "cost_per_inline_post_engagement",
-        "inline_link_click_ctr",
-        "cpp",
-        "cost_per_action_type",
-        "unique_link_clicks_ctr",
-        "spend",
-        "cost_per_unique_click",
-        "unique_clicks",
-        "social_spend",
-        "reach",
-        "canvas_avg_view_percent",
-        "objective",
-        "quality_ranking",
-        "engagement_rate_ranking",
-        "conversion_rate_ranking",
-        "impressions",
-        "unique_ctr",
-        "cost_per_inline_link_click",
-        "ctr",
-    ]
-
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSINSIGHTS, COLUMNS ARE REPORTED AS NULL
-    #         AND NOT CRITICAL TO REPORTS
-
-    columns_remaining = [
-        "unique_actions",
-        "actions",
-        "action_values",
-        "outbound_clicks",
-        "unique_outbound_clicks",
-        "video_30_sec_watched_actions",
-        "video_p25_watched_actions",
-        "video_p50_watched_actions",
-        "video_p75_watched_actions",
-        "video_p100_watched_actions",
-    ]
 
     name = "adsinsights"
 
-    path = f"/insights?level=ad&fields={columns}"
+    @property
+    def path(self) -> str:
+        columns = [
+            "account_id",
+            "account_name",
+            "campaign_id",
+            "campaign_name",
+            "date_start",
+            "date_stop",
+            "spend",
+            "impressions",
+            "clicks",
+            "conversions"
+        ]
+
+        start_date = self.config.get("start_date", "")
+        end_date =  self.config.get("end_date", "") or datetime.now().strftime("%Y-%m-%d")
+        time_range = f"&time_range={{'since':'{start_date}', 'until':'{end_date}'}}" if start_date else ""
+        return f"/insights?level=campaign&fields={columns}&breakdowns=country&time_increment=1{time_range}"
 
     replication_keys = ["date_start"]
     replication_method = "incremental"
 
     schema = PropertiesList(
-        Property("clicks", StringType),
-        Property("date_stop", StringType),
-        Property("ad_id", StringType),
-        Property(
-            "website_ctr",
-            ArrayType(
-                ObjectType(
-                    Property("value", StringType),
-                    Property("action_destination", StringType),
-                    Property("action_target_id", StringType),
-                    Property("action_type", StringType),
-                ),
-            ),
-        ),
-        Property("unique_inline_link_click_ctr", StringType),
-        Property("adset_id", StringType),
-        Property("frequency", StringType),
-        Property("account_name", StringType),
-        Property("canvas_avg_view_time", StringType),
-        Property("unique_inline_link_clicks", StringType),
-        Property(
-            "cost_per_unique_action_type",
-            ArrayType(
-                ObjectType(
-                    Property("value", StringType),
-                    Property("action_type", StringType),
-                ),
-            ),
-        ),
-        Property("inline_post_engagement", StringType),
-        Property("campaign_name", StringType),
-        Property("inline_link_clicks", IntegerType),
-        Property("campaign_id", StringType),
-        Property("cpc", StringType),
-        Property("ad_name", StringType),
-        Property("cost_per_unique_inline_link_click", StringType),
-        Property("cpm", StringType),
-        Property("cost_per_inline_post_engagement", StringType),
-        Property("inline_link_click_ctr", StringType),
-        Property("cpp", StringType),
-        Property("cost_per_action_type", StringType),
-        Property("unique_link_clicks_ctr", StringType),
-        Property("spend", StringType),
-        Property("cost_per_unique_click", StringType),
-        Property("adset_name", StringType),
-        Property("unique_clicks", StringType),
-        Property("social_spend", StringType),
-        Property("canvas_avg_view_percent", StringType),
         Property("account_id", StringType),
+        Property("account_name", StringType),
+        Property("campaign_id", StringType),
+        Property("campaign_name", StringType),
         Property("date_start", DateTimeType),
-        Property("objective", StringType),
-        Property("quality_ranking", StringType),
-        Property("engagement_rate_ranking", StringType),
-        Property("conversion_rate_ranking", StringType),
-        Property("impressions", IntegerType),
-        Property("unique_ctr", StringType),
-        Property("cost_per_inline_link_click", StringType),
-        Property("ctr", StringType),
-        Property("reach", IntegerType),
+        Property("date_stop", StringType),
+        Property("spend", StringType),
+        Property("impressions", StringType),
+        Property("clicks", StringType),
+        Property("country", StringType),
         Property(
-            "actions",
+            "conversions",
             ArrayType(
                 ObjectType(
                     Property("action_type", StringType),
