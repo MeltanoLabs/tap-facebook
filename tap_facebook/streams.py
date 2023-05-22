@@ -80,9 +80,6 @@ class AdsInsightStream(FacebookStream):
         "ctr",
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSINSIGHTS, COLUMNS ARE REPORTED AS NULL
-    #         AND NOT CRITICAL TO REPORTS
-
     columns_remaining = [
         "unique_actions",
         "actions",
@@ -237,9 +234,6 @@ class AdsStream(FacebookStream):
         "conversion_domain",
         "bid_amount",
     ]
-
-    # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADS, COLUMNS ARE REPORTED AS NULL
-    #       AND NOT CRITICAL TO REPORTS
 
     columns_remaining = ["adlabels", "recommendations"]
 
@@ -531,9 +525,6 @@ class AdsetsStream(FacebookStream):
         "targeting",
         "bid_info",
     ]
-
-    # TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN ADSETS, COLUMNS ARE REPORTED AS NULL AND
-    #       NOT CRITICAL TO REPORTS
 
     columns_remaining = [
         "adlabels",
@@ -832,8 +823,6 @@ class CampaignStream(FacebookStream):
         "last_budget_toggling_time",
     ]
 
-    #   TODO: CONTINUE MONITORING TARGETING COLUMNS WITHIN CAMPAIGNS, COLUMNS ARE REPORTED AS NULL
-    #         AND NOT CRITICAL TO REPORTS
     columns_remaining = [
         "adlabels",
         "issues_info",
