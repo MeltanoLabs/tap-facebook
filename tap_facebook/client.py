@@ -26,8 +26,8 @@ class FacebookStream(RESTStream):
 
     @property
     def url_base(self) -> str:
-        version = self.config.get("api_version")
-        account_id = self.config.get("account_id")
+        version: str = self.config["api_version"]
+        account_id: str = self.config["account_id"]
         return f"https://graph.facebook.com/{version}/act_{account_id}"
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
