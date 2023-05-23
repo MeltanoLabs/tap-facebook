@@ -40,7 +40,7 @@ if t.TYPE_CHECKING:
 
 
 class Tapfacebook(Tap):
-    """facebook tap class."""
+    """Singer tap for extracting data from the Facebook Marketing API."""
 
     name = "tap-facebook"
 
