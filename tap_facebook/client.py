@@ -44,7 +44,7 @@ class FacebookStream(RESTStream):
         """
         return BearerTokenAuthenticator.create_for_stream(
             self,
-            token=self.config.get("access_token"),
+            token=self.config["access_token"],
         )
 
     def get_next_page_token(
