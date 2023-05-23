@@ -50,13 +50,20 @@ class Tapfacebook(Tap):
             "access_token",
             th.StringType,
             description="The token to authenticate against the API service",
+            required=True,
         ),
         th.Property(
             "api_version",
             th.StringType,
-            description="The API version",
+            description="The API version to request data from.",
+            default="v16.0",
         ),
-        th.Property("account_id", th.StringType, description="Account ID"),
+        th.Property(
+            "account_id",
+            th.StringType,
+            description="Your Facebook Account ID.",
+            required=True,
+        ),
         th.Property(
             "start_date",
             th.DateTimeType,
