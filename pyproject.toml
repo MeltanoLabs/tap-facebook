@@ -29,7 +29,7 @@ build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry.scripts]
 # CLI declaration
-tap-facebook = 'tap_facebook.tap:Tapfacebook.cli'
+tap-facebook = 'tap_facebook.tap:TapFacebook.cli'
 
 [tool.poetry-dynamic-versioning]
 enable = true

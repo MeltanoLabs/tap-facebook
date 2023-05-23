@@ -39,7 +39,7 @@ if t.TYPE_CHECKING:
     from tap_facebook import streams
 
 
-class Tapfacebook(Tap):
+class TapFacebook(Tap):
     """Singer tap for extracting data from the Facebook Marketing API."""
 
     name = "tap-facebook"
@@ -86,4 +86,4 @@ class Tapfacebook(Tap):
 
 
 if __name__ == "__main__":
-    Tapfacebook.cli()
+    TapFacebook.cli()
