@@ -1,8 +1,8 @@
-# tap-facebook
+# `tap-facebook`
 
-`tap-facebook` is a Singer tap for facebook.
+facebook tap class.
 
-Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Targets.
+Built with the [Meltano Singer SDK](https://sdk.meltano.com).
 
 ## Capabilities
 
@@ -17,15 +17,15 @@ Built with the [Meltano SDK](https://sdk.meltano.com) for Singer Taps and Target
 
 | Setting             | Required | Default | Description |
 |:--------------------|:--------:|:-------:|:------------|
-| access_token        |   True   |  None   | The token to authenticate against the API service |
-| api_version         |  False   |  v16.0  | The API version |
-| account_id          |   True   |  None   | Account ID  |
-| start_date          |  False   |  None   | The earliest record date to sync |
-| end_date            |  False   |  None   | The latest record date to sync |
-| stream_maps         |  False   |  None   | Config object for stream maps capability. |
-| stream_map_config   |  False   |  None   | User-defined config values to be used within map expressions. |
-| flattening_enabled  |  False   |  None   | 'True' to enable schema flattening and automatically expand nested properties. |
-| flattening_max_depth|  False   |  None   | The max depth to flatten schemas. |
+| access_token        | True     | None    | The token to authenticate against the API service |
+| api_version         | False    | v16.0   | The API version |
+| account_id          | True     | None    | Account ID  |
+| start_date          | False    | None    | The earliest record date to sync |
+| end_date            | False    | None    | The latest record date to sync |
+| stream_maps         | False    | None    | Config object for stream maps capability. For more information check out [Stream Maps](https://sdk.meltano.com/en/latest/stream_maps.html). |
+| stream_map_config   | False    | None    | User-defined config values to be used within map expressions. |
+| flattening_enabled  | False    | None    | 'True' to enable schema flattening and automatically expand nested properties. |
+| flattening_max_depth| False    | None    | The max depth to flatten schemas. |
 
 A full list of supported settings and capabilities is available by running: `tap-facebook --about`
 
@@ -33,7 +33,7 @@ A full list of supported settings and capabilities is available by running: `tap
 ## Installation
 
 ```bash
-pipx install git+https://github.com/MeltanoLabs/tap-facebook-sdk.git
+pipx install git+https://github.com/MeltanoLabs/tap-facebook.git
 ```
 
 ## Configuration
@@ -43,31 +43,25 @@ pipx install git+https://github.com/MeltanoLabs/tap-facebook-sdk.git
 The following config values need to be set in order to use with Meltano. These can be set in `meltano.yml`, via
 ```meltano config tap-facebook set --interactive```, or via the env var mappings shown above.
 
-- [ ] `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
-- [ ] `start_date:` start date
-- [ ] `end_date:` end_date
-- [ ] `account_id:` account ID from TAP_FACEBOOK_ACCOUNT_ID variable
-- [ ] `api_version:` api version
+- `access_token:` access token from TAP_FACEBOOK_ACCESS_TOKEN variable
+- `start_date:` start date
+- `end_date:` end_date
+- `account_id:` account ID from TAP_FACEBOOK_ACCOUNT_ID variable
+- `api_version:` api version
 
 ```bash
 tap-facebook --about
 ```
 
-### Metadata Columns
-
-- [ ] `add_metadata_columns:` We can add metadata columns to LinkedIn records, we have to update meltano.yml and set this variable to true for the loader.
-
-
 ### Elastic License 2.0
 
 The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software.
-
 
 ### Attribution Window
 
 Attribution Window is time period during which conversions might be credited to ads, we can have this time period between 1 day to 7 days for clicks and views
 
-- [ ] `action_attribution_windows:` We can add these variable to params, it will have a list type value which takes in 1d-7d clicks and 1d-7d views values. We have added
+- `action_attribution_windows:` We can add these variable to params, it will have a list type value which takes in 1d-7d clicks and 1d-7d views values. We have added
 this variable in get_url_params function of ads insights stream
 
 
@@ -86,18 +80,6 @@ Hitting the rate limit for the Facebook API while making requests will return th
 
 This error is handled using the [Backoff Library](https://github.com/litl/backoff), and the program will cease for a random amount of time before
 attempting to call the API again
-
-### Metadata Columns
-
-- [ ] `add_metadata_columns:` Setting this config to 'true' adds the `_SDC_BATCHED_AT`, `_SDC_DELETED_AT` and `_SDC_EXTRACTED_AT` metadata columns to the loaded tables
-
-### Elastic License 2.0
-
-The licensor grants you a non-exclusive, royalty-free, worldwide, non-sublicensable, non-transferable license to use, copy, distribute, make available, and prepare derivative works of the software.
-
-
-
-You can easily run `tap-facebook` by itself or in a pipeline using [Meltano](https://meltano.com/).
 
 ### Executing the Tap Directly
 
