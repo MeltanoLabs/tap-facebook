@@ -3,7 +3,7 @@
 
 from singer_sdk.testing import SuiteConfig, get_tap_test_class
 
-from tap_facebook.tap import Tapfacebook
+from tap_facebook.tap import TapFacebook
 
 SAMPLE_CONFIG = {
     "start_date": "2023-03-01T00:00:00Z",
@@ -11,7 +11,7 @@ SAMPLE_CONFIG = {
 }
 
 TestTapFacebook = get_tap_test_class(
-    Tapfacebook,
+    TapFacebook,
     config=SAMPLE_CONFIG,
     suite_config=SuiteConfig(
         max_records_limit=20,
