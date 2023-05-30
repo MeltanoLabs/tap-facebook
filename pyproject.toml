@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "tap-facebook"
+name = "meltano-tap-facebook"
 version = "0.0.0"
 description = "`tap-facebook` is a Singer tap for facebook, built with the Meltano SDK for Singer Taps."
 authors = ["Meltano <hello@meltano.com>"]
@@ -8,6 +8,10 @@ keywords = [
     "facebook",
 ]
 license = "Elastic-2.0"
+packages = [
+    { include = "tap_facebook" },
+]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "<3.11,>=3.7.1"
