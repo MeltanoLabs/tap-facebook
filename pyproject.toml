@@ -11,6 +11,7 @@ license = "Elastic-2.0"
 packages = [
     { include = "tap_facebook" },
 ]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "<3.11,>=3.7.1"

@@ -76,7 +76,9 @@ A Facebook access token is required to make API requests. (See [Facebook API](ht
 
 Hitting the rate limit for the Facebook API while making requests will return the following error:
 
-```400 Client Error: b'{"error":{"message":"(#80004) There have been too many calls to this ad-account. Wait a bit and try again```
+```
+400 Client Error: b'{"error":{"message":"(#80004) There have been too many calls to this ad-account. Wait a bit and try again
+```
 
 This error is handled using the [Backoff Library](https://github.com/litl/backoff), and the program will cease for a random amount of time before
 attempting to call the API again
