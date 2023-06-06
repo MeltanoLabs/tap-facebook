@@ -1453,7 +1453,7 @@ class CustomConversions(FacebookStream):
 
     schema = PropertiesList(
         Property("account_id", StringType),
-        Property("id", IntegerType),
+        Property("id", StringType),
         Property("name", StringType),
         Property("creation_time", StringType),
         Property("business", StringType),
@@ -1521,7 +1521,7 @@ class CustomAudiencesInternal(FacebookStream):
 
     schema = PropertiesList(
         Property("account_id", StringType),
-        Property("id", IntegerType),
+        Property("id", StringType),
         Property("approximate_count_lower_bound", IntegerType),
         Property("approximate_count_upper_bound", IntegerType),
         Property("time_updated", StringType),
