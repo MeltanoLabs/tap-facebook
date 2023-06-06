@@ -141,7 +141,7 @@ class AdsInsightStream(FacebookStream):
         Property("cost_per_inline_post_engagement", StringType),
         Property("inline_link_click_ctr", StringType),
         Property("cpp", StringType),
-        Property("cost_per_action_type", StringType),
+        Property("cost_per_action_type", ArrayType(ObjectType())),
         Property("unique_link_clicks_ctr", StringType),
         Property("spend", StringType),
         Property("cost_per_unique_click", StringType),
@@ -198,6 +198,16 @@ class AdsInsightStream(FacebookStream):
         params["action_attribution_windows"] = '["1d_view","7d_click"]'
 
         return params
+
+    def post_process(
+        self,
+        row: dict,
+        context: dict | None = None,  # noqa: ARG002
+    ) -> dict | None:
+        row["inline_link_clicks"] = int(row["inline_link_clicks"])
+        row["impressions"] = int(row["impressions"])
+        row["reach"] = int(row["reach"])
+        return row
 
 
 # ads stream
@@ -849,7 +859,7 @@ class CampaignStream(FacebookStream):
     schema = PropertiesList(
         Property("name", StringType),
         Property("objective", StringType),
-        Property("id", IntegerType),
+        Property("id", StringType),
         Property("account_id", StringType),
         Property("effective_status", StringType),
         Property("buying_type", StringType),
@@ -861,12 +871,12 @@ class CampaignStream(FacebookStream):
         Property("primary_attribution", StringType),
         Property("smart_promotion_type", StringType),
         Property("pacing_type", ArrayType),
-        Property("source_campaign_id", IntegerType),
+        Property("source_campaign_id", StringType),
         Property("boosted_object_id", IntegerType),
         Property("special_ad_categories", ArrayType),
         Property("special_ad_category", StringType),
         Property("status", StringType),
-        Property("topline_id", IntegerType),
+        Property("topline_id", StringType),
         Property("spend_cap", IntegerType),
         Property("budget_remaining", StringType),
         Property("daily_budget", IntegerType),
@@ -1024,7 +1034,7 @@ class CreativeStream(FacebookStream):
     replication_method = "incremental"
 
     schema = PropertiesList(
-        Property("id", IntegerType),
+        Property("id", StringType),
         Property("account_id", StringType),
         Property("actor_id", StringType),
         Property("applink_treatment", StringType),
@@ -1036,7 +1046,7 @@ class CreativeStream(FacebookStream):
         Property("call_to_action_type", StringType),
         Property("categorization_criteria", StringType),
         Property("category_media_source", StringType),
-        Property("degrees_of_freedom_spec", StringType),
+        Property("degrees_of_freedom_spec", ObjectType()),
         Property("destination_set_id", StringType),
         Property("dynamic_ad_voice", StringType),
         Property("effective_authorization_category", StringType),
@@ -1057,7 +1067,7 @@ class CreativeStream(FacebookStream):
         Property("object_id", IntegerType),
         Property("object_store_url", StringType),
         Property("object_story_id", StringType),
-        Property("object_story_spec", StringType),
+        Property("object_story_spec", ObjectType()),
         Property("object_type", StringType),
         Property("object_url", StringType),
         Property("page_link", StringType),
@@ -1456,7 +1466,7 @@ class CustomConversions(FacebookStream):
         Property("id", StringType),
         Property("name", StringType),
         Property("creation_time", StringType),
-        Property("business", StringType),
+        Property("business", ObjectType()),
         Property("is_archived", BooleanType),
         Property("is_unavailable", BooleanType),
         Property("last_fired_time", StringType),
@@ -1789,7 +1799,7 @@ class AdVideos(FacebookStream):
         Property("embed_html", StringType),
         Property("embeddable", BooleanType),
         Property("event", StringType),
-        Property("format", StringType),
+        Property("format", ArrayType(ObjectType())),
         Property("from_object", StringType),
         Property("icon", StringType),
         Property("is_crosspost_video", BooleanType),
@@ -1797,14 +1807,14 @@ class AdVideos(FacebookStream):
         Property("is_episode", BooleanType),
         Property("is_instagram_eligible", BooleanType),
         Property("is_reference_only", BooleanType),
-        Property("length", IntegerType),
+        Property("length", NumberType),
         Property("live_status", StringType),
         Property("music_video_copyright", StringType),
         Property("permalink_url", StringType),
         Property("place", StringType),
         Property("post_views", IntegerType),
         Property("premiere_living_room_status", StringType),
-        Property("privacy", StringType),
+        Property("privacy", ObjectType()),
         Property("published", BooleanType),
         Property("scheduled_publish_time", DateTimeType),
         Property("source", StringType),
