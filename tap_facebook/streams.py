@@ -439,7 +439,15 @@ class AdsStream(FacebookStream):
         Property("global_ads_about_social_issues_elections_or_politics", StringType),
         Property("configured_status", StringType),
         Property("conversion_domain", StringType),
-        Property("conversion_specs", ArrayType(Property("items", StringType))),
+        Property(
+            "conversion_specs",
+            ArrayType(
+                ObjectType(
+                    Property("action.type", ArrayType(StringType)),
+                    Property("conversion_id", ArrayType(StringType)),
+                ),
+            ),
+        ),
         Property("placement_specific_instagram_advertising_policies", StringType),
         Property("recommendation_data", ArrayType(Property("items", StringType))),
         Property("application", ArrayType(Property("items", StringType))),
@@ -1056,7 +1064,10 @@ class CreativeStream(FacebookStream):
         Property("account_id", StringType),
         Property("actor_id", StringType),
         Property("applink_treatment", StringType),
-        Property("asset_feed_spec", StringType),
+        Property(
+            "asset_feed_spec",
+            ObjectType(),
+        ),
         Property("authorization_category", StringType),
         Property("body", BooleanType),
         Property("branded_content_sponsor_page_id", BooleanType),
