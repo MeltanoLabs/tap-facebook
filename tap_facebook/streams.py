@@ -287,7 +287,7 @@ class AdsStream(FacebookStream):
             "creative",
             ObjectType(Property("creative_id", StringType), Property("id", StringType)),
         ),
-        Property("id", IntegerType),
+        Property("id", StringType),
         Property("updated_time", StringType),
         Property("created_time", StringType),
         Property("name", StringType),
@@ -311,9 +311,12 @@ class AdsStream(FacebookStream):
             "tracking_specs",
             ArrayType(
                 ObjectType(
-                    Property("application", ArrayType(Property("items", StringType))),
-                    Property("post", StringType),
-                    Property("conversion_id", StringType),
+                    Property(
+                        "application",
+                        ArrayType(ObjectType(Property("items", StringType))),
+                    ),
+                    Property("post", ArrayType(StringType)),
+                    Property("conversion_id", ArrayType(StringType)),
                     Property("action.type", ArrayType(Property("items", StringType))),
                     Property("post.type", ArrayType(Property("items", StringType))),
                     Property("page", ArrayType(Property("items", StringType))),
@@ -353,8 +356,8 @@ class AdsStream(FacebookStream):
             "conversion_specs",
             ArrayType(
                 ObjectType(
-                    Property("application", ArrayType(Property("items", StringType))),
-                    Property("application", ArrayType(Property("items", StringType))),
+                    Property("action.type", ArrayType(StringType)),
+                    Property("conversion_id", ArrayType(StringType)),
                 ),
             ),
         ),
@@ -575,13 +578,13 @@ class AdsetsStream(FacebookStream):
         Property("billing_event", StringType),
         Property("campaign_attribution", StringType),
         Property("destination_type", StringType),
-        Property("is_dynamic_creative", StringType),
-        Property("lifetime_imps", StringType),
+        Property("is_dynamic_creative", BooleanType),
+        Property("lifetime_imps", IntegerType),
         Property("multi_optimization_goal_weight", StringType),
         Property("optimization_goal", StringType),
         Property("optimization_sub_event", StringType),
-        Property("pacing_type", StringType),
-        Property("recurring_budget_semantics", StringType),
+        Property("pacing_type", ArrayType(StringType)),
+        Property("recurring_budget_semantics", BooleanType),
         Property("source_adset_id", StringType),
         Property("status", StringType),
         Property("targeting_optimization_types", StringType),
@@ -599,7 +602,7 @@ class AdsetsStream(FacebookStream):
                 Property("offer_id", StringType),
             ),
         ),
-        Property("id", IntegerType),
+        Property("id", StringType),
         Property("account_id", StringType),
         Property("updated_time", StringType),
         Property("daily_budget", StringType),
@@ -679,11 +682,17 @@ class AdsetsStream(FacebookStream):
         Property(
             "targeting",
             ObjectType(
-                Property("age_max", StringType),
-                Property("age_min", StringType),
+                Property("age_max", IntegerType),
+                Property("age_min", IntegerType),
                 Property("excluded_custom_adiences", ArrayType(StringType)),
-                Property("geo_locations", StringType),
-                Property("genders", ArrayType(StringType)),
+                Property(
+                    "geo_locations",
+                    ObjectType(
+                        Property("countries", ArrayType(StringType)),
+                        Property("location_types", ArrayType(StringType)),
+                    ),
+                ),
+                Property("genders", ArrayType(IntegerType)),
                 Property("brand_safety_content_filter_levels", ArrayType(StringType)),
                 Property("publisher_platforms", ArrayType(StringType)),
                 Property("facebook_positions", ArrayType(StringType)),
@@ -872,7 +881,7 @@ class CampaignStream(FacebookStream):
         Property("smart_promotion_type", StringType),
         Property("pacing_type", ArrayType),
         Property("source_campaign_id", StringType),
-        Property("boosted_object_id", IntegerType),
+        Property("boosted_object_id", StringType),
         Property("special_ad_categories", ArrayType),
         Property("special_ad_category", StringType),
         Property("status", StringType),
@@ -960,6 +969,14 @@ class CampaignStream(FacebookStream):
             params["order_by"] = self.replication_key
 
         return params
+
+    def post_process(
+        self,
+        row: dict,
+        context: dict | None,  # noqa: ARG002
+    ) -> dict:
+        row["daily_budget"] = int(row["daily_budget"])
+        return row
 
 
 class CreativeStream(FacebookStream):
@@ -1056,7 +1073,7 @@ class CreativeStream(FacebookStream):
         Property("enable_direct_install", BooleanType),
         Property("image_hash", StringType),
         Property("image_url", StringType),
-        Property("instagram_actor_id", IntegerType),
+        Property("instagram_actor_id", StringType),
         Property("instagram_permalink_url", StringType),
         Property("instagram_story_id", IntegerType),
         Property("link_destination_display_url", StringType),
@@ -1172,12 +1189,12 @@ class AdLabelsStream(FacebookStream):
     replication_method = "incremental"
 
     schema = PropertiesList(
-        Property("id", IntegerType),
+        Property("id", StringType),
         Property(
             "account",
             ObjectType(
                 Property("account_id", StringType),
-                Property("id", IntegerType),
+                Property("id", StringType),
             ),
         ),
         Property("created_time", StringType),
@@ -1322,7 +1339,7 @@ class AdAccountsStream(FacebookStream):
         Property("account_id", StringType),
         Property("timezone_id", IntegerType),
         Property("business_name", StringType),
-        Property("account_status", StringType),
+        Property("account_status", IntegerType),
         Property("age", NumberType),
         Property("amount_spent", IntegerType),
         Property("balance", IntegerType),
@@ -1334,8 +1351,8 @@ class AdAccountsStream(FacebookStream):
         Property("capabilities", ArrayType(StringType)),
         Property("created_time", StringType),
         Property("currency", StringType),
-        Property("disable_reason", StringType),
-        Property("end_advertiser", IntegerType),
+        Property("disable_reason", IntegerType),
+        Property("end_advertiser", StringType),
         Property("end_advertiser_name", StringType),
         Property("has_advertiser_opted_in_odax", BooleanType),
         Property("has_migrated_permissions", BooleanType),
@@ -1344,7 +1361,7 @@ class AdAccountsStream(FacebookStream):
         Property("is_direct_deals_enabled", BooleanType),
         Property("is_in_3ds_authorization_enabled_market", BooleanType),
         Property("is_notifications_enabled", BooleanType),
-        Property("is_personal", StringType),
+        Property("is_personal", IntegerType),
         Property("is_prepay_account", BooleanType),
         Property("is_tax_id_required", BooleanType),
         Property("min_campaign_group_spend_cap", IntegerType),
@@ -1353,9 +1370,9 @@ class AdAccountsStream(FacebookStream):
         Property("offsite_pixels_tos_accepted", BooleanType),
         Property("owner", StringType),
         Property("spend_cap", IntegerType),
-        Property("tax_id_status", StringType),
+        Property("tax_id_status", IntegerType),
         Property("tax_id_type", StringType),
-        Property("timezone_id", StringType),
+        Property("timezone_id", IntegerType),
         Property("timezone_name", StringType),
         Property("timezone_offset_hours_utc", IntegerType),
         Property("agency_client_declaration_agency_representing_client", IntegerType),
@@ -1429,6 +1446,17 @@ class AdAccountsStream(FacebookStream):
             params["order_by"] = self.replication_key
 
         return params
+
+    def post_process(
+        self,
+        row: dict,
+        context: dict | None = None,  # noqa: ARG002
+    ) -> dict | None:
+        row["amount_spent"] = int(row["amount_spent"])
+        row["balance"] = int(row["balance"])
+        row["min_campaign_group_spend_cap"] = int(row["min_campaign_group_spend_cap"])
+        row["spend_cap"] = int(row["spend_cap"])
+        return row
 
 
 class CustomConversions(FacebookStream):
@@ -1686,7 +1714,7 @@ class AdImages(FacebookStream):
         Property("id", StringType),
         Property("account_id", StringType),
         Property("created_time", StringType),
-        Property("creatives", StringType),
+        Property("creatives", ArrayType(StringType)),
         Property("hash", StringType),
         Property("height", IntegerType),
         Property("is_associated_creatives_in_adgroups", BooleanType),
