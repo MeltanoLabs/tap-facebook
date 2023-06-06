@@ -975,7 +975,8 @@ class CampaignStream(FacebookStream):
         row: dict,
         context: dict | None,  # noqa: ARG002
     ) -> dict:
-        row["daily_budget"] = int(row["daily_budget"])
+        daily_budget = row.get("daily_budget")
+        row["daily_budget"] = int(daily_budget) if daily_budget is not None else None
         return row
 
 
