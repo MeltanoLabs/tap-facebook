@@ -20,7 +20,8 @@ from singer_sdk.typing import (
 
 from tap_facebook.client import FacebookStream
 
-from datetime import datetime
+from datetime import date, datetime, timedelta
+from typing import Generator
 
 SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
@@ -41,6 +42,40 @@ class AdsInsightStream(FacebookStream):
 
     name = "adsinsights"
 
+    def datetime_range(self, start: date, end: date, delta: timedelta) -> Generator[datetime, None, None]:
+        delta_units = int((end - start) / delta)
+
+        for _ in range(delta_units):
+            yield start
+            start += delta
+
+
+    def get_records(self, context: dict | None) -> t.Iterable[dict[str, t.Any]]:
+        start_date = datetime.strptime(self.config.get("start_date", ""), '%Y-%m-%d').date() if self.config.get("start_date", "") else (date.today() - timedelta(days=30))
+        end_date = datetime.strptime(self.config.get("end_date", ""), '%Y-%m-%d').date() if self.config.get("end_date", "") else date.today()
+        delta = timedelta(days=1)
+        for current_start in self.datetime_range(start_date, end_date, delta):
+            if context is None:
+                context = {}
+            context['current_start'] = current_start
+            context['current_end'] = current_start + timedelta(days=1)
+
+            for record in self.request_records(context):
+                transformed_record = self.post_process(record, context)
+                if transformed_record is None:
+                    # Record filtered out during post_process()
+                    continue
+                yield transformed_record
+
+
+    def get_url(self, context: dict | None) -> str:
+        url = FacebookStream.get_url(self, context)
+        start_date = context["current_start"].strftime("%Y-%m-%d")
+        end_date = context["current_end"].strftime("%Y-%m-%d")
+        time_range = f"{{'since':'{start_date}', 'until':'{end_date}'}}"
+        url = url + f"&time_range={time_range}"
+        return url
+
     @property
     def path(self) -> str:
         columns = [
@@ -56,10 +91,9 @@ class AdsInsightStream(FacebookStream):
             "conversions"
         ]
 
-        start_date = self.config.get("start_date", "")
-        end_date =  self.config.get("end_date", "") or datetime.now().strftime("%Y-%m-%d")
-        time_range = f"&time_range={{'since':'{start_date}', 'until':'{end_date}'}}" if start_date else ""
-        return f"/insights?level=campaign&fields={columns}&breakdowns=country&time_increment=1{time_range}"
+        #timerange = f"timerange={{'since':'2023-04-10', 'until':'2023-04-11'}}"
+        return f"/insights?level=campaign&filtering=[{{field:'ad.impressions',operator:'GREATER_THAN',value:0}}]&fields={columns}&breakdowns=country"
+
 
     replication_keys = ["date_start"]
     replication_method = "incremental"
