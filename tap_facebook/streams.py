@@ -58,7 +58,7 @@ class AdsInsightStream(FacebookStream):
             if context is None:
                 context = {}
             context['current_start'] = current_start
-            context['current_end'] = current_start + timedelta(days=1)
+            context['current_end'] = current_start
 
             for record in self.request_records(context):
                 transformed_record = self.post_process(record, context)
