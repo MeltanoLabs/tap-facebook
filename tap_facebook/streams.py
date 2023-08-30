@@ -204,11 +204,10 @@ class AdsInsightStream(FacebookStream):
         row: dict,
         context: dict | None = None,  # noqa: ARG002
     ) -> dict | None:
-        row["inline_link_clicks"] = int(row["inline_link_clicks"])
-        row["impressions"] = int(row["impressions"])
-        row["reach"] = int(row["reach"])
+        row["inline_link_clicks"] = int(row["inline_link_clicks"]) if "inline_link_clicks" in row else None
+        row["impressions"] = int(row["impressions"]) if "impressions" in row else None
+        row["reach"] = int(row["reach"]) if "reach" in row else None
         return row
-
 
 # ads stream
 class AdsStream(FacebookStream):
@@ -1464,10 +1463,10 @@ class AdAccountsStream(FacebookStream):
         row: dict,
         context: dict | None = None,  # noqa: ARG002
     ) -> dict | None:
-        row["amount_spent"] = int(row["amount_spent"])
-        row["balance"] = int(row["balance"])
-        row["min_campaign_group_spend_cap"] = int(row["min_campaign_group_spend_cap"])
-        row["spend_cap"] = int(row["spend_cap"])
+        row["amount_spent"] = int(row["amount_spent"]) if "amount_spent" in row else None
+        row["balance"] = int(row["balance"]) if "balance" in row else None
+        row["min_campaign_group_spend_cap"] = int(row["min_campaign_group_spend_cap"]) if "min_campaign_group_spend_cap" in row else None
+        row["spend_cap"] = int(row["spend_cap"]) if "spend_cap" in row else None
         return row
 
 
