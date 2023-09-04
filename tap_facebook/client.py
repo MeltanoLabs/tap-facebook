@@ -51,7 +51,7 @@ class FacebookStream(RESTStream):
         self,
         response: requests.Response,
         previous_token: t.Any | None,  # noqa: ARG002, ANN401
-    ) -> t.Any | None:    # noqa: ANN401
+    ) -> t.Any | None:  # noqa: ANN401
         """Return a token for identifying next page or None if no more pages.
 
         Args:
