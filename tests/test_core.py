@@ -3,14 +3,14 @@
 
 from singer_sdk.testing import SuiteConfig, get_tap_test_class
 
+from tap_facebook.streams import AdAccountsStream, AdsInsightStream
 from tap_facebook.tap import TapFacebook
-from tap_facebook.streams import AdsInsightStream, AdAccountsStream
 
 SAMPLE_CONFIG = {
     "start_date": "2023-03-01T00:00:00Z",
     "api_version": "v16.0",
     "access_token": "xxx",
-    "account_id": "xxx"
+    "account_id": "xxx",
 }
 
 TestTapFacebook = get_tap_test_class(
@@ -29,10 +29,9 @@ def test_ads_insights_post_process():
 
     post_processed_row = ads_insights_stream.post_process(row)
 
-    assert post_processed_row['inline_link_clicks'] is None
-    assert post_processed_row['reach'] == 0
-    assert post_processed_row['impressions'] == 1
-
+    assert post_processed_row["inline_link_clicks"] is None
+    assert post_processed_row["reach"] == 0
+    assert post_processed_row["impressions"] == 1
 
 
 def test_ads_accounts_post_process():
@@ -42,8 +41,7 @@ def test_ads_accounts_post_process():
 
     post_processed_row = ads_accounts_stream.post_process(row)
 
-    assert post_processed_row['spend_cap'] is None
-    assert post_processed_row['amount_spent'] == 0
-    assert post_processed_row['balance'] == 1
-    assert post_processed_row['min_campaign_group_spend_cap'] == 2
-
+    assert post_processed_row["spend_cap"] is None
+    assert post_processed_row["amount_spent"] == 0
+    assert post_processed_row["balance"] == 1
+    assert post_processed_row["min_campaign_group_spend_cap"] == 2
