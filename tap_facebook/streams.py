@@ -1226,8 +1226,6 @@ class AdAccountsStream(FacebookStream):
     path = f"/adaccounts?fields={columns}"
     tap_stream_id = "adaccounts"
     primary_keys = ["created_time"]  # noqa: RUF012
-    replication_keys = ["created_time"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
 
     schema = PropertiesList(
         Property("account_id", StringType),
