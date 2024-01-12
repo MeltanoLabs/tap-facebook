@@ -26,7 +26,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 # ads insights stream
 class AdsInsightStream(FacebookStream):
-    """https://developers.facebook.com/docs/marketing-api/insights."""
+    """https://developers.facebook.com/docs/marketing-api/reference/ad-account/insights."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -72,6 +72,7 @@ class AdsInsightStream(FacebookStream):
         "reach",
         "canvas_avg_view_percent",
         "objective",
+        # TODO: quality_ranking, engagement_rate_ranking deprecated in v18
         "quality_ranking",
         "engagement_rate_ranking",
         "conversion_rate_ranking",
@@ -98,8 +99,8 @@ class AdsInsightStream(FacebookStream):
 
     path = f"/insights?level=ad&fields={columns}"
 
-    replication_keys = ["date_start"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "date_start"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("clicks", StringType),
@@ -153,6 +154,7 @@ class AdsInsightStream(FacebookStream):
         Property("account_id", StringType),
         Property("date_start", DateTimeType),
         Property("objective", StringType),
+        # TODO: quality_ranking, engagement_rate_ranking, conversion_rate_ranking deprecated in v18
         Property("quality_ranking", StringType),
         Property("engagement_rate_ranking", StringType),
         Property("conversion_rate_ranking", StringType),
@@ -254,8 +256,8 @@ class AdsStream(FacebookStream):
     path = f"/ads?fields={columns}"
 
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
-    replication_keys = ["updated_time"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "updated_time"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("bid_type", StringType),
@@ -555,8 +557,8 @@ class AdsetsStream(FacebookStream):
 
     path = f"/adsets?fields={columns}"
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
-    replication_keys = ["updated_time"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "updated_time"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("name", StringType),
@@ -815,8 +817,8 @@ class CampaignStream(FacebookStream):
     path = f"/campaigns?fields={columns}"
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     tap_stream_id = "campaigns"
-    replication_keys = ["updated_time"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "updated_time"  # noqa: RUF012
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -986,8 +988,8 @@ class CreativeStream(FacebookStream):
     name = "creatives"
     path = f"/adcreatives?fields={columns}"
     tap_stream_id = "creatives"
-    replication_keys = ["id"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "id"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1103,8 +1105,8 @@ class AdLabelsStream(FacebookStream):
     path = f"/adlabels?fields={columns}"
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     tap_stream_id = "adlabels"
-    replication_keys = ["updated_time"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "updated_time"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1122,7 +1124,7 @@ class AdLabelsStream(FacebookStream):
 
 
 class AdAccountsStream(FacebookStream):
-    """https://developers.facebook.com/docs/graph-api/reference/user/accounts/."""
+    """https://developers.facebook.com/docs/graph-api/reference/user/adaccounts."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -1360,8 +1362,8 @@ class CustomConversions(FacebookStream):
     path = f"/customconversions?fields={columns}"
     tap_stream_id = "customconversions"
     primary_keys = ["id"]  # noqa: RUF012
-    replication_keys = ["creation_time"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "creation_time"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -1376,7 +1378,7 @@ class CustomConversions(FacebookStream):
 
 
 class CustomAudiencesInternal(FacebookStream):
-    """https://developers.facebook.com/docs/marketing-api/reference/custom-audience/."""
+    """https://developers.facebook.com/docs/marketing-api/reference/ad-account/customaudiences/."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -1401,11 +1403,10 @@ class CustomAudiencesInternal(FacebookStream):
     ]
 
     name = "customaudiencesinternal"
-    path = f"/customaudiences?fields={columns}"
     tap_stream_id = "customaudiencesinternal"
     primary_keys = ["id"]  # noqa: RUF012
-    replication_keys = ["time_updated"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "time_updated"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -1509,8 +1510,8 @@ class AdImages(FacebookStream):
     name = "adimages"
     path = f"/adimages?fields={columns}"
     tap_stream_id = "images"
-    replication_keys = ["id"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "id"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1588,8 +1589,8 @@ class AdVideos(FacebookStream):
     name = "advideos"
     path = f"/advideos?fields={columns}"
     tap_stream_id = "videos"
-    replication_keys = ["id"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
+    replication_key = "id"  # noqa: RUF012
 
     schema = PropertiesList(
         Property("id", StringType),
