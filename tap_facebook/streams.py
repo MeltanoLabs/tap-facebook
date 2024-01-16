@@ -26,7 +26,7 @@ SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 # ads insights stream
 class AdsInsightStream(FacebookStream):
-    """https://developers.facebook.com/docs/marketing-api/reference/ad-account/insights."""
+    """https://developers.facebook.com/docs/marketing-api/insights."""
 
     """
     columns: columns which will be added to fields parameter in api
@@ -1124,7 +1124,7 @@ class AdLabelsStream(FacebookStream):
 
 
 class AdAccountsStream(FacebookStream):
-    """https://developers.facebook.com/docs/graph-api/reference/user/adaccounts."""
+    """https://developers.facebook.com/docs/graph-api/reference/user/accounts/."""
 
     """
     columns: columns which will be added to fields parameter in api
