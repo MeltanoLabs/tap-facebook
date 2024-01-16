@@ -1454,6 +1454,10 @@ class CustomAudiencesInternal(FacebookStream):
         Property("name", StringType),
     ).to_dict()
 
+    @property
+    def path(self):
+        return f"/customaudiences?fields={self.columns}"
+
 
 class CustomAudiences(CustomAudiencesInternal):
     """https://developers.facebook.com/docs/marketing-api/reference/custom-audience/."""
@@ -1468,11 +1472,11 @@ class CustomAudiences(CustomAudiencesInternal):
     """
 
     # Add rule column
-
-    columns = ["rule"]  # noqa: RUF012
+    @property
+    def columns(self):
+        return super().columns + ["rule"]
 
     name = "customaudiences"
-    path = f"/customaudiences?fields={columns}"
     tap_stream_id = "customaudiences"
 
 
