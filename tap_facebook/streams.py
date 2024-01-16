@@ -6,6 +6,7 @@ import typing as t
 from pathlib import Path
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
+from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from singer_sdk.typing import (
     ArrayType,
     BooleanType,
@@ -98,7 +99,7 @@ class AdsInsightStream(FacebookStream):
     path = f"/insights?level=ad&fields={columns}"
 
     replication_keys = ["date_start"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("clicks", StringType),
@@ -254,7 +255,7 @@ class AdsStream(FacebookStream):
 
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     replication_keys = ["updated_time"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("bid_type", StringType),
@@ -555,7 +556,7 @@ class AdsetsStream(FacebookStream):
     path = f"/adsets?fields={columns}"
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     replication_keys = ["updated_time"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("name", StringType),
@@ -815,7 +816,7 @@ class CampaignStream(FacebookStream):
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     tap_stream_id = "campaigns"
     replication_keys = ["updated_time"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -986,7 +987,7 @@ class CreativeStream(FacebookStream):
     path = f"/adcreatives?fields={columns}"
     tap_stream_id = "creatives"
     replication_keys = ["id"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1103,7 +1104,7 @@ class AdLabelsStream(FacebookStream):
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     tap_stream_id = "adlabels"
     replication_keys = ["updated_time"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1225,7 +1226,7 @@ class AdAccountsStream(FacebookStream):
     tap_stream_id = "adaccounts"
     primary_keys = ["created_time"]  # noqa: RUF012
     replication_keys = ["created_time"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -1360,7 +1361,7 @@ class CustomConversions(FacebookStream):
     tap_stream_id = "customconversions"
     primary_keys = ["id"]  # noqa: RUF012
     replication_keys = ["creation_time"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -1404,7 +1405,7 @@ class CustomAudiencesInternal(FacebookStream):
     tap_stream_id = "customaudiencesinternal"
     primary_keys = ["id"]  # noqa: RUF012
     replication_keys = ["time_updated"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -1509,7 +1510,7 @@ class AdImages(FacebookStream):
     path = f"/adimages?fields={columns}"
     tap_stream_id = "images"
     replication_keys = ["id"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1588,7 +1589,7 @@ class AdVideos(FacebookStream):
     path = f"/advideos?fields={columns}"
     tap_stream_id = "videos"
     replication_keys = ["id"]  # noqa: RUF012
-    replication_method = "INCREMENTAL"
+    replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
         Property("id", StringType),
