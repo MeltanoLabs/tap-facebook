@@ -100,7 +100,7 @@ class AdsInsightStream(FacebookStream):
     path = f"/insights?level=ad&fields={columns}"
 
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "date_start"  # noqa: RUF012
+    replication_key = "date_start"
 
     schema = PropertiesList(
         Property("clicks", StringType),
@@ -257,7 +257,7 @@ class AdsStream(FacebookStream):
 
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "updated_time"  # noqa: RUF012
+    replication_key = "updated_time"
 
     schema = PropertiesList(
         Property("bid_type", StringType),
@@ -558,7 +558,7 @@ class AdsetsStream(FacebookStream):
     path = f"/adsets?fields={columns}"
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "updated_time"  # noqa: RUF012
+    replication_key = "updated_time"
 
     schema = PropertiesList(
         Property("name", StringType),
@@ -818,7 +818,7 @@ class CampaignStream(FacebookStream):
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     tap_stream_id = "campaigns"
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "updated_time"  # noqa: RUF012
+    replication_key = "updated_time"
 
     PropertiesList = th.PropertiesList
     Property = th.Property
@@ -989,7 +989,7 @@ class CreativeStream(FacebookStream):
     path = f"/adcreatives?fields={columns}"
     tap_stream_id = "creatives"
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "id"  # noqa: RUF012
+    replication_key = "id"
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1106,7 +1106,7 @@ class AdLabelsStream(FacebookStream):
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     tap_stream_id = "adlabels"
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "updated_time"  # noqa: RUF012
+    replication_key = "updated_time"
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1363,7 +1363,7 @@ class CustomConversions(FacebookStream):
     tap_stream_id = "customconversions"
     primary_keys = ["id"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "creation_time"  # noqa: RUF012
+    replication_key = "creation_time"
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -1406,7 +1406,7 @@ class CustomAudiencesInternal(FacebookStream):
     tap_stream_id = "customaudiencesinternal"
     primary_keys = ["id"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "time_updated"  # noqa: RUF012
+    replication_key = "time_updated"
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -1511,7 +1511,7 @@ class AdImages(FacebookStream):
     path = f"/adimages?fields={columns}"
     tap_stream_id = "images"
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "id"  # noqa: RUF012
+    replication_key = "id"
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -1590,7 +1590,7 @@ class AdVideos(FacebookStream):
     path = f"/advideos?fields={columns}"
     tap_stream_id = "videos"
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "id"  # noqa: RUF012
+    replication_key = "id"
 
     schema = PropertiesList(
         Property("id", StringType),
