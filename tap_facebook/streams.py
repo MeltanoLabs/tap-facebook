@@ -1378,7 +1378,7 @@ class CustomConversions(FacebookStream):
 
 
 class CustomAudiencesInternal(FacebookStream):
-    """https://developers.facebook.com/docs/marketing-api/reference/ad-account/customaudiences/."""
+    """https://developers.facebook.com/docs/marketing-api/reference/custom-audience/."""
 
     """
     columns: columns which will be added to fields parameter in api
