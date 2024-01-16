@@ -1474,7 +1474,7 @@ class CustomAudiences(CustomAudiencesInternal):
     # Add rule column
     @property
     def columns(self):
-        return super().columns + ["rule"]
+        return [*super().columns, "rule"]
 
     name = "customaudiences"
     tap_stream_id = "customaudiences"
