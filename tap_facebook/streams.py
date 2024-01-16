@@ -72,7 +72,6 @@ class AdsInsightStream(FacebookStream):
         "reach",
         "canvas_avg_view_percent",
         "objective",
-        # TODO: quality_ranking, engagement_rate_ranking deprecated in v18
         "quality_ranking",
         "engagement_rate_ranking",
         "conversion_rate_ranking",
@@ -154,7 +153,6 @@ class AdsInsightStream(FacebookStream):
         Property("account_id", StringType),
         Property("date_start", DateTimeType),
         Property("objective", StringType),
-        # TODO: quality_ranking, engagement_rate_ranking, conversion_rate_ranking deprecated in v18
         Property("quality_ranking", StringType),
         Property("engagement_rate_ranking", StringType),
         Property("conversion_rate_ranking", StringType),
@@ -194,7 +192,7 @@ class AdsInsightStream(FacebookStream):
         if next_page_token is not None:
             params["after"] = next_page_token
         if self.replication_key:
-            params["sort"] = "asc"
+            params["sort"] = [f"{self.replication_key}_ascending"]
             params["order_by"] = self.replication_key
 
         params["action_attribution_windows"] = '["1d_view","7d_click"]'
@@ -1389,18 +1387,20 @@ class CustomAudiencesInternal(FacebookStream):
     tap_stream_id = stream id
     """
 
-    columns = [  # noqa: RUF012
-        "account_id",
-        "id",
-        "approximate_count_lower_bound",
-        "approximate_count_upper_bound",
-        "time_updated",
-        "time_created",
-        "customer_file_source",
-        "data_source",
-        "delivery_status",
-        "description",
-    ]
+    @property
+    def columns(self) -> list[str]:
+        return [
+            "account_id",
+            "id",
+            "approximate_count_lower_bound",
+            "approximate_count_upper_bound",
+            "time_updated",
+            "time_created",
+            "customer_file_source",
+            "data_source",
+            "delivery_status",
+            "description",
+        ]
 
     name = "customaudiencesinternal"
     tap_stream_id = "customaudiencesinternal"
@@ -1455,7 +1455,7 @@ class CustomAudiencesInternal(FacebookStream):
     ).to_dict()
 
     @property
-    def path(self):
+    def path(self) -> str:
         return f"/customaudiences?fields={self.columns}"
 
 
@@ -1473,7 +1473,7 @@ class CustomAudiences(CustomAudiencesInternal):
 
     # Add rule column
     @property
-    def columns(self):
+    def columns(self) -> list[str]:
         return [*super().columns, "rule"]
 
     name = "customaudiences"
