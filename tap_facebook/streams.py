@@ -1225,7 +1225,7 @@ class AdAccountsStream(FacebookStream):
     path = f"/adaccounts?fields={columns}"
     tap_stream_id = "adaccounts"
     primary_keys = ["created_time"]  # noqa: RUF012
-    replication_keys = ["created_time"]  # noqa: RUF012
+    replication_key = "created_time"
     replication_method = REPLICATION_INCREMENTAL
 
     schema = PropertiesList(
@@ -1331,6 +1331,26 @@ class AdAccountsStream(FacebookStream):
         )
         row["spend_cap"] = int(row["spend_cap"]) if "spend_cap" in row else None
         return row
+
+    def get_url_params(
+        self,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {"limit": 25}
+        if next_page_token is not None:
+            params["after"] = next_page_token
+
+        return params
 
 
 class CustomConversions(FacebookStream):
@@ -1478,6 +1498,26 @@ class CustomAudiences(CustomAudiencesInternal):
 
     name = "customaudiences"
     tap_stream_id = "customaudiences"
+
+    def get_url_params(
+        self,
+        context: dict | None,  # noqa: ARG002
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        """Return a dictionary of values to be used in URL parameterization.
+
+        Args:
+            context: The stream context.
+            next_page_token: The next page index or value.
+
+        Returns:
+            A dictionary of URL query parameters.
+        """
+        params: dict = {"limit": 25}
+        if next_page_token is not None:
+            params["after"] = next_page_token
+
+        return params
 
 
 class AdImages(FacebookStream):
