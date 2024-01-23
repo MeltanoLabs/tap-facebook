@@ -14,12 +14,12 @@ packages = [
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "<3.12,>=3.7.1"
-requests = "^2.31.0"
+python = ">=3.8"
+requests = "~=2.31.0"
 singer-sdk = ">=0.27,<0.35"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.4.1"
+pytest = ">=7.4.1"
 singer-sdk = {version = ">=0.27,<0.35", extras = ["testing"]}
 
 [tool.isort]
@@ -28,7 +28,7 @@ multi_line_output = 3 # Vertical Hanging Indent
 src_paths = "tap_facebook"
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
+requires = ["poetry-core==1.8.1", "poetry-dynamic-versioning==1.2.0"]
 build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry.scripts]
@@ -39,10 +39,12 @@ tap-facebook = 'tap_facebook.tap:TapFacebook.cli'
 enable = true
 
 [tool.ruff]
-ignore = ["ANN101", "DJ", "PD", "D101", "D102"]
 line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+ignore = ["ANN101", "DJ", "PD", "D101", "D102"]
 select = ["ALL"]
-target-version = "py37"
 
 [tool.ruff.flake8-import-conventions]
 banned-from = ["typing"]

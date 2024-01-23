@@ -109,11 +109,7 @@ class FacebookStream(RESTStream):
             self.logger.info(msg)
             return
 
-        if (
-            HTTPStatus.BAD_REQUEST
-            <= response.status_code
-            < HTTPStatus.INTERNAL_SERVER_ERROR
-        ):
+        if HTTPStatus.BAD_REQUEST <= response.status_code < HTTPStatus.INTERNAL_SERVER_ERROR:
             msg = (
                 f"{response.status_code} Client Error: "
                 f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"

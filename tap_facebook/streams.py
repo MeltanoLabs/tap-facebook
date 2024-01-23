@@ -1320,9 +1320,7 @@ class AdAccountsStream(FacebookStream):
         row: dict,
         context: dict | None = None,  # noqa: ARG002
     ) -> dict | None:
-        row["amount_spent"] = (
-            int(row["amount_spent"]) if "amount_spent" in row else None
-        )
+        row["amount_spent"] = int(row["amount_spent"]) if "amount_spent" in row else None
         row["balance"] = int(row["balance"]) if "balance" in row else None
         row["min_campaign_group_spend_cap"] = (
             int(row["min_campaign_group_spend_cap"])
