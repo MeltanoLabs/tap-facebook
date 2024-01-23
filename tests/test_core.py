@@ -8,7 +8,7 @@ from tap_facebook.streams import AdAccountsStream, AdsInsightStream
 from tap_facebook.tap import TapFacebook
 
 SAMPLE_CONFIG = {
-    "start_date": "2023-03-01T00:00:00Z",
+    "start_date": "2021-03-01T00:00:00Z",
     "access_token": os.environ["TAP_FACEBOOK_ACCESS_TOKEN"],
     "account_id": os.environ["TAP_FACEBOOK_ACCOUNT_ID"],
 }
