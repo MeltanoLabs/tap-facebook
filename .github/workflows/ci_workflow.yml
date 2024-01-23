@@ -42,8 +42,7 @@ jobs:
       id: test_pytest
       continue-on-error: false
       env:
-         TAP_FACEBOOK_ACCESS_TOKEN: ${{ secrets.access_token }}
-         TAP_FACEBOOK_ACCOUNT_ID: ${{ secrets.account_id }}
-         TAP_FACEBOOK_API_VERSION: ${{ secrets.api_version }}
+         TAP_FACEBOOK_ACCESS_TOKEN: ${{ secrets.tap_facebook_access_token }}
+         TAP_FACEBOOK_ACCOUNT_ID: ${{ secrets.tap_facebook_account_id }}
       run: |
         poetry run pytest --capture=no
