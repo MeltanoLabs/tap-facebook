@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import typing as t
 from http import HTTPStatus
-from pathlib import Path
 from urllib.parse import urlparse
 
 from singer_sdk.authenticators import BearerTokenAuthenticator
@@ -15,7 +14,6 @@ from singer_sdk.streams import RESTStream
 if t.TYPE_CHECKING:
     import requests
 
-SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 class FacebookStream(RESTStream):
