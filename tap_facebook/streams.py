@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typing as t
-from pathlib import Path
 
 from singer_sdk import typing as th  # JSON Schema typing helpers
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL
@@ -20,8 +19,6 @@ from singer_sdk.typing import (
 )
 
 from tap_facebook.client import FacebookStream
-
-SCHEMAS_DIR = Path(__file__).parent / Path("./schemas")
 
 
 # ads insights stream
