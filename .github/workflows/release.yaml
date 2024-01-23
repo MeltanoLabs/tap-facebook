@@ -1,53 +1,42 @@
-name: Publish with Dynamic Versioning
+name: Build
 
-on:
-  release:
-    types: [published]
+on: push
 
 permissions:
-  contents: write
-  id-token: write
+  contents: write # Upload artifacts to release
+  id-token: write # Use PyPI trusted publishing
 
 jobs:
+  build:
+    name: Build and Inspect
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0
+      - uses: hynek/build-and-inspect-python-package@v2
+
   publish:
     name: Publish to PyPI
     runs-on: ubuntu-latest
-    environment: publishing
-    env:
-      PIP_CONSTRAINT: .github/workflows/constraints.txt
+    needs: [build]
+    environment:
+      name: publishing
+      url: https://pypi.org/p/meltano-tap-facebook
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4.0.0
+      - uses: actions/download-artifact@v4.1.1
         with:
-          fetch-depth: 0
-
-      - name: Set up Python
-        uses: actions/setup-python@v4.6.1
-        with:
-          python-version: "3.10"
-
-      - name: Upgrade pip
-        run: |
-          pip install pip
-          pip --version
-
-      - name: Install Poetry
-        run: |
-          pipx install poetry
-          pipx inject poetry poetry-dynamic-versioning[plugin]
-          poetry --version
-          poetry self show plugins
-
-      - name: Build
-        run: poetry build
-
+          name: Packages
+          path: dist
       - name: Upload wheel to release
         uses: svenstaro/upload-release-action@v2
         with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: dist/*.whl
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
 
       - name: Publish
-        uses: pypa/gh-action-pypi-publish@v1.8.10
+        uses: pypa/gh-action-pypi-publish@v1.8.11
