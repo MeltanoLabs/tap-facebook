@@ -18,7 +18,7 @@ from singer_sdk.typing import (
     StringType,
 )
 
-from tap_facebook.client import FacebookStream
+from tap_facebook.client import FacebookStream, IncrementalFacebookStream
 
 
 # ads insights stream
@@ -210,7 +210,7 @@ class AdsInsightStream(FacebookStream):
 
 
 # ads stream
-class AdsStream(FacebookStream):
+class AdsStream(IncrementalFacebookStream):
     """Ads stream class.
 
     columns: columns which will be added to fields parameter in api
@@ -247,6 +247,7 @@ class AdsStream(FacebookStream):
     columns_remaining = ["adlabels", "recommendations"]  # noqa: RUF012
 
     name = "ads"
+    filter_entity = "ad"
 
     path = f"/ads?fields={columns}"
 
@@ -475,7 +476,7 @@ class AdsStream(FacebookStream):
 
 
 # adsets stream
-class AdsetsStream(FacebookStream):
+class AdsetsStream(IncrementalFacebookStream):
     """https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/."""
 
     """
@@ -549,6 +550,7 @@ class AdsetsStream(FacebookStream):
     ]
 
     name = "adsets"
+    filter_entity = "adset"
 
     path = f"/adsets?fields={columns}"
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
@@ -753,7 +755,7 @@ class AdsetsStream(FacebookStream):
 
 
 # campaigns stream
-class CampaignStream(FacebookStream):
+class CampaignStream(IncrementalFacebookStream):
     """https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group."""
 
     """
@@ -808,6 +810,7 @@ class CampaignStream(FacebookStream):
     ]
 
     name = "campaigns"
+    filter_entity = "campaign"
 
     path = f"/campaigns?fields={columns}"
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
