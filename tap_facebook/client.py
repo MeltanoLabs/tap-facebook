@@ -15,7 +15,6 @@ if t.TYPE_CHECKING:
     import requests
 
 
-
 class FacebookStream(RESTStream):
     """facebook stream class."""
 
