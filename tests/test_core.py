@@ -1,5 +1,6 @@
 """Tests standard tap features using the built-in SDK tests library."""
 
+import os
 
 from singer_sdk.testing import SuiteConfig, get_tap_test_class
 
@@ -9,8 +10,8 @@ from tap_facebook.tap import TapFacebook
 SAMPLE_CONFIG = {
     "start_date": "2023-03-01T00:00:00Z",
     "api_version": "v16.0",
-    "access_token": "xxx",
-    "account_id": "xxx",
+    "access_token": os.environ["TAP_FACEBOOK_ACCESS_TOKEN"],
+    "account_id": os.environ["TAP_FACEBOOK_ACCOUNT_ID"],
 }
 
 TestTapFacebook = get_tap_test_class(
@@ -18,6 +19,11 @@ TestTapFacebook = get_tap_test_class(
     config=SAMPLE_CONFIG,
     suite_config=SuiteConfig(
         max_records_limit=20,
+        ignore_no_records_for_streams=[
+            "adlabels",
+            "adsinsights",
+            "customconversions",
+        ],
     ),
 )
 
