@@ -7,6 +7,9 @@ import typing as t
 from singer_sdk import Tap
 from singer_sdk import typing as th  # JSON schema typing helpers
 
+if t.TYPE_CHECKING:
+    from tap_facebook.client import FacebookStream
+
 from tap_facebook.streams import (
     AdAccountsStream,
     AdImages,
@@ -34,9 +37,6 @@ STREAM_TYPES = [
     AdImages,
     AdVideos,
 ]
-
-if t.TYPE_CHECKING:
-    from tap_facebook import streams
 
 
 class TapFacebook(Tap):
@@ -76,7 +76,7 @@ class TapFacebook(Tap):
         ),
     ).to_dict()
 
-    def discover_streams(self) -> list[streams.FacebookStream]:
+    def discover_streams(self) -> list[FacebookStream]:
         """Return a list of discovered streams.
 
         Returns:
