@@ -662,14 +662,22 @@ class AdsetsStream(IncrementalFacebookStream):
         Property("promoted_object_product_set_id", IntegerType),
         Property("promoted_object_retention_days", StringType),
         Property("promoted_object_application_type", StringType),
-        Property("bid_amount", StringType),
+        Property("bid_amount", IntegerType),
         Property("bid_strategy", StringType),
         Property(
             "targeting",
             ObjectType(
                 Property("age_max", IntegerType),
                 Property("age_min", IntegerType),
-                Property("excluded_custom_audiences", ArrayType(StringType)),
+                Property(
+                    "excluded_custom_audiences",
+                    ArrayType(
+                        ObjectType(
+                            Property("id", StringType),
+                            Property("name", StringType),
+                        ),
+                    ),
+                ),
                 Property(
                     "geo_locations",
                     ObjectType(
