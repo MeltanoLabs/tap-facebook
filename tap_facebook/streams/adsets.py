@@ -297,7 +297,7 @@ class AdsetsStream(IncrementalFacebookStream):
                 Property("industries", ArrayType(ObjectType())),
                 Property("interests", ArrayType(StringType)),
                 Property("life_events", ArrayType(ObjectType())),
-                Property("locales", ArrayType(StringType)),
+                Property("locales", ArrayType(IntegerType)),
                 Property("relationship_statuses", ArrayType(StringType)),
                 Property("user_adclusters", ArrayType(ObjectType())),
                 Property("user_device", ArrayType(StringType)),
