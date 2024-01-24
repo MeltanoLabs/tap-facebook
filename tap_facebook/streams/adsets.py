@@ -211,6 +211,15 @@ class AdsetsStream(IncrementalFacebookStream):
                 Property("age_max", IntegerType),
                 Property("age_min", IntegerType),
                 Property(
+                    "custom_audiences",
+                    ArrayType(
+                        ObjectType(
+                            Property("id", StringType),
+                            Property("name", StringType),
+                        ),
+                    ),
+                ),
+                Property(
                     "excluded_custom_audiences",
                     ArrayType(
                         ObjectType(
