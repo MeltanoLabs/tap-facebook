@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from singer_sdk.typing import (
-    ArrayType,
     BooleanType,
     IntegerType,
     ObjectType,
@@ -141,43 +140,64 @@ class CreativeStream(FacebookStream):
         Property("url_tags", StringType),
         Property("use_page_actor_override", BooleanType),
         Property("video_id", StringType),
-        Property("template_app_link_spec_android", ArrayType(StringType)),
-        Property("template_app_link_spec_ios", ArrayType(StringType)),
-        Property("template_app_link_spec_ipad", ArrayType(StringType)),
-        Property("template_app_link_spec_iphone", ArrayType(StringType)),
-        Property("template_caption", StringType),
-        Property("template_child_attachments", ArrayType(StringType)),
-        Property("template_description", StringType),
-        Property("template_link", StringType),
-        Property("template_message", StringType),
-        Property("template_page_link", StringType),
-        Property("template_url_spec_android_app_name", StringType),
-        Property("template_url_spec_android_package", StringType),
-        Property("template_url_spec_android_url", StringType),
-        Property("template_url_spec_config_app_id", StringType),
-        Property("template_url_spec_ios_app_name", StringType),
-        Property("template_url_spec_ios_app_store_id", StringType),
-        Property("template_url_spec_ios_url", StringType),
-        Property("template_url_spec_ipad_app_name", StringType),
-        Property("template_url_spec_ipad_app_store_id", StringType),
-        Property("template_url_spec_ipad_url", StringType),
-        Property("template_url_spec_iphone_app_name", StringType),
-        Property("template_url_spec_iphone_app_store_id", StringType),
-        Property("template_url_spec_iphone_url", StringType),
-        Property("template_url_spec_web_should_fallback", StringType),
-        Property("template_url_spec_web_url", StringType),
-        Property("template_url_spec_windows_phone_app_id", StringType),
-        Property("template_url_spec_windows_phone_app_name", StringType),
-        Property("template_url_spec_windows_phone_url", StringType),
         Property(
-            "platform_customizations_instagram_caption_ids",
-            ArrayType(StringType),
+            "template_url_spec",
+            ObjectType(
+                Property(
+                    "android",
+                    ObjectType(
+                        Property("app_name", StringType),
+                        Property("package", StringType),
+                        Property("url", StringType),
+                    ),
+                ),
+                Property(
+                    "config",
+                    ObjectType(
+                        Property("app_id", StringType),
+                    ),
+                ),
+                Property(
+                    "ios",
+                    ObjectType(
+                        Property("app_name", StringType),
+                        Property("app_store_id", StringType),
+                        Property("url", StringType),
+                    ),
+                ),
+                Property(
+                    "ipad",
+                    ObjectType(
+                        Property("app_name", StringType),
+                        Property("app_store_id", StringType),
+                        Property("url", StringType),
+                    ),
+                ),
+                Property(
+                    "iphone",
+                    ObjectType(
+                        Property("app_name", StringType),
+                        Property("app_store_id", StringType),
+                        Property("url", StringType),
+                    ),
+                ),
+                Property(
+                    "web",
+                    ObjectType(
+                        Property("should_fallback", StringType),
+                        Property("url", StringType),
+                    ),
+                ),
+                Property(
+                    "windows_phone",
+                    ObjectType(
+                        Property("app_id", StringType),
+                        Property("app_name", StringType),
+                        Property("url", StringType),
+                    ),
+                ),
+            ),
         ),
-        Property("platform_customizations_instagram_image_hash", StringType),
-        Property("platform_customizations_instagram_image_url", StringType),
-        Property("platform_customizations_instagram_video_id", IntegerType),
-        Property("object_story_link_data_caption", StringType),
-        Property("object_story_link_data_description", StringType),
         Property("product_set_id", StringType),
         Property("carousel_ad_link", StringType),
     ).to_dict()
