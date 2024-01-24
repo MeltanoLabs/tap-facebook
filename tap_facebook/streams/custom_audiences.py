@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import typing as t
 
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from singer_sdk.typing import (
     BooleanType,
     IntegerType,
@@ -18,7 +17,7 @@ from singer_sdk.typing import (
 from tap_facebook.client import FacebookStream
 
 
-class CustomAudiencesInternal(FacebookStream):
+class CustomAudiences(FacebookStream):
     """https://developers.facebook.com/docs/marketing-api/reference/custom-audience/."""
 
     """
@@ -29,6 +28,13 @@ class CustomAudiencesInternal(FacebookStream):
     schema: instream schema
     tap_stream_id = stream id
     """
+
+    name = "customaudiences"
+    primary_keys = ["id"]  # noqa: RUF012
+
+    @property
+    def path(self) -> str:
+        return f"/customaudiences?fields={self.columns}"
 
     @property
     def columns(self) -> list[str]:
@@ -54,12 +60,6 @@ class CustomAudiencesInternal(FacebookStream):
             "opt_out_link",
             "name",
         ]
-
-    name = "customaudiencesinternal"
-    tap_stream_id = "customaudiencesinternal"
-    primary_keys = ["id"]  # noqa: RUF012
-    replication_method = REPLICATION_INCREMENTAL
-    replication_key = "time_updated"
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -91,37 +91,11 @@ class CustomAudiencesInternal(FacebookStream):
         Property("permission_for_actions", ObjectType()),
         Property("pixel_id", StringType),
         Property("retention_days", IntegerType),
-        Property("rule", StringType),
         Property("subtype", StringType),
         Property("rule_aggregation", StringType),
         Property("opt_out_link", StringType),
         Property("name", StringType),
     ).to_dict()
-
-    @property
-    def path(self) -> str:
-        return f"/customaudiences?fields={self.columns}"
-
-
-class CustomAudiences(CustomAudiencesInternal):
-    """https://developers.facebook.com/docs/marketing-api/reference/custom-audience/."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    account_id: facebook account
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    tap_stream_id = stream id
-    """
-
-    # Add rule column
-    @property
-    def columns(self) -> list[str]:
-        return [*super().columns, "rule"]
-
-    name = "customaudiences"
-    tap_stream_id = "customaudiences"
 
     def get_url_params(
         self,
