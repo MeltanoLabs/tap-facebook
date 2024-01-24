@@ -5,7 +5,6 @@ from __future__ import annotations
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from singer_sdk.typing import (
     ArrayType,
-    DateTimeType,
     IntegerType,
     ObjectType,
     PropertiesList,
@@ -50,7 +49,7 @@ class AdsStream(IncrementalFacebookStream):
         "bid_amount",
     ]
 
-    columns_remaining = ["adlabels", "recommendations"]  # noqa: RUF012
+    columns_remaining = ["adlabels"]  # noqa: RUF012
 
     name = "ads"
     filter_entity = "ad"
@@ -66,17 +65,6 @@ class AdsStream(IncrementalFacebookStream):
         Property("account_id", StringType),
         Property("campaign_id", StringType),
         Property("adset_id", StringType),
-        Property(
-            "adlabels",
-            ArrayType(
-                ObjectType(
-                    Property("id", StringType),
-                    Property("created_time", DateTimeType),
-                    Property("name", StringType),
-                    Property("updated_time", DateTimeType),
-                ),
-            ),
-        ),
         Property("bid_amount", IntegerType),
         Property(
             "bid_info",
@@ -167,115 +155,7 @@ class AdsStream(IncrementalFacebookStream):
                 ),
             ),
         ),
-        Property("placement_specific_facebook_unsafe_substances", StringType),
-        Property("placement_specific_instagram_unsafe_substances", StringType),
-        Property("global_unsafe_substances", StringType),
-        Property("placement_specific_instagram_personal_attributes", StringType),
-        Property("global_personal_attributes", StringType),
-        Property("placement_specific_facebook_personal_attributes", StringType),
-        Property("placement_specific_instagram_nonexistent_functionality", StringType),
-        Property("global_nonexistent_functionality", StringType),
-        Property("placement_specific_facebook_nonexistent_functionality", StringType),
-        Property("placement_specific_facebook_advertising_policies", StringType),
-        Property("global_advertising_policies", StringType),
-        Property("global_spyware_or_malware", StringType),
-        Property("placement_specific_instagram_spyware_or_malware", StringType),
-        Property("placement_specific_facebook_spyware_or_malware", StringType),
-        Property("placement_specific_instagram_unrealistic_outcomes", StringType),
-        Property("global_unrealistic_outcomes", StringType),
-        Property("placement_specific_facebook_unrealistic_outcomes", StringType),
-        Property("placement_specific_facebook_brand_usage_in_ads", StringType),
-        Property("global_brand_usage_in_ads", StringType),
-        Property("global_personal_health_and_appearance", StringType),
-        Property(
-            "placement_specific_facebook_personal_health_and_appearance",
-            StringType,
-        ),
-        Property(
-            "placement_specific_instagram_personal_health_and_appearance",
-            StringType,
-        ),
-        Property(
-            "placement_specific_instagram_illegal_products_or_services",
-            StringType,
-        ),
-        Property("global_illegal_products_or_services", StringType),
-        Property(
-            "placement_specific_facebook_illegal_products_or_services",
-            StringType,
-        ),
-        Property("global_non_functional_landing_page", StringType),
-        Property("placement_specific_facebook_non_functional_landing_page", StringType),
-        Property(
-            "placement_specific_instagram_non_functional_landing_page",
-            StringType,
-        ),
-        Property(
-            "placement_specific_instagram_commercial_exploitation_of_crises_and_controversial_events",
-            StringType,
-        ),
-        Property(
-            "placement_specific_facebook_commercial_exploitation_of_crises_and_controversial_events",
-            StringType,
-        ),
-        Property(
-            "global_commercial_exploitation_of_crises_and_controversial_events",
-            StringType,
-        ),
-        Property("global_discriminatory_practices", StringType),
-        Property("placement_specific_facebook_discriminatory_practices", StringType),
-        Property("global_circumventing_systems", StringType),
-        Property("placement_specific_facebook_circumventing_systems", StringType),
-        Property("placement_specific_instagram_circumventing_systems", StringType),
-        Property("placement_specific_facebook_adult_content", StringType),
-        Property("placement_specific_facebook_sensational_content", StringType),
-        Property("global_adult_content", StringType),
-        Property("global_sensational_content", StringType),
-        Property("placement_specific_instagram_adult_content", StringType),
-        Property("placement_specific_instagram_brand_usage_in_ads", StringType),
-        Property("placement_specific_instagram_sensational_content", StringType),
-        Property(
-            "placement_specific_facebook_ads_about_social_issues_elections_or_politics",
-            StringType,
-        ),
-        Property(
-            "placement_specific_instagram_ads_about_social_issues_elections_or_politics",
-            StringType,
-        ),
-        Property("global_ads_about_social_issues_elections_or_politics", StringType),
         Property("configured_status", StringType),
-        Property("conversion_domain", StringType),
-        Property(
-            "conversion_specs",
-            ArrayType(
-                ObjectType(
-                    Property("action.type", ArrayType(StringType)),
-                    Property("conversion_id", ArrayType(StringType)),
-                ),
-            ),
-        ),
-        Property("placement_specific_instagram_advertising_policies", StringType),
-        Property("recommendation_data", ArrayType(Property("items", StringType))),
-        Property("application", ArrayType(Property("items", StringType))),
-        Property("dataset", ArrayType(Property("items", StringType))),
-        Property("event", ArrayType(Property("items", StringType))),
-        Property("event_creator", ArrayType(Property("items", StringType))),
-        Property("event_type", ArrayType(Property("items", StringType))),
-        Property("fb_pixel", ArrayType(Property("items", StringType))),
-        Property("fb_pixel_event", ArrayType(Property("items", StringType))),
-        Property("leadgen", ArrayType(Property("items", StringType))),
-        Property("object", ArrayType(Property("items", StringType))),
-        Property("object_domain", ArrayType(Property("items", StringType))),
-        Property("offer", ArrayType(Property("items", StringType))),
-        Property("offer_creator", ArrayType(Property("items", StringType))),
-        Property("offsite_pixel", ArrayType(Property("items", StringType))),
-        Property("page_parent", ArrayType(Property("items", StringType))),
-        Property("post_object", ArrayType(Property("items", StringType))),
-        Property("post_object_wall", ArrayType(Property("items", StringType))),
-        Property("question", ArrayType(Property("items", StringType))),
-        Property("question_creator", ArrayType(Property("items", StringType))),
-        Property("response", ArrayType(Property("items", StringType))),
-        Property("subtype", ArrayType(Property("items", StringType))),
     ).to_dict()
 
     tap_stream_id = "ads"
