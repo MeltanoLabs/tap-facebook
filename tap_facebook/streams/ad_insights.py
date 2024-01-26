@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import typing as t
 
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL
+import facebook_business.adobjects.user as fb_user
+import pendulum
+from facebook_business.adobjects.adaccount import AdAccount
+from facebook_business.api import FacebookAdsApi
+from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
 from singer_sdk.typing import (
     ArrayType,
     DateTimeType,
@@ -15,20 +19,12 @@ from singer_sdk.typing import (
     StringType,
 )
 
-from tap_facebook.client import FacebookStream
 
-
-class AdsInsightStream(FacebookStream):
-    """https://developers.facebook.com/docs/marketing-api/insights."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    account_id: facebook account
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    tap_stream_id = stream id
-    """
+class AdsInsightStream(Stream):
+    name = "adsinsights"
+    tap_stream_id = "adsinsights"
+    replication_method = REPLICATION_INCREMENTAL
+    replication_key = "date_start"
 
     columns = [  # noqa: RUF012
         "account_id",
@@ -73,26 +69,6 @@ class AdsInsightStream(FacebookStream):
         "cost_per_inline_link_click",
         "ctr",
     ]
-
-    columns_remaining = [  # noqa: RUF012
-        "unique_actions",
-        "actions",
-        "action_values",
-        "outbound_clicks",
-        "unique_outbound_clicks",
-        "video_30_sec_watched_actions",
-        "video_p25_watched_actions",
-        "video_p50_watched_actions",
-        "video_p75_watched_actions",
-        "video_p100_watched_actions",
-    ]
-
-    name = "adsinsights"
-
-    path = f"/insights?level=ad&fields={columns}"
-
-    replication_method = REPLICATION_INCREMENTAL
-    replication_key = "date_start"
 
     schema = PropertiesList(
         Property("clicks", StringType),
@@ -165,41 +141,133 @@ class AdsInsightStream(FacebookStream):
         ),
     ).to_dict()
 
-    tap_stream_id = "adsinsights"
+    # @property
+    # def schema(self) -> dict:
+    #     properties: List[th.Property] = []
+    # from facebook_business.adobjects.adsinsights import AdsInsights
+    # from facebook_business.adobjects.adsactionstats import AdsActionStats
+    # AdsInsights._field_types
+    # AdsActionStats._field_types
+    # ValidFields = Enum("ValidEnums", AdsInsights.Field.__dict__)
+    # ValidBreakdowns = Enum("ValidBreakdowns", AdsInsights.Breakdowns.__dict__)
+    # ValidActionBreakdowns = Enum("ValidActionBreakdowns", AdsInsights.ActionBreakdowns.__dict__)
 
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        FacebookAdsApi.init(access_token=self.config["access_token"], timeout=300)
+        user = fb_user.User(fbid="me")
 
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
+        account_id = self.config["account_id"]
+        self.account = AdAccount(f"act_{account_id}").api_get()
+        if not self.account:
+            msg = f"Couldn't find account with id {account_id}"
+            raise Exception(msg)
 
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params: dict = {"limit": 25}
-        if next_page_token is not None:
-            params["after"] = next_page_token
-        if self.replication_key:
-            params["sort"] = [f"{self.replication_key}_ascending"]
-            params["order_by"] = self.replication_key
+    def _run_job_to_completion(self, params):
+        import time
 
-        params["action_attribution_windows"] = '["1d_view","7d_click"]'
-
-        return params
-
-    def post_process(
-        self,
-        row: dict,
-        context: dict | None = None,  # noqa: ARG002
-    ) -> dict | None:
-        row["inline_link_clicks"] = (
-            int(row["inline_link_clicks"]) if "inline_link_clicks" in row else None
+        job = self.account.get_insights(
+            params=params,
+            is_async=True,
         )
-        row["impressions"] = int(row["impressions"]) if "impressions" in row else None
-        row["reach"] = int(row["reach"]) if "reach" in row else None
-        return row
+        status = None
+        time_start = time.time()
+        sleep_time = 10
+        INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
+        INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
+        INSIGHTS_MAX_ASYNC_SLEEP_SECONDS = 5 * 60
+        while status != "Job Completed":
+            duration = time.time() - time_start
+            job = job.api_get()
+            status = job["async_status"]
+            percent_complete = job["async_percent_completion"]
+
+            job_id = job["id"]
+            self.logger.info("%s, %d%% done", status, percent_complete)
+
+            if status == "Job Completed":
+                return job
+
+            if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
+                pretty_error_message = (
+                    "Insights job {} did not start after {} seconds. "
+                    + "This is an intermittent error and may resolve itself on subsequent queries to the Facebook API. "
+                    + "You should deselect fields from the schema that are not necessary, "
+                    + "as that may help improve the reliability of the Facebook API."
+                )
+                raise InsightsJobTimeout(
+                    pretty_error_message.format(job_id, INSIGHTS_MAX_WAIT_TO_START_SECONDS)
+                )
+            elif duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS and status != "Job Completed":
+                pretty_error_message = (
+                    "Insights job {} did not complete after {} seconds. "
+                    + "This is an intermittent error and may resolve itself on subsequent queries to the Facebook API. "
+                    + "You should deselect fields from the schema that are not necessary, "
+                    + "as that may help improve the reliability of the Facebook API."
+                )
+                raise InsightsJobTimeout(
+                    pretty_error_message.format(job_id, INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60)
+                )
+
+            self.logger.info("sleeping for %d seconds until job is done", sleep_time)
+            time.sleep(sleep_time)
+            if sleep_time < INSIGHTS_MAX_ASYNC_SLEEP_SECONDS:
+                sleep_time = 2 * sleep_time
+
+    def get_records(
+        self,
+        context: dict | None,
+    ) -> t.Iterable[dict | tuple[dict, dict | None]]:
+        # Aggregation window of 1 day
+        # TODO: if we allow this to be configurable we need to increase the time range accordingly
+        time_increment = 1
+
+        # Facebook freezes insight data 28 days after it was generated, which means that all data
+        # from the past 28 days may have changed since we last emitted it, so we retrieve it again.
+        # But in some cases users my have define their own lookback window, thats
+        # why the value for `insights_lookback_window` is set throught config.
+        lookback_window = 28
+
+        # Facebook store metrics maximum of 37 months old. Any time range that
+        # older that 37 months from current date would result in 400 Bad request
+        # HTTP response.
+        # https://developers.facebook.com/docs/marketing-api/reference/ad-account/insights/#overview
+        INSIGHTS_RETENTION_PERIOD = pendulum.duration(months=37)
+
+        today = pendulum.today().date()
+        # TODO: handle these edge cases
+        # oldest_date = today - INSIGHTS_RETENTION_PERIOD
+        # refresh_date = today - lookback_window
+        report_start = (
+            pendulum.parse(self.get_starting_replication_key_value(context))
+            .subtract(days=lookback_window)
+            .date()
+        )
+
+        action_breakdowns = []
+        breakdowns = []
+        while report_start <= today:
+            params = {
+                "level": "ad",
+                "action_breakdowns": action_breakdowns,
+                # AdsInsights.ActionReportTime.__dict__
+                # "conversion", "impression", "mixed"
+                "action_report_time": "mixed",
+                "breakdowns": breakdowns,
+                "fields": self.columns,
+                # Ignore time increment and just split it manually
+                # We can define increment as 1 for daily agg but then chose a larger
+                # time range to get multiple reports back in one async jobs
+                "time_increment": time_increment,
+                "limit": 100,
+                "action_attribution_windows": ["1d_view", "7d_click"],
+                "time_range": {
+                    "since": report_start.to_date_string(),
+                    "until": report_start.to_date_string(),
+                },
+            }
+            job = self._run_job_to_completion(params)
+            for obj in job.get_result():
+                yield obj.export_all_data()
+            # Bump to the next increment
+            report_start = report_start.add(days=time_increment)
