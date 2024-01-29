@@ -56,6 +56,10 @@ EXCLUDED_FIELDS = [
     "__dict__",
 ]
 
+SLEEP_TIME_INCREMENT = 5
+INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
+INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
+
 class AdsInsightStream(Stream):
     name = "adsinsights"
     tap_stream_id = "adsinsights"
@@ -132,9 +136,6 @@ class AdsInsightStream(Stream):
         )
         status = None
         time_start = time.time()
-        sleep_time = 5
-        INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
-        INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
         while status != "Job Completed":
             duration = time.time() - time_start
             job = job.api_get()
@@ -142,35 +143,31 @@ class AdsInsightStream(Stream):
             percent_complete = job[AdReportRun.Field.async_percent_completion]
 
             job_id = job["id"]
-            self.logger.info("%s, %d%% done", status, percent_complete)
+            self.logger.info(f"{status}, {percent_complete}% done")
 
             if status == "Job Completed":
                 return job
             if status == "Job Failed":
                 raise Exception(dict(job))
             if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
-                pretty_error_message = (
-                    "Insights job {} did not start after {} seconds. "
+                error_message = (
+                    f"Insights job {job_id} did not start after {INSIGHTS_MAX_WAIT_TO_START_SECONDS} seconds. "
                     + "This is an intermittent error and may resolve itself on subsequent queries to the Facebook API. "
                     + "You should deselect fields from the schema that are not necessary, "
                     + "as that may help improve the reliability of the Facebook API."
                 )
-                raise InsightsJobTimeout(
-                    pretty_error_message.format(job_id, INSIGHTS_MAX_WAIT_TO_START_SECONDS)
-                )
+                raise Exception(error_message)
             elif duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS and status != "Job Completed":
-                pretty_error_message = (
-                    "Insights job {} did not complete after {} seconds. "
+                error_message = (
+                    f"Insights job {job_id} did not complete after {INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
                     + "This is an intermittent error and may resolve itself on subsequent queries to the Facebook API. "
                     + "You should deselect fields from the schema that are not necessary, "
                     + "as that may help improve the reliability of the Facebook API."
                 )
-                raise InsightsJobTimeout(
-                    pretty_error_message.format(job_id, INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60)
-                )
+                raise Exception(error_message)
 
-            self.logger.info("sleeping for %d seconds until job is done", sleep_time)
-            time.sleep(sleep_time)
+            self.logger.info(f"Sleeping for {SLEEP_TIME_INCREMENT} seconds until job is done")
+            time.sleep(SLEEP_TIME_INCREMENT)
 
     def _get_selected_columns(self):
         return [
@@ -180,35 +177,52 @@ class AdsInsightStream(Stream):
             and len(keys) > 0
         ]
 
-    def get_records(
+    def _get_start_date(
         self,
         context: dict | None,
-    ) -> t.Iterable[dict | tuple[dict, dict | None]]:
-        self._initialize_client()
-        # Aggregation window of 1 day
-        # TODO: if we allow this to be configurable we need to increase the time range accordingly
-        time_increment = 1
-
+    ) -> pendulum.Date:
         # Facebook freezes insight data 28 days after it was generated, which means that all data
         # from the past 28 days may have changed since we last emitted it, so we retrieve it again.
         # But in some cases users my have define their own lookback window, thats
         # why the value for `insights_lookback_window` is set throught config.
         lookback_window = 28
 
+        config_start_date = pendulum.parse(self.config["start_date"]).date()
+        incremental_start_date = pendulum.parse(self.get_starting_replication_key_value(context)).date()
+        lookback_start_date = incremental_start_date.subtract(days=lookback_window)
+
+        # Don't use lookback if this is the first sync. Just start where the user requested.
+        if config_start_date >= incremental_start_date:
+            report_start = config_start_date
+            self.logger.info(f"Using configured start_date as report start filter.")
+        else:
+            self.logger.info(f"Incremental sync, applying lookback '{lookback_window}' to the bookmark start_date '{incremental_start_date}'. Syncing reports starting on '{lookback_start_date}'.")
+            report_start = lookback_start_date
+
         # Facebook store metrics maximum of 37 months old. Any time range that
         # older that 37 months from current date would result in 400 Bad request
         # HTTP response.
         # https://developers.facebook.com/docs/marketing-api/reference/ad-account/insights/#overview
-        INSIGHTS_RETENTION_PERIOD = pendulum.duration(months=37)
+        today = pendulum.today().date()
+        oldest_allowed_start_date = today.subtract(months=37)
+        if report_start < oldest_allowed_start_date:
+            report_start = oldest_allowed_start_date
+            self.logger.info(f"Report start date '{report_start}' is older than 37 months. Using oldest allowed start date '{oldest_allowed_start_date}' instead.")
+        return report_start
+
+    def get_records(
+        self,
+        context: dict | None,
+    ) -> t.Iterable[dict | tuple[dict, dict | None]]:
+        self._initialize_client()
+
+        time_increment = 1
 
         today = pendulum.today().date()
-        # TODO: handle these edge cases
-        # oldest_date = today - INSIGHTS_RETENTION_PERIOD
-        # refresh_date = today - lookback_window
-        report_start = (
-            pendulum.parse(self.get_starting_replication_key_value(context))
-            .subtract(days=lookback_window)
-            .date()
+        report_start = self._get_start_date(context)
+        report_end = (
+            report_start
+            .add(days=time_increment)
         )
 
         action_breakdowns = []
@@ -223,15 +237,12 @@ class AdsInsightStream(Stream):
                 "action_report_time": "mixed",
                 "breakdowns": breakdowns,
                 "fields": columns,
-                # Ignore time increment and just split it manually
-                # We can define increment as 1 for daily agg but then chose a larger
-                # time range to get multiple reports back in one async jobs
                 "time_increment": time_increment,
                 "limit": 100,
                 "action_attribution_windows": ["1d_view", "7d_click"],
                 "time_range": {
                     "since": report_start.to_date_string(),
-                    "until": report_start.to_date_string(),
+                    "until": report_end.to_date_string(),
                 },
             }
             job = self._run_job_to_completion(params)
@@ -239,3 +250,4 @@ class AdsInsightStream(Stream):
                 yield obj.export_all_data()
             # Bump to the next increment
             report_start = report_start.add(days=time_increment)
+            report_end = report_end.add(days=time_increment)
