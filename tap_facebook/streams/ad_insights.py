@@ -3,11 +3,16 @@
 from __future__ import annotations
 
 import typing as t
+from functools import lru_cache
 
 import facebook_business.adobjects.user as fb_user
 import pendulum
 from facebook_business.adobjects.adaccount import AdAccount
+from facebook_business.adobjects.adsactionstats import AdsActionStats
+from facebook_business.adobjects.adshistogramstats import AdsHistogramStats
+from facebook_business.adobjects.adsinsights import AdsInsights
 from facebook_business.api import FacebookAdsApi
+from singer_sdk import typing as th
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
 from singer_sdk.typing import (
     ArrayType,
@@ -26,134 +31,49 @@ class AdsInsightStream(Stream):
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "date_start"
 
-    columns = [  # noqa: RUF012
-        "account_id",
-        "ad_id",
-        "adset_id",
-        "campaign_id",
-        "ad_name",
-        "adset_name",
-        "campaign_name",
-        "date_start",
-        "date_stop",
-        "clicks",
-        "website_ctr",
-        "unique_inline_link_click_ctr",
-        "frequency",
-        "account_name",
-        "unique_inline_link_clicks",
-        "cost_per_unique_action_type",
-        "inline_post_engagement",
-        "inline_link_clicks",
-        "cpc",
-        "cost_per_unique_inline_link_click",
-        "cpm",
-        "canvas_avg_view_time",
-        "cost_per_inline_post_engagement",
-        "inline_link_click_ctr",
-        "cpp",
-        "cost_per_action_type",
-        "unique_link_clicks_ctr",
-        "spend",
-        "cost_per_unique_click",
-        "unique_clicks",
-        "social_spend",
-        "reach",
-        "canvas_avg_view_percent",
-        "objective",
-        "quality_ranking",
-        "engagement_rate_ranking",
-        "conversion_rate_ranking",
-        "impressions",
-        "unique_ctr",
-        "cost_per_inline_link_click",
-        "ctr",
-    ]
+    @staticmethod
+    def _get_datatype(field):
+        d_type = AdsInsights._field_types[field]
+        if d_type == "string":
+            return th.StringType()
+        elif d_type.startswith("list"):
+            if "AdsActionStats" in d_type:
+                sub_props = [th.Property(field, th.StringType()) for field in list(AdsActionStats.Field.__dict__) if field not in ["__module__", "__doc__", "__dict__"]]
+                return th.ArrayType(
+                    th.ObjectType(
+                        *sub_props
+                    )
+                )
+            if "AdsHistogramStats" in d_type:
+                sub_props = []
+                for field in list(AdsHistogramStats.Field.__dict__):
+                    if field not in ["__module__", "__doc__", "__dict__"]:
+                        clean_field = field.replace("field_", "")
+                        if AdsHistogramStats._field_types[clean_field] == "string":
+                            sub_props.append(
+                                th.Property(field, th.StringType())
+                            )
+                        else:
+                            sub_props.append(
+                                th.Property(field, th.ArrayType(th.IntegerType()))
+                            )
+                return th.ArrayType(th.ObjectType(*sub_props))
+            return th.ArrayType(th.ObjectType())
 
-    schema = PropertiesList(
-        Property("clicks", StringType),
-        Property("date_stop", StringType),
-        Property("ad_id", StringType),
-        Property(
-            "website_ctr",
-            ArrayType(
-                ObjectType(
-                    Property("value", StringType),
-                    Property("action_destination", StringType),
-                    Property("action_target_id", StringType),
-                    Property("action_type", StringType),
-                ),
-            ),
-        ),
-        Property("unique_inline_link_click_ctr", StringType),
-        Property("adset_id", StringType),
-        Property("frequency", StringType),
-        Property("account_name", StringType),
-        Property("canvas_avg_view_time", StringType),
-        Property("unique_inline_link_clicks", StringType),
-        Property(
-            "cost_per_unique_action_type",
-            ArrayType(
-                ObjectType(
-                    Property("value", StringType),
-                    Property("action_type", StringType),
-                ),
-            ),
-        ),
-        Property("inline_post_engagement", StringType),
-        Property("campaign_name", StringType),
-        Property("inline_link_clicks", IntegerType),
-        Property("campaign_id", StringType),
-        Property("cpc", StringType),
-        Property("ad_name", StringType),
-        Property("cost_per_unique_inline_link_click", StringType),
-        Property("cpm", StringType),
-        Property("cost_per_inline_post_engagement", StringType),
-        Property("inline_link_click_ctr", StringType),
-        Property("cpp", StringType),
-        Property("cost_per_action_type", ArrayType(ObjectType())),
-        Property("unique_link_clicks_ctr", StringType),
-        Property("spend", StringType),
-        Property("cost_per_unique_click", StringType),
-        Property("adset_name", StringType),
-        Property("unique_clicks", StringType),
-        Property("social_spend", StringType),
-        Property("canvas_avg_view_percent", StringType),
-        Property("account_id", StringType),
-        Property("date_start", DateTimeType),
-        Property("objective", StringType),
-        Property("quality_ranking", StringType),
-        Property("engagement_rate_ranking", StringType),
-        Property("conversion_rate_ranking", StringType),
-        Property("impressions", IntegerType),
-        Property("unique_ctr", StringType),
-        Property("cost_per_inline_link_click", StringType),
-        Property("ctr", StringType),
-        Property("reach", IntegerType),
-        Property(
-            "actions",
-            ArrayType(
-                ObjectType(
-                    Property("action_type", StringType),
-                    Property("value", StringType),
-                ),
-            ),
-        ),
-    ).to_dict()
-
-    # @property
-    # def schema(self) -> dict:
-    #     properties: List[th.Property] = []
-    # from facebook_business.adobjects.adsinsights import AdsInsights
-    # from facebook_business.adobjects.adsactionstats import AdsActionStats
-    # AdsInsights._field_types
-    # AdsActionStats._field_types
-    # ValidFields = Enum("ValidEnums", AdsInsights.Field.__dict__)
-    # ValidBreakdowns = Enum("ValidBreakdowns", AdsInsights.Breakdowns.__dict__)
-    # ValidActionBreakdowns = Enum("ValidActionBreakdowns", AdsInsights.ActionBreakdowns.__dict__)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    @property
+    @lru_cache
+    def schema(self) -> dict:
+        properties: List[th.Property] = []
+        columns = list(AdsInsights.Field.__dict__)[1:]
+        for field in columns:
+            if field in ["__module__", "__doc__", "__dict__"]:
+                continue
+            properties.append(
+                th.Property(field, self._get_datatype(field))
+            )
+        return th.PropertiesList(*properties).to_dict()
+    
+    def _initialize_client(self):
         FacebookAdsApi.init(access_token=self.config["access_token"], timeout=300)
         user = fb_user.User(fbid="me")
 
@@ -214,10 +134,19 @@ class AdsInsightStream(Stream):
             if sleep_time < INSIGHTS_MAX_ASYNC_SLEEP_SECONDS:
                 sleep_time = 2 * sleep_time
 
+    def _get_selected_columns(self):
+        return [
+            keys[1]
+            for keys, data in self.metadata.items()
+            if data.selected
+            and len(keys) > 0
+        ]
+
     def get_records(
         self,
         context: dict | None,
     ) -> t.Iterable[dict | tuple[dict, dict | None]]:
+        self._initialize_client()
         # Aggregation window of 1 day
         # TODO: if we allow this to be configurable we need to increase the time range accordingly
         time_increment = 1
@@ -246,6 +175,7 @@ class AdsInsightStream(Stream):
 
         action_breakdowns = []
         breakdowns = []
+        columns = self._get_selected_columns()
         while report_start <= today:
             params = {
                 "level": "ad",
@@ -254,7 +184,7 @@ class AdsInsightStream(Stream):
                 # "conversion", "impression", "mixed"
                 "action_report_time": "mixed",
                 "breakdowns": breakdowns,
-                "fields": self.columns,
+                "fields": columns,
                 # Ignore time increment and just split it manually
                 # We can define increment as 1 for daily agg but then chose a larger
                 # time range to get multiple reports back in one async jobs
