@@ -38,7 +38,14 @@ class AdsInsightStream(Stream):
             return th.StringType()
         elif d_type.startswith("list"):
             if "AdsActionStats" in d_type:
-                sub_props = [th.Property(field, th.StringType()) for field in list(AdsActionStats.Field.__dict__) if field not in ["__module__", "__doc__", "__dict__"]]
+                sub_props = [
+                    th.Property(
+                        field.replace("field_", ""),
+                        th.StringType()
+                    )
+                    for field in list(AdsActionStats.Field.__dict__)
+                    if field not in ["__module__", "__doc__", "__dict__"]
+                ]
                 return th.ArrayType(
                     th.ObjectType(
                         *sub_props
@@ -51,11 +58,11 @@ class AdsInsightStream(Stream):
                         clean_field = field.replace("field_", "")
                         if AdsHistogramStats._field_types[clean_field] == "string":
                             sub_props.append(
-                                th.Property(field, th.StringType())
+                                th.Property(clean_field, th.StringType())
                             )
                         else:
                             sub_props.append(
-                                th.Property(field, th.ArrayType(th.IntegerType()))
+                                th.Property(clean_field, th.ArrayType(th.IntegerType()))
                             )
                 return th.ArrayType(th.ObjectType(*sub_props))
             return th.ArrayType(th.ObjectType())
