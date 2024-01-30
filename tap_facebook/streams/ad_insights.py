@@ -16,15 +16,6 @@ from facebook_business.adobjects.adsinsights import AdsInsights
 from facebook_business.api import FacebookAdsApi
 from singer_sdk import typing as th
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
-from singer_sdk.typing import (
-    ArrayType,
-    DateTimeType,
-    IntegerType,
-    ObjectType,
-    PropertiesList,
-    Property,
-    StringType,
-)
 
 EXCLUDED_FIELDS = [
     "total_postbacks",
@@ -93,7 +84,7 @@ class AdsInsightStream(Stream):
                             sub_props.append(th.Property(clean_field, th.StringType()))
                         else:
                             sub_props.append(
-                                th.Property(clean_field, th.ArrayType(th.IntegerType()))
+                                th.Property(clean_field, th.ArrayType(th.IntegerType())),
                             )
                 return th.ArrayType(th.ObjectType(*sub_props))
             return th.ArrayType(th.ObjectType())
@@ -153,10 +144,7 @@ class AdsInsightStream(Stream):
                     + "as that may help improve the reliability of the Facebook API."
                 )
                 raise Exception(error_message)
-            elif (
-                duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS
-                and status != "Job Completed"
-            ):
+            elif duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS and status != "Job Completed":
                 error_message = (
                     f"Insights job {job_id} did not complete after {INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
                     + "This is an intermittent error and may resolve itself on subsequent queries to the Facebook API. "
@@ -166,16 +154,12 @@ class AdsInsightStream(Stream):
                 raise Exception(error_message)
 
             self.logger.info(
-                f"Sleeping for {SLEEP_TIME_INCREMENT} seconds until job is done"
+                f"Sleeping for {SLEEP_TIME_INCREMENT} seconds until job is done",
             )
             time.sleep(SLEEP_TIME_INCREMENT)
 
     def _get_selected_columns(self):
-        return [
-            keys[1]
-            for keys, data in self.metadata.items()
-            if data.selected and len(keys) > 0
-        ]
+        return [keys[1] for keys, data in self.metadata.items() if data.selected and len(keys) > 0]
 
     def _get_start_date(
         self,
@@ -185,17 +169,17 @@ class AdsInsightStream(Stream):
 
         config_start_date = pendulum.parse(self.config["start_date"]).date()
         incremental_start_date = pendulum.parse(
-            self.get_starting_replication_key_value(context)
+            self.get_starting_replication_key_value(context),
         ).date()
         lookback_start_date = incremental_start_date.subtract(days=lookback_window)
 
         # Don't use lookback if this is the first sync. Just start where the user requested.
         if config_start_date >= incremental_start_date:
             report_start = config_start_date
-            self.logger.info(f"Using configured start_date as report start filter.")
+            self.logger.info("Using configured start_date as report start filter.")
         else:
             self.logger.info(
-                f"Incremental sync, applying lookback '{lookback_window}' to the bookmark start_date '{incremental_start_date}'. Syncing reports starting on '{lookback_start_date}'."
+                f"Incremental sync, applying lookback '{lookback_window}' to the bookmark start_date '{incremental_start_date}'. Syncing reports starting on '{lookback_start_date}'.",
             )
             report_start = lookback_start_date
 
@@ -208,7 +192,7 @@ class AdsInsightStream(Stream):
         if report_start < oldest_allowed_start_date:
             report_start = oldest_allowed_start_date
             self.logger.info(
-                f"Report start date '{report_start}' is older than 37 months. Using oldest allowed start date '{oldest_allowed_start_date}' instead."
+                f"Report start date '{report_start}' is older than 37 months. Using oldest allowed start date '{oldest_allowed_start_date}' instead.",
             )
         return report_start
 
@@ -221,7 +205,7 @@ class AdsInsightStream(Stream):
         time_increment = self._report_definition["time_increment_days"]
 
         sync_end_date = pendulum.parse(
-            self.config.get("end_date", pendulum.today().to_date_string())
+            self.config.get("end_date", pendulum.today().to_date_string()),
         ).date()
 
         report_start = self._get_start_date(context)

@@ -158,14 +158,14 @@ class TapFacebook(Tap):
         """
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
         report_configs = [DEFAULT_INSIGHT_REPORT] + self.config.get(
-            "insight_reports_list"
+            "insight_reports_list",
         )
         for insight_report_definition in report_configs:
             streams.append(
                 AdsInsightStream(
                     tap=self,
                     report_definition=insight_report_definition,
-                )
+                ),
             )
         return streams
 
