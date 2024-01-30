@@ -60,6 +60,7 @@ SLEEP_TIME_INCREMENT = 5
 INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
 INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
 
+
 class AdsInsightStream(Stream):
     name = "adsinsights"
     replication_method = REPLICATION_INCREMENTAL
@@ -69,7 +70,7 @@ class AdsInsightStream(Stream):
         self._report_definition = kwargs.pop("report_definition")
         kwargs["name"] = f"{self.name}_{self._report_definition['name']}"
         super().__init__(*args, **kwargs)
-        
+
     @staticmethod
     def _get_datatype(field):
         d_type = AdsInsights._field_types[field]
@@ -78,27 +79,18 @@ class AdsInsightStream(Stream):
         elif d_type.startswith("list"):
             if "AdsActionStats" in d_type:
                 sub_props = [
-                    th.Property(
-                        field.replace("field_", ""),
-                        th.StringType()
-                    )
+                    th.Property(field.replace("field_", ""), th.StringType())
                     for field in list(AdsActionStats.Field.__dict__)
                     if field not in EXCLUDED_FIELDS
                 ]
-                return th.ArrayType(
-                    th.ObjectType(
-                        *sub_props
-                    )
-                )
+                return th.ArrayType(th.ObjectType(*sub_props))
             if "AdsHistogramStats" in d_type:
                 sub_props = []
                 for field in list(AdsHistogramStats.Field.__dict__):
                     if field not in EXCLUDED_FIELDS:
                         clean_field = field.replace("field_", "")
                         if AdsHistogramStats._field_types[clean_field] == "string":
-                            sub_props.append(
-                                th.Property(clean_field, th.StringType())
-                            )
+                            sub_props.append(th.Property(clean_field, th.StringType()))
                         else:
                             sub_props.append(
                                 th.Property(clean_field, th.ArrayType(th.IntegerType()))
@@ -114,15 +106,11 @@ class AdsInsightStream(Stream):
         for field in columns:
             if field in EXCLUDED_FIELDS:
                 continue
-            properties.append(
-                th.Property(field, self._get_datatype(field))
-            )
+            properties.append(th.Property(field, self._get_datatype(field)))
         for breakdown in self._report_definition["breakdowns"]:
-            properties.append(
-                th.Property(breakdown, th.StringType())
-            )
+            properties.append(th.Property(breakdown, th.StringType()))
         return th.PropertiesList(*properties).to_dict()
-    
+
     def _initialize_client(self):
         FacebookAdsApi.init(
             access_token=self.config["access_token"],
@@ -165,7 +153,10 @@ class AdsInsightStream(Stream):
                     + "as that may help improve the reliability of the Facebook API."
                 )
                 raise Exception(error_message)
-            elif duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS and status != "Job Completed":
+            elif (
+                duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS
+                and status != "Job Completed"
+            ):
                 error_message = (
                     f"Insights job {job_id} did not complete after {INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
                     + "This is an intermittent error and may resolve itself on subsequent queries to the Facebook API. "
@@ -174,15 +165,16 @@ class AdsInsightStream(Stream):
                 )
                 raise Exception(error_message)
 
-            self.logger.info(f"Sleeping for {SLEEP_TIME_INCREMENT} seconds until job is done")
+            self.logger.info(
+                f"Sleeping for {SLEEP_TIME_INCREMENT} seconds until job is done"
+            )
             time.sleep(SLEEP_TIME_INCREMENT)
 
     def _get_selected_columns(self):
         return [
             keys[1]
             for keys, data in self.metadata.items()
-            if data.selected
-            and len(keys) > 0
+            if data.selected and len(keys) > 0
         ]
 
     def _get_start_date(
@@ -192,7 +184,9 @@ class AdsInsightStream(Stream):
         lookback_window = self._report_definition["lookback_window"]
 
         config_start_date = pendulum.parse(self.config["start_date"]).date()
-        incremental_start_date = pendulum.parse(self.get_starting_replication_key_value(context)).date()
+        incremental_start_date = pendulum.parse(
+            self.get_starting_replication_key_value(context)
+        ).date()
         lookback_start_date = incremental_start_date.subtract(days=lookback_window)
 
         # Don't use lookback if this is the first sync. Just start where the user requested.
@@ -200,7 +194,9 @@ class AdsInsightStream(Stream):
             report_start = config_start_date
             self.logger.info(f"Using configured start_date as report start filter.")
         else:
-            self.logger.info(f"Incremental sync, applying lookback '{lookback_window}' to the bookmark start_date '{incremental_start_date}'. Syncing reports starting on '{lookback_start_date}'.")
+            self.logger.info(
+                f"Incremental sync, applying lookback '{lookback_window}' to the bookmark start_date '{incremental_start_date}'. Syncing reports starting on '{lookback_start_date}'."
+            )
             report_start = lookback_start_date
 
         # Facebook store metrics maximum of 37 months old. Any time range that
@@ -211,7 +207,9 @@ class AdsInsightStream(Stream):
         oldest_allowed_start_date = today.subtract(months=37)
         if report_start < oldest_allowed_start_date:
             report_start = oldest_allowed_start_date
-            self.logger.info(f"Report start date '{report_start}' is older than 37 months. Using oldest allowed start date '{oldest_allowed_start_date}' instead.")
+            self.logger.info(
+                f"Report start date '{report_start}' is older than 37 months. Using oldest allowed start date '{oldest_allowed_start_date}' instead."
+            )
         return report_start
 
     def get_records(
@@ -223,18 +221,11 @@ class AdsInsightStream(Stream):
         time_increment = self._report_definition["time_increment_days"]
 
         sync_end_date = pendulum.parse(
-            self.config.get(
-                "end_date",
-                pendulum.today().to_date_string()
-            )
+            self.config.get("end_date", pendulum.today().to_date_string())
         ).date()
 
         report_start = self._get_start_date(context)
-        report_end = (
-            report_start
-            .add(days=time_increment)
-        )
-
+        report_end = report_start.add(days=time_increment)
 
         columns = self._get_selected_columns()
         while report_start <= sync_end_date:
@@ -248,7 +239,7 @@ class AdsInsightStream(Stream):
                 "limit": 100,
                 "action_attribution_windows": [
                     self._report_definition["action_attribution_windows_view"],
-                   self._report_definition["action_attribution_windows_click"],
+                    self._report_definition["action_attribution_windows_click"],
                 ],
                 "time_range": {
                     "since": report_start.to_date_string(),

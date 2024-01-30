@@ -49,6 +49,7 @@ DEFAULT_INSIGHT_REPORT = {
     "lookback_window": 28,
 }
 
+
 class TapFacebook(Tap):
     """Singer tap for extracting data from the Facebook Marketing API."""
 
@@ -112,19 +113,19 @@ class TapFacebook(Tap):
                         "action_attribution_windows_view",
                         th.StringType,
                         description="The attribution window for the actions. For example, 28d_view means the API returns all actions that happened 28 days after someone viewed the ad.",
-                        default="1d_view"
+                        default="1d_view",
                     ),
                     th.Property(
                         "action_attribution_windows_click",
                         th.StringType,
                         description="The attribution window for the actions. For example, 28d_click means the API returns all actions that happened 28 days after someone clicked on the ad.",
-                        default="7d_click"
+                        default="7d_click",
                     ),
                     th.Property(
                         "action_report_time",
                         th.StringType,
                         description="Determines the report time of action stats. For example, if a person saw the ad on Jan 1st but converted on Jan 2nd, when you query the API with action_report_time=impression, you see a conversion on Jan 1st. When you query the API with action_report_time=conversion, you see a conversion on Jan 2nd.",
-                        default="mixed"
+                        default="mixed",
                     ),
                     th.Property(
                         "lookback_window",
@@ -155,10 +156,10 @@ class TapFacebook(Tap):
         Returns:
             A list of discovered streams.
         """
-        streams = [
-            stream_class(tap=self) for stream_class in STREAM_TYPES
-        ]
-        report_configs = [DEFAULT_INSIGHT_REPORT] + self.config.get("insight_reports_list")
+        streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
+        report_configs = [DEFAULT_INSIGHT_REPORT] + self.config.get(
+            "insight_reports_list"
+        )
         for insight_report_definition in report_configs:
             streams.append(
                 AdsInsightStream(
@@ -167,6 +168,7 @@ class TapFacebook(Tap):
                 )
             )
         return streams
+
 
 if __name__ == "__main__":
     TapFacebook.cli()
