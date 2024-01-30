@@ -62,10 +62,14 @@ INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
 
 class AdsInsightStream(Stream):
     name = "adsinsights"
-    tap_stream_id = "adsinsights"
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "date_start"
 
+    def __init__(self, *args, **kwargs):
+        self._report_definition = kwargs.pop("report_definition")
+        kwargs["name"] = f"{self.name}_{self._report_definition['name']}"
+        super().__init__(*args, **kwargs)
+        
     @staticmethod
     def _get_datatype(field):
         d_type = AdsInsights._field_types[field]
@@ -113,6 +117,10 @@ class AdsInsightStream(Stream):
             properties.append(
                 th.Property(field, self._get_datatype(field))
             )
+        for breakdown in self._report_definition["breakdowns"]:
+            properties.append(
+                th.Property(breakdown, th.StringType())
+            )
         return th.PropertiesList(*properties).to_dict()
     
     def _initialize_client(self):
@@ -139,7 +147,7 @@ class AdsInsightStream(Stream):
         while status != "Job Completed":
             duration = time.time() - time_start
             job = job.api_get()
-            status = job["async_status"]
+            status = job[AdReportRun.Field.async_status]
             percent_complete = job[AdReportRun.Field.async_percent_completion]
 
             job_id = job["id"]
@@ -181,11 +189,7 @@ class AdsInsightStream(Stream):
         self,
         context: dict | None,
     ) -> pendulum.Date:
-        # Facebook freezes insight data 28 days after it was generated, which means that all data
-        # from the past 28 days may have changed since we last emitted it, so we retrieve it again.
-        # But in some cases users my have define their own lookback window, thats
-        # why the value for `insights_lookback_window` is set throught config.
-        lookback_window = 28
+        lookback_window = self._report_definition["lookback_window"]
 
         config_start_date = pendulum.parse(self.config["start_date"]).date()
         incremental_start_date = pendulum.parse(self.get_starting_replication_key_value(context)).date()
@@ -216,30 +220,36 @@ class AdsInsightStream(Stream):
     ) -> t.Iterable[dict | tuple[dict, dict | None]]:
         self._initialize_client()
 
-        time_increment = 1
+        time_increment = self._report_definition["time_increment_days"]
 
-        today = pendulum.today().date()
+        sync_end_date = pendulum.parse(
+            self.config.get(
+                "end_date",
+                pendulum.today().to_date_string()
+            )
+        ).date()
+
         report_start = self._get_start_date(context)
         report_end = (
             report_start
             .add(days=time_increment)
         )
 
-        action_breakdowns = []
-        breakdowns = []
+
         columns = self._get_selected_columns()
-        while report_start <= today:
+        while report_start <= sync_end_date:
             params = {
-                "level": "ad",
-                "action_breakdowns": action_breakdowns,
-                # AdsInsights.ActionReportTime.__dict__
-                # "conversion", "impression", "mixed"
-                "action_report_time": "mixed",
-                "breakdowns": breakdowns,
+                "level": self._report_definition["level"],
+                "action_breakdowns": self._report_definition["action_breakdowns"],
+                "action_report_time": self._report_definition["action_report_time"],
+                "breakdowns": self._report_definition["breakdowns"],
                 "fields": columns,
                 "time_increment": time_increment,
                 "limit": 100,
-                "action_attribution_windows": ["1d_view", "7d_click"],
+                "action_attribution_windows": [
+                    self._report_definition["action_attribution_windows_view"],
+                   self._report_definition["action_attribution_windows_click"],
+                ],
                 "time_range": {
                     "since": report_start.to_date_string(),
                     "until": report_end.to_date_string(),
