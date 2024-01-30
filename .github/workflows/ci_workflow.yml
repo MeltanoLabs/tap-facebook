@@ -43,5 +43,6 @@ jobs:
       env:
          TAP_FACEBOOK_ACCESS_TOKEN: ${{ secrets.tap_facebook_access_token }}
          TAP_FACEBOOK_ACCOUNT_ID: ${{ secrets.tap_facebook_account_id }}
+         TAP_FACEBOOK_START_DATE: ${{ secrets.tap_facebook_start_date }}
       run: |
         poetry run pytest --capture=no

@@ -2,204 +2,270 @@
 
 from __future__ import annotations
 
+import time
 import typing as t
+from functools import lru_cache
 
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL
-from singer_sdk.typing import (
-    ArrayType,
-    DateTimeType,
-    IntegerType,
-    ObjectType,
-    PropertiesList,
-    Property,
-    StringType,
-)
+import facebook_business.adobjects.user as fb_user
+import pendulum
+from facebook_business.adobjects.adaccount import AdAccount
+from facebook_business.adobjects.adreportrun import AdReportRun
+from facebook_business.adobjects.adsactionstats import AdsActionStats
+from facebook_business.adobjects.adshistogramstats import AdsHistogramStats
+from facebook_business.adobjects.adsinsights import AdsInsights
+from facebook_business.api import FacebookAdsApi
+from singer_sdk import typing as th
+from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
 
-from tap_facebook.client import FacebookStream
+EXCLUDED_FIELDS = [
+    "total_postbacks",
+    "adset_end",
+    "adset_start",
+    "conversion_lead_rate",
+    "cost_per_conversion_lead",
+    "cost_per_dda_countby_convs",
+    "cost_per_one_thousand_ad_impression",
+    "cost_per_unique_conversion",
+    "creative_media_type",
+    "dda_countby_convs",
+    "dda_results",
+    "instagram_upcoming_event_reminders_set",
+    "interactive_component_tap",
+    "marketing_messages_cost_per_delivered",
+    "marketing_messages_cost_per_link_btn_click",
+    "marketing_messages_spend",
+    "place_page_name",
+    "total_postbacks",
+    "total_postbacks_detailed",
+    "total_postbacks_detailed_v4",
+    "unique_conversions",
+    "unique_video_continuous_2_sec_watched_actions",
+    "unique_video_view_15_sec",
+    "video_thruplay_watched_actions",
+    "__module__",
+    "__doc__",
+    "__dict__",
+]
+
+SLEEP_TIME_INCREMENT = 5
+INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
+INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
 
 
-class AdsInsightStream(FacebookStream):
-    """https://developers.facebook.com/docs/marketing-api/insights."""
-
-    """
-    columns: columns which will be added to fields parameter in api
-    name: stream name
-    account_id: facebook account
-    path: path which will be added to api url in client.py
-    schema: instream schema
-    tap_stream_id = stream id
-    """
-
-    columns = [  # noqa: RUF012
-        "account_id",
-        "ad_id",
-        "adset_id",
-        "campaign_id",
-        "ad_name",
-        "adset_name",
-        "campaign_name",
-        "date_start",
-        "date_stop",
-        "clicks",
-        "website_ctr",
-        "unique_inline_link_click_ctr",
-        "frequency",
-        "account_name",
-        "unique_inline_link_clicks",
-        "cost_per_unique_action_type",
-        "inline_post_engagement",
-        "inline_link_clicks",
-        "cpc",
-        "cost_per_unique_inline_link_click",
-        "cpm",
-        "canvas_avg_view_time",
-        "cost_per_inline_post_engagement",
-        "inline_link_click_ctr",
-        "cpp",
-        "cost_per_action_type",
-        "unique_link_clicks_ctr",
-        "spend",
-        "cost_per_unique_click",
-        "unique_clicks",
-        "social_spend",
-        "reach",
-        "canvas_avg_view_percent",
-        "objective",
-        "quality_ranking",
-        "engagement_rate_ranking",
-        "conversion_rate_ranking",
-        "impressions",
-        "unique_ctr",
-        "cost_per_inline_link_click",
-        "ctr",
-    ]
-
-    columns_remaining = [  # noqa: RUF012
-        "unique_actions",
-        "actions",
-        "action_values",
-        "outbound_clicks",
-        "unique_outbound_clicks",
-        "video_30_sec_watched_actions",
-        "video_p25_watched_actions",
-        "video_p50_watched_actions",
-        "video_p75_watched_actions",
-        "video_p100_watched_actions",
-    ]
-
+class AdsInsightStream(Stream):
     name = "adsinsights"
-
-    path = f"/insights?level=ad&fields={columns}"
-
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "date_start"
 
-    schema = PropertiesList(
-        Property("clicks", StringType),
-        Property("date_stop", StringType),
-        Property("ad_id", StringType),
-        Property(
-            "website_ctr",
-            ArrayType(
-                ObjectType(
-                    Property("value", StringType),
-                    Property("action_destination", StringType),
-                    Property("action_target_id", StringType),
-                    Property("action_type", StringType),
-                ),
-            ),
-        ),
-        Property("unique_inline_link_click_ctr", StringType),
-        Property("adset_id", StringType),
-        Property("frequency", StringType),
-        Property("account_name", StringType),
-        Property("canvas_avg_view_time", StringType),
-        Property("unique_inline_link_clicks", StringType),
-        Property(
-            "cost_per_unique_action_type",
-            ArrayType(
-                ObjectType(
-                    Property("value", StringType),
-                    Property("action_type", StringType),
-                ),
-            ),
-        ),
-        Property("inline_post_engagement", StringType),
-        Property("campaign_name", StringType),
-        Property("inline_link_clicks", IntegerType),
-        Property("campaign_id", StringType),
-        Property("cpc", StringType),
-        Property("ad_name", StringType),
-        Property("cost_per_unique_inline_link_click", StringType),
-        Property("cpm", StringType),
-        Property("cost_per_inline_post_engagement", StringType),
-        Property("inline_link_click_ctr", StringType),
-        Property("cpp", StringType),
-        Property("cost_per_action_type", ArrayType(ObjectType())),
-        Property("unique_link_clicks_ctr", StringType),
-        Property("spend", StringType),
-        Property("cost_per_unique_click", StringType),
-        Property("adset_name", StringType),
-        Property("unique_clicks", StringType),
-        Property("social_spend", StringType),
-        Property("canvas_avg_view_percent", StringType),
-        Property("account_id", StringType),
-        Property("date_start", DateTimeType),
-        Property("objective", StringType),
-        Property("quality_ranking", StringType),
-        Property("engagement_rate_ranking", StringType),
-        Property("conversion_rate_ranking", StringType),
-        Property("impressions", IntegerType),
-        Property("unique_ctr", StringType),
-        Property("cost_per_inline_link_click", StringType),
-        Property("ctr", StringType),
-        Property("reach", IntegerType),
-        Property(
-            "actions",
-            ArrayType(
-                ObjectType(
-                    Property("action_type", StringType),
-                    Property("value", StringType),
-                ),
-            ),
-        ),
-    ).to_dict()
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
+        """Initialize the stream."""
+        self._report_definition = kwargs.pop("report_definition")
+        kwargs["name"] = f"{self.name}_{self._report_definition['name']}"
+        super().__init__(*args, **kwargs)
 
-    tap_stream_id = "adsinsights"
+    @staticmethod
+    def _get_datatype(field: str) -> th.Type | None:
+        d_type = AdsInsights._field_types[field]  # noqa: SLF001
+        if d_type == "string":
+            return th.StringType()
+        if d_type.startswith("list"):
+            if "AdsActionStats" in d_type:
+                sub_props = [
+                    th.Property(field.replace("field_", ""), th.StringType())
+                    for field in list(AdsActionStats.Field.__dict__)
+                    if field not in EXCLUDED_FIELDS
+                ]
+                return th.ArrayType(th.ObjectType(*sub_props))
+            if "AdsHistogramStats" in d_type:
+                sub_props = []
+                for field in list(AdsHistogramStats.Field.__dict__):
+                    if field not in EXCLUDED_FIELDS:
+                        clean_field = field.replace("field_", "")
+                        if AdsHistogramStats._field_types[clean_field] == "string":  # noqa: SLF001
+                            sub_props.append(th.Property(clean_field, th.StringType()))
+                        else:
+                            sub_props.append(
+                                th.Property(
+                                    clean_field,
+                                    th.ArrayType(th.IntegerType()),
+                                ),
+                            )
+                return th.ArrayType(th.ObjectType(*sub_props))
+            return th.ArrayType(th.ObjectType())
+        msg = f"Type not found for field: {field}"
+        raise RuntimeError(msg)
 
-    def get_url_params(
-        self,
-        context: dict | None,  # noqa: ARG002
-        next_page_token: t.Any | None,  # noqa: ANN401
-    ) -> dict[str, t.Any]:
-        """Return a dictionary of values to be used in URL parameterization.
+    @property
+    @lru_cache  # noqa: B019
+    def schema(self) -> dict:
+        properties: th.List[th.Property] = []
+        columns = list(AdsInsights.Field.__dict__)[1:]
+        for field in columns:
+            if field in EXCLUDED_FIELDS:
+                continue
+            properties.append(th.Property(field, self._get_datatype(field)))
+        for breakdown in self._report_definition["breakdowns"]:
+            properties.append(th.Property(breakdown, th.StringType()))
+        return th.PropertiesList(*properties).to_dict()
 
-        Args:
-            context: The stream context.
-            next_page_token: The next page index or value.
-
-        Returns:
-            A dictionary of URL query parameters.
-        """
-        params: dict = {"limit": 25}
-        if next_page_token is not None:
-            params["after"] = next_page_token
-        if self.replication_key:
-            params["sort"] = [f"{self.replication_key}_ascending"]
-            params["order_by"] = self.replication_key
-
-        params["action_attribution_windows"] = '["1d_view","7d_click"]'
-
-        return params
-
-    def post_process(
-        self,
-        row: dict,
-        context: dict | None = None,  # noqa: ARG002
-    ) -> dict | None:
-        row["inline_link_clicks"] = (
-            int(row["inline_link_clicks"]) if "inline_link_clicks" in row else None
+    def _initialize_client(self) -> None:
+        FacebookAdsApi.init(
+            access_token=self.config["access_token"],
+            timeout=300,
+            api_version=self.config["api_version"],
         )
-        row["impressions"] = int(row["impressions"]) if "impressions" in row else None
-        row["reach"] = int(row["reach"]) if "reach" in row else None
-        return row
+        fb_user.User(fbid="me")
+
+        account_id = self.config["account_id"]
+        self.account = AdAccount(f"act_{account_id}").api_get()
+        if not self.account:
+            msg = f"Couldn't find account with id {account_id}"
+            raise RuntimeError(msg)
+
+    def _run_job_to_completion(self, params: dict) -> th.Any:
+        job = self.account.get_insights(
+            params=params,
+            is_async=True,
+        )
+        status = None
+        time_start = time.time()
+        while status != "Job Completed":
+            duration = time.time() - time_start
+            job = job.api_get()
+            status = job[AdReportRun.Field.async_status]
+            percent_complete = job[AdReportRun.Field.async_percent_completion]
+
+            job_id = job["id"]
+            self.logger.info(
+                "%s for %s - %s. %s%% done. ",
+                status,
+                params["time_range"]["since"],
+                params["time_range"]["until"],
+                percent_complete,
+            )
+
+            if status == "Job Completed":
+                return job
+            if status == "Job Failed":
+                raise RuntimeError(dict(job))
+            if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
+                error_message = (
+                    f"Insights job {job_id} did not start after "
+                    f"{INSIGHTS_MAX_WAIT_TO_START_SECONDS} seconds. "
+                    "This is an intermittent error and may resolve itself on subsequent "
+                    "queries to the Facebook API. "
+                    "You should deselect fields from the schema that are not necessary, "
+                    "as that may help improve the reliability of the Facebook API."
+                )
+                raise RuntimeError(error_message)
+
+            if duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS:
+                error_message = (
+                    f"Insights job {job_id} did not complete after "
+                    f"{INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
+                    "This is an intermittent error and may resolve itself on "
+                    "subsequent queries to the Facebook API. "
+                    "You should deselect fields from the schema that are not necessary, "
+                    "as that may help improve the reliability of the Facebook API."
+                )
+                raise RuntimeError(error_message)
+
+            self.logger.info(
+                "Sleeping for %s seconds until job is done",
+                SLEEP_TIME_INCREMENT,
+            )
+            time.sleep(SLEEP_TIME_INCREMENT)
+        msg = "Job failed to complete for unknown reason"
+        raise RuntimeError(msg)
+
+    def _get_selected_columns(self) -> list[str]:
+        columns = [
+            keys[1] for keys, data in self.metadata.items() if data.selected and len(keys) > 0
+        ]
+        if not columns and self.name == "adsinsights_default":
+            columns = list(self.schema["properties"])
+        return columns
+
+    def _get_start_date(
+        self,
+        context: dict | None,
+    ) -> pendulum.Date:
+        lookback_window = self._report_definition["lookback_window"]
+
+        config_start_date = pendulum.parse(self.config["start_date"]).date()
+        incremental_start_date = pendulum.parse(
+            self.get_starting_replication_key_value(context),
+        ).date()
+        lookback_start_date = incremental_start_date.subtract(days=lookback_window)
+
+        # Don't use lookback if this is the first sync. Just start where the user requested.
+        if config_start_date >= incremental_start_date:
+            report_start = config_start_date
+            self.logger.info("Using configured start_date as report start filter.")
+        else:
+            self.logger.info(
+                "Incremental sync, applying lookback '%s' to the "
+                "bookmark start_date '%s'. Syncing "
+                "reports starting on '%s'.",
+                lookback_window,
+                incremental_start_date,
+                lookback_start_date,
+            )
+            report_start = lookback_start_date
+
+        # Facebook store metrics maximum of 37 months old. Any time range that
+        # older that 37 months from current date would result in 400 Bad request
+        # HTTP response.
+        # https://developers.facebook.com/docs/marketing-api/reference/ad-account/insights/#overview
+        today = pendulum.today().date()
+        oldest_allowed_start_date = today.subtract(months=37)
+        if report_start < oldest_allowed_start_date:
+            report_start = oldest_allowed_start_date
+            self.logger.info(
+                "Report start date '%s' is older than 37 months. "
+                "Using oldest allowed start date '%s' instead.",
+                report_start,
+                oldest_allowed_start_date,
+            )
+        return report_start
+
+    def get_records(
+        self,
+        context: dict | None,
+    ) -> t.Iterable[dict | tuple[dict, dict | None]]:
+        self._initialize_client()
+
+        time_increment = self._report_definition["time_increment_days"]
+
+        sync_end_date = pendulum.parse(
+            self.config.get("end_date", pendulum.today().to_date_string()),
+        ).date()
+
+        report_start = self._get_start_date(context)
+        report_end = report_start.add(days=time_increment)
+
+        columns = self._get_selected_columns()
+        while report_start <= sync_end_date:
+            params = {
+                "level": self._report_definition["level"],
+                "action_breakdowns": self._report_definition["action_breakdowns"],
+                "action_report_time": self._report_definition["action_report_time"],
+                "breakdowns": self._report_definition["breakdowns"],
+                "fields": columns,
+                "time_increment": time_increment,
+                "limit": 100,
+                "action_attribution_windows": [
+                    self._report_definition["action_attribution_windows_view"],
+                    self._report_definition["action_attribution_windows_click"],
+                ],
+                "time_range": {
+                    "since": report_start.to_date_string(),
+                    "until": report_end.to_date_string(),
+                },
+            }
+            job = self._run_job_to_completion(params)
+            for obj in job.get_result():
+                yield obj.export_all_data()
+            # Bump to the next increment
+            report_start = report_start.add(days=time_increment)
+            report_end = report_end.add(days=time_increment)
