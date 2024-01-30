@@ -4,7 +4,7 @@ import os
 
 from singer_sdk.testing import SuiteConfig, get_tap_test_class
 
-from tap_facebook.streams import AdAccountsStream, AdsInsightStream
+from tap_facebook.streams import AdAccountsStream
 from tap_facebook.tap import TapFacebook
 
 SAMPLE_CONFIG = {
@@ -24,6 +24,7 @@ TestTapFacebook = get_tap_test_class(
         ],
     ),
 )
+
 
 def test_ads_accounts_post_process():
     row = {"amount_spent": "0", "balance": "1", "min_campaign_group_spend_cap": "2"}
