@@ -132,7 +132,7 @@ class AdsInsightStream(Stream):
             job_id = job["id"]
             self.logger.info(
                 f"{status} for {params['time_range']['since']} - {params['time_range']['until']}. "
-                f"{percent_complete}% done. "
+                f"{percent_complete}% done. ",
             )
 
             if status == "Job Completed":
@@ -161,8 +161,10 @@ class AdsInsightStream(Stream):
             )
             time.sleep(SLEEP_TIME_INCREMENT)
 
-    def _get_selected_columns(self):            
-        columns = [keys[1] for keys, data in self.metadata.items() if data.selected and len(keys) > 0]
+    def _get_selected_columns(self):
+        columns = [
+            keys[1] for keys, data in self.metadata.items() if data.selected and len(keys) > 0
+        ]
         if not columns and self.name == "adsinsights_default":
             columns = list(self.schema["properties"])
         return columns
