@@ -93,7 +93,7 @@ class AdsInsightStream(Stream):
                 return th.ArrayType(th.ObjectType(*sub_props))
             return th.ArrayType(th.ObjectType())
         msg = f"Type not found for field: {field}"
-        raise Exception(msg)  # noqa: TRY002
+        raise RuntimeError(msg)
 
     @property
     @lru_cache  # noqa: B019
@@ -120,7 +120,7 @@ class AdsInsightStream(Stream):
         self.account = AdAccount(f"act_{account_id}").api_get()
         if not self.account:
             msg = f"Couldn't find account with id {account_id}"
-            raise Exception(msg)  # noqa: TRY002
+            raise RuntimeError(msg)
 
     def _run_job_to_completion(self, params: dict) -> th.Any:
         job = self.account.get_insights(
@@ -136,16 +136,18 @@ class AdsInsightStream(Stream):
             percent_complete = job[AdReportRun.Field.async_percent_completion]
 
             job_id = job["id"]
-            msg = (
-                f"{status} for {params['time_range']['since']} - {params['time_range']['until']}. "
-                f"{percent_complete}% done. "
+            self.logger.info(
+                "%s for %s - %s. %s%% done. ",
+                status,
+                params["time_range"]["since"],
+                params["time_range"]["until"],
+                percent_complete,
             )
-            self.logger.info(msg)
 
             if status == "Job Completed":
                 return job
             if status == "Job Failed":
-                raise Exception(dict(job))  # noqa: TRY002
+                raise RuntimeError(dict(job))
             if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
                 error_message = (
                     f"Insights job {job_id} did not start after "
@@ -155,8 +157,9 @@ class AdsInsightStream(Stream):
                     "You should deselect fields from the schema that are not necessary, "
                     "as that may help improve the reliability of the Facebook API."
                 )
-                raise Exception(error_message)  # noqa: TRY002
-            if duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS and status != "Job Completed":
+                raise RuntimeError(error_message)
+
+            if duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS:
                 error_message = (
                     f"Insights job {job_id} did not complete after "
                     f"{INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
@@ -165,13 +168,15 @@ class AdsInsightStream(Stream):
                     "You should deselect fields from the schema that are not necessary, "
                     "as that may help improve the reliability of the Facebook API."
                 )
-                raise Exception(error_message)  # noqa: TRY002
+                raise RuntimeError(error_message)
 
-            msg = f"Sleeping for {SLEEP_TIME_INCREMENT} seconds until job is done"
-            self.logger.info(msg)
+            self.logger.info(
+                "Sleeping for %s seconds until job is done",
+                SLEEP_TIME_INCREMENT,
+            )
             time.sleep(SLEEP_TIME_INCREMENT)
         msg = "Job failed to complete for unknown reason"
-        raise Exception(msg)  # noqa: TRY002
+        raise RuntimeError(msg)
 
     def _get_selected_columns(self) -> list[str]:
         columns = [
@@ -198,12 +203,14 @@ class AdsInsightStream(Stream):
             report_start = config_start_date
             self.logger.info("Using configured start_date as report start filter.")
         else:
-            msg = (
-                f"Incremental sync, applying lookback '{lookback_window}' to the "
-                f"bookmark start_date '{incremental_start_date}'. Syncing "
-                f"reports starting on '{lookback_start_date}'."
+            self.logger.info(
+                "Incremental sync, applying lookback '%s' to the "
+                "bookmark start_date '%s'. Syncing "
+                "reports starting on '%s'.",
+                lookback_window,
+                incremental_start_date,
+                lookback_start_date,
             )
-            self.logger.info(msg)
             report_start = lookback_start_date
 
         # Facebook store metrics maximum of 37 months old. Any time range that
@@ -214,11 +221,12 @@ class AdsInsightStream(Stream):
         oldest_allowed_start_date = today.subtract(months=37)
         if report_start < oldest_allowed_start_date:
             report_start = oldest_allowed_start_date
-            msg = (
-                f"Report start date '{report_start}' is older than 37 months. "
-                f"Using oldest allowed start date '{oldest_allowed_start_date}' instead."
+            self.logger.info(
+                "Report start date '%s' is older than 37 months. "
+                "Using oldest allowed start date '%s' instead.",
+                report_start,
+                oldest_allowed_start_date,
             )
-            self.logger.info(msg)
         return report_start
 
     def get_records(
