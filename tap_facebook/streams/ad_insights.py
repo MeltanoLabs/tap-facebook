@@ -57,17 +57,18 @@ class AdsInsightStream(Stream):
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "date_start"
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
+        """Initialize the stream."""
         self._report_definition = kwargs.pop("report_definition")
         kwargs["name"] = f"{self.name}_{self._report_definition['name']}"
         super().__init__(*args, **kwargs)
 
     @staticmethod
-    def _get_datatype(field):
-        d_type = AdsInsights._field_types[field]
+    def _get_datatype(field: str) -> th.Type | None:
+        d_type = AdsInsights._field_types[field]  # noqa: SLF001
         if d_type == "string":
             return th.StringType()
-        elif d_type.startswith("list"):
+        if d_type.startswith("list"):
             if "AdsActionStats" in d_type:
                 sub_props = [
                     th.Property(field.replace("field_", ""), th.StringType())
@@ -80,19 +81,24 @@ class AdsInsightStream(Stream):
                 for field in list(AdsHistogramStats.Field.__dict__):
                     if field not in EXCLUDED_FIELDS:
                         clean_field = field.replace("field_", "")
-                        if AdsHistogramStats._field_types[clean_field] == "string":
+                        if AdsHistogramStats._field_types[clean_field] == "string":  # noqa: SLF001
                             sub_props.append(th.Property(clean_field, th.StringType()))
                         else:
                             sub_props.append(
-                                th.Property(clean_field, th.ArrayType(th.IntegerType())),
+                                th.Property(
+                                    clean_field,
+                                    th.ArrayType(th.IntegerType()),
+                                ),
                             )
                 return th.ArrayType(th.ObjectType(*sub_props))
             return th.ArrayType(th.ObjectType())
+        msg = f"Type not found for field: {field}"
+        raise Exception(msg)  # noqa: TRY002
 
     @property
-    @lru_cache
+    @lru_cache  # noqa: B019
     def schema(self) -> dict:
-        properties: List[th.Property] = []
+        properties: th.List[th.Property] = []
         columns = list(AdsInsights.Field.__dict__)[1:]
         for field in columns:
             if field in EXCLUDED_FIELDS:
@@ -102,21 +108,21 @@ class AdsInsightStream(Stream):
             properties.append(th.Property(breakdown, th.StringType()))
         return th.PropertiesList(*properties).to_dict()
 
-    def _initialize_client(self):
+    def _initialize_client(self) -> None:
         FacebookAdsApi.init(
             access_token=self.config["access_token"],
             timeout=300,
             api_version=self.config["api_version"],
         )
-        user = fb_user.User(fbid="me")
+        fb_user.User(fbid="me")
 
         account_id = self.config["account_id"]
         self.account = AdAccount(f"act_{account_id}").api_get()
         if not self.account:
             msg = f"Couldn't find account with id {account_id}"
-            raise Exception(msg)
+            raise Exception(msg)  # noqa: TRY002
 
-    def _run_job_to_completion(self, params):
+    def _run_job_to_completion(self, params: dict) -> th.Any:
         job = self.account.get_insights(
             params=params,
             is_async=True,
@@ -130,38 +136,44 @@ class AdsInsightStream(Stream):
             percent_complete = job[AdReportRun.Field.async_percent_completion]
 
             job_id = job["id"]
-            self.logger.info(
+            msg = (
                 f"{status} for {params['time_range']['since']} - {params['time_range']['until']}. "
-                f"{percent_complete}% done. ",
+                f"{percent_complete}% done. "
             )
+            self.logger.info(msg)
 
             if status == "Job Completed":
                 return job
             if status == "Job Failed":
-                raise Exception(dict(job))
+                raise Exception(dict(job))  # noqa: TRY002
             if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
                 error_message = (
-                    f"Insights job {job_id} did not start after {INSIGHTS_MAX_WAIT_TO_START_SECONDS} seconds. "
-                    + "This is an intermittent error and may resolve itself on subsequent queries to the Facebook API. "
-                    + "You should deselect fields from the schema that are not necessary, "
-                    + "as that may help improve the reliability of the Facebook API."
+                    f"Insights job {job_id} did not start after "
+                    f"{INSIGHTS_MAX_WAIT_TO_START_SECONDS} seconds. "
+                    "This is an intermittent error and may resolve itself on subsequent "
+                    "queries to the Facebook API. "
+                    "You should deselect fields from the schema that are not necessary, "
+                    "as that may help improve the reliability of the Facebook API."
                 )
-                raise Exception(error_message)
-            elif duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS and status != "Job Completed":
+                raise Exception(error_message)  # noqa: TRY002
+            if duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS and status != "Job Completed":
                 error_message = (
-                    f"Insights job {job_id} did not complete after {INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
-                    + "This is an intermittent error and may resolve itself on subsequent queries to the Facebook API. "
-                    + "You should deselect fields from the schema that are not necessary, "
-                    + "as that may help improve the reliability of the Facebook API."
+                    f"Insights job {job_id} did not complete after "
+                    f"{INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
+                    "This is an intermittent error and may resolve itself on "
+                    "subsequent queries to the Facebook API. "
+                    "You should deselect fields from the schema that are not necessary, "
+                    "as that may help improve the reliability of the Facebook API."
                 )
-                raise Exception(error_message)
+                raise Exception(error_message)  # noqa: TRY002
 
-            self.logger.info(
-                f"Sleeping for {SLEEP_TIME_INCREMENT} seconds until job is done",
-            )
+            msg = f"Sleeping for {SLEEP_TIME_INCREMENT} seconds until job is done"
+            self.logger.info(msg)
             time.sleep(SLEEP_TIME_INCREMENT)
+        msg = "Job failed to complete for unknown reason"
+        raise Exception(msg)  # noqa: TRY002
 
-    def _get_selected_columns(self):
+    def _get_selected_columns(self) -> list[str]:
         columns = [
             keys[1] for keys, data in self.metadata.items() if data.selected and len(keys) > 0
         ]
@@ -186,9 +198,12 @@ class AdsInsightStream(Stream):
             report_start = config_start_date
             self.logger.info("Using configured start_date as report start filter.")
         else:
-            self.logger.info(
-                f"Incremental sync, applying lookback '{lookback_window}' to the bookmark start_date '{incremental_start_date}'. Syncing reports starting on '{lookback_start_date}'.",
+            msg = (
+                f"Incremental sync, applying lookback '{lookback_window}' to the "
+                f"bookmark start_date '{incremental_start_date}'. Syncing "
+                f"reports starting on '{lookback_start_date}'."
             )
+            self.logger.info(msg)
             report_start = lookback_start_date
 
         # Facebook store metrics maximum of 37 months old. Any time range that
@@ -199,9 +214,11 @@ class AdsInsightStream(Stream):
         oldest_allowed_start_date = today.subtract(months=37)
         if report_start < oldest_allowed_start_date:
             report_start = oldest_allowed_start_date
-            self.logger.info(
-                f"Report start date '{report_start}' is older than 37 months. Using oldest allowed start date '{oldest_allowed_start_date}' instead.",
+            msg = (
+                f"Report start date '{report_start}' is older than 37 months. "
+                f"Using oldest allowed start date '{oldest_allowed_start_date}' instead."
             )
+            self.logger.info(msg)
         return report_start
 
     def get_records(

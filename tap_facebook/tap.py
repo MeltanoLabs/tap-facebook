@@ -82,7 +82,11 @@ class TapFacebook(Tap):
                     th.Property(
                         "name",
                         th.StringType,
-                        description="A name used to define your custom report. This will included in the stream name. Changing this name will affect incremental bookmark values.",
+                        description=(
+                            "A name used to define your custom report. "
+                            "This will included in the stream name. "
+                            "Changing this name will affect incremental bookmark values.",
+                        ),
                         required=True,
                     ),
                     th.Property(
@@ -94,48 +98,82 @@ class TapFacebook(Tap):
                     th.Property(
                         "action_breakdowns",
                         th.ArrayType(th.StringType),
-                        description="How to break down action results. Supports more than one breakdowns.",
+                        description=(
+                            "How to break down action results. "
+                            "Supports more than one breakdowns.",
+                        ),
                         default=[],
                     ),
                     th.Property(
                         "breakdowns",
                         th.ArrayType(th.StringType),
-                        description="How to break down the result. For more than one breakdown, only certain combinations are available: See 'Combining Breakdowns' in the [Breakdowns page](https://developers.facebook.com/docs/marketing-api/insights/breakdowns). The option impression_device cannot be used by itself",
+                        description=(
+                            "How to break down the result. "
+                            "For more than one breakdown, only certain combinations are available: "
+                            "See 'Combining Breakdowns' in the "
+                            "[Breakdowns page](https://developers.facebook.com/docs/marketing-api/insights/breakdowns). "  # noqa: E501
+                            "The option impression_device cannot be used by itself"
+                        ),
                         default=[],
                     ),
                     th.Property(
                         "time_increment_days",
                         th.IntegerType,
-                        description="The amount of days to aggregate your stats by, in days. A value of 1 will return a daily aggregation of your stats.",
+                        description=(
+                            "The amount of days to aggregate your stats by, in days. "
+                            "A value of 1 will return a daily aggregation of your stats."
+                        ),
                         default=1,
                     ),
                     th.Property(
                         "action_attribution_windows_view",
                         th.StringType,
-                        description="The attribution window for the actions. For example, 28d_view means the API returns all actions that happened 28 days after someone viewed the ad.",
+                        description=(
+                            "The attribution window for the actions. For example, "
+                            "28d_view means the API returns all actions that happened "
+                            "28 days after someone viewed the ad."
+                        ),
                         default="1d_view",
                     ),
                     th.Property(
                         "action_attribution_windows_click",
                         th.StringType,
-                        description="The attribution window for the actions. For example, 28d_click means the API returns all actions that happened 28 days after someone clicked on the ad.",
+                        description=(
+                            "The attribution window for the actions. "
+                            "For example, 28d_click means the API returns "
+                            "all actions that happened 28 days after someone clicked on the ad."
+                        ),
                         default="7d_click",
                     ),
                     th.Property(
                         "action_report_time",
                         th.StringType,
-                        description="Determines the report time of action stats. For example, if a person saw the ad on Jan 1st but converted on Jan 2nd, when you query the API with action_report_time=impression, you see a conversion on Jan 1st. When you query the API with action_report_time=conversion, you see a conversion on Jan 2nd.",
+                        description=(
+                            "Determines the report time of action stats. "
+                            "For example, if a person saw the ad on Jan 1st but converted on Jan "
+                            "2nd, when you query the API with action_report_time=impression, you "
+                            "see a conversion on Jan 1st. When you query the API with "
+                            "action_report_time=conversion, you see a conversion on Jan 2nd."
+                        ),
                         default="mixed",
                     ),
                     th.Property(
                         "lookback_window",
                         th.IntegerType,
-                        description="Facebook freezes insight data 28 days after it was generated, which means that all data from the past 28 days may have changed since we last emitted it, so we attempt to retrieve it again.",
+                        description=(
+                            "Facebook freezes insight data 28 days after it was generated, which "
+                            "means that all data from the past 28 days may have changed since we "
+                            "last emitted it, so we attempt to retrieve it again."
+                        ),
                         default=28,
                     ),
                 ),
             ),
-            description="A list of insight report definitions. See the [Ad Insights docs](https://developers.facebook.com/docs/marketing-api/reference/adgroup/insights) for more details.",
+            description=(
+                "A list of insight report definitions. See the "
+                "[Ad Insights docs](https://developers.facebook.com/docs/marketing-api/reference/adgroup/insights) "  # noqa: E501
+                "for more details."
+            ),
             default=[],
         ),
         th.Property(
@@ -157,17 +195,18 @@ class TapFacebook(Tap):
             A list of discovered streams.
         """
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
-        report_configs = [DEFAULT_INSIGHT_REPORT] + self.config.get(
-            "insight_reports_list",
-        )
-        for insight_report_definition in report_configs:
-            streams.append(
-                AdsInsightStream(
-                    tap=self,
-                    report_definition=insight_report_definition,
-                ),
+        report_configs = [
+            DEFAULT_INSIGHT_REPORT,
+            *self.config.get("insight_reports_list"),
+        ]
+        insight_streams = [
+            AdsInsightStream(
+                tap=self,
+                report_definition=insight_report_definition,
             )
-        return streams
+            for insight_report_definition in report_configs
+        ]
+        return [*streams, *insight_streams]
 
 
 if __name__ == "__main__":
