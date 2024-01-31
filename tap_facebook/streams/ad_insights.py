@@ -63,6 +63,10 @@ class AdsInsightStream(Stream):
         kwargs["name"] = f"{self.name}_{self._report_definition['name']}"
         super().__init__(*args, **kwargs)
 
+    @property
+    def primary_keys(self) -> list[str] | None:
+        return ["date_start", "account_id", "ad_id"] + self._report_definition["breakdowns"]
+
     @staticmethod
     def _get_datatype(field: str) -> th.Type | None:
         d_type = AdsInsights._field_types[field]  # noqa: SLF001
