@@ -63,9 +63,18 @@ class AdsInsightStream(Stream):
         kwargs["name"] = f"{self.name}_{self._report_definition['name']}"
         super().__init__(*args, **kwargs)
 
-    @Stream.primary_keys.getter
+    @property
     def primary_keys(self) -> list[str] | None:
         return ["date_start", "account_id", "ad_id"] + self._report_definition["breakdowns"]
+
+    @primary_keys.setter
+    def primary_keys(self, new_value: list[str] | None) -> None:
+        """Set primary key(s) for the stream.
+
+        Args:
+            new_value: TODO
+        """
+        self._primary_keys = new_value
 
     @staticmethod
     def _get_datatype(field: str) -> th.Type | None:
