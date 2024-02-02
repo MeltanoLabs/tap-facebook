@@ -102,14 +102,17 @@ class AdsInsightStream(Stream):
     @property
     @lru_cache  # noqa: B019
     def schema(self) -> dict:
-        properties: th.List[th.Property] = []
+        properties: list[th.Property] = []
         columns = list(AdsInsights.Field.__dict__)[1:]
         for field in columns:
             if field in EXCLUDED_FIELDS:
                 continue
             properties.append(th.Property(field, self._get_datatype(field)))
-        for breakdown in self._report_definition["breakdowns"]:
-            properties.append(th.Property(breakdown, th.StringType()))
+        breakdown_list = [
+            th.Property(breakdown, th.StringType())
+            for breakdown in self._report_definition["breakdowns"]
+        ]
+        properties.extend(breakdown_list)
         return th.PropertiesList(*properties).to_dict()
 
     def _initialize_client(self) -> None:
@@ -126,7 +129,7 @@ class AdsInsightStream(Stream):
             msg = f"Couldn't find account with id {account_id}"
             raise RuntimeError(msg)
 
-    def _run_job_to_completion(self, params: dict) -> th.Any:
+    def _run_job_to_completion(self, params: dict) -> t.Any:  # noqa: ANN401
         job = self.account.get_insights(
             params=params,
             is_async=True,
