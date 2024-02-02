@@ -36,6 +36,10 @@ class CustomAudiences(FacebookStream):
     def path(self) -> str:
         return f"/customaudiences?fields={self.columns}"
 
+    @path.setter
+    def path(self, new_value: str) -> None:
+        self._value = new_value
+
     @property
     def columns(self) -> list[str]:
         return [
