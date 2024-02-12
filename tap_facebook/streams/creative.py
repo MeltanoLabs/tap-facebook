@@ -114,7 +114,7 @@ class CreativeStream(FacebookStream):
         Property("image_url", StringType),
         Property("instagram_actor_id", StringType),
         Property("instagram_permalink_url", StringType),
-        Property("instagram_story_id", IntegerType),
+        Property("instagram_story_id", StringType),
         Property("link_destination_display_url", StringType),
         Property("link_og_id", IntegerType),
         Property("link_url", StringType),
