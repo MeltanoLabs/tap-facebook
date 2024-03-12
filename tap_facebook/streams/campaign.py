@@ -1,6 +1,5 @@
 """Stream class for Campaigns."""
 
-
 from __future__ import annotations
 
 from singer_sdk import typing as th  # JSON Schema typing helpers

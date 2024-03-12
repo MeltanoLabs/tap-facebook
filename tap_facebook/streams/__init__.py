@@ -1,4 +1,5 @@
 """Stream classes for tap-facebook."""
+
 from tap_facebook.streams.ad_accounts import AdAccountsStream
 from tap_facebook.streams.ad_images import AdImages
 from tap_facebook.streams.ad_insights import AdsInsightStream
