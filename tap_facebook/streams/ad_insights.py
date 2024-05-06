@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import json
 import time
 import typing as t
 from functools import lru_cache
 
 import facebook_business.adobjects.user as fb_user
 import pendulum
+import requests as rq
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.adreportrun import AdReportRun
 from facebook_business.adobjects.adsactionstats import AdsActionStats
@@ -50,6 +52,7 @@ EXCLUDED_FIELDS = [
 SLEEP_TIME_INCREMENT = 5
 INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
 INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
+USAGE_LIMIT_THRESHOLD = 75
 
 
 class AdsInsightStream(Stream):
@@ -188,6 +191,7 @@ class AdsInsightStream(Stream):
                 SLEEP_TIME_INCREMENT,
             )
             time.sleep(SLEEP_TIME_INCREMENT)
+            self.check_limit()
         msg = "Job failed to complete for unknown reason"
         raise RuntimeError(msg)
 
@@ -277,8 +281,58 @@ class AdsInsightStream(Stream):
                 },
             }
             job = self._run_job_to_completion(params)
+            self.check_limit()
             for obj in job.get_result():
                 yield obj.export_all_data()
             # Bump to the next increment
             report_start = report_start.add(days=time_increment)
             report_end = report_end.add(days=time_increment)
+
+    #Function to find the string between two strings or characters
+    def find_between(self, usage, find ) -> str:
+        try:
+            usage = json.loads(usage)
+            for key in usage.keys():
+                # Access the list corresponding to the current key and iterate through its elements
+                for item in usage[key]:
+                    if find in item:
+                        return item[find]
+        except ValueError:
+            return 0
+
+    #Function to check how close you are to the FB Rate Limit
+    def get_limit(self)->float:
+        """
+        This function makes a GET request to the Facebook Graph API to retrieve
+        the usage limit for the Ads Insights endpoint and returns the maximum
+        usage among the call count, CPU time, and total time.
+
+        Returns:
+            float: The maximum usage among call count, CPU time, and total time.
+        """
+        # Make a GET request to the Facebook Graph API to retrieve the usage limit
+        check = rq.get(
+            'https://graph.facebook.com/v19.0/act_' +
+            self.config["account_id"] +
+            '/insights?access_token=' +
+            self.config["access_token"]
+        )
+
+        # Parse the usage limit from the headers of the response
+        #Call count is % amount of limit used
+        call = float(self.find_between(check.headers["x-business-use-case-usage"], "call_count"))
+        cpu = float(self.find_between(check.headers["x-business-use-case-usage"], "total_cputime"))
+        total = float(self.find_between(check.headers["x-business-use-case-usage"], "total_time"))
+
+        # Find the maximum usage among call count, CPU time, and total time
+        usage = max(call, cpu, total)
+
+        # Return the maximum usage
+        return usage
+
+    def check_limit(self) -> None:
+        #Check if you reached 75% of the limit, if yes then back-off for 5 minutes
+        if (self.get_limit()>USAGE_LIMIT_THRESHOLD):
+            #After threshold is reached start throttling all consecutive requests until the limit is reset.
+            self.logger.debug(f"{USAGE_LIMIT_THRESHOLD}% Rate Limit Reached. Cooling Time 5 Minutes.")
+            time.sleep(300)
