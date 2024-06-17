@@ -11,7 +11,7 @@ jobs:
     name: Build and Inspect
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.6
+      - uses: actions/checkout@v4.1.7
         with:
           fetch-depth: 0
       - uses: hynek/build-and-inspect-python-package@v2
