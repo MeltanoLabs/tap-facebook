@@ -497,18 +497,6 @@ files = [
 requests = "*"
 
 [[package]]
-name = "enum34"
-version = "1.1.10"
-description = "Python 3.4 Enum backported to 3.3, 3.2, 3.1, 2.7, 2.6, 2.5, and 2.4"
-optional = false
-python-versions = "*"
-files = [
-    {file = "enum34-1.1.10-py2-none-any.whl", hash = "sha256:a98a201d6de3f2ab3db284e70a33b0f896fbf35f8086594e8c9e74b909058d53"},
-    {file = "enum34-1.1.10-py3-none-any.whl", hash = "sha256:c3858660960c984d6ab0ebad691265180da2b43f07e061c0f8dca9ef3cffd328"},
-    {file = "enum34-1.1.10.tar.gz", hash = "sha256:cce6a7477ed816bd2542d03d53db9f0db935dd013b70f336a95c73979289f248"},
-]
-
-[[package]]
 name = "exceptiongroup"
 version = "1.2.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -524,19 +512,18 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "facebook-business"
-version = "19.0.0"
+version = "20.0.0"
 description = "Facebook Business SDK"
 optional = false
 python-versions = "*"
 files = [
-    {file = "facebook_business-19.0.0-py3-none-any.whl", hash = "sha256:591deedc010cefeb49151bbfadf72659cf262056072b437ca3dbf0ba37b3fa43"},
-    {file = "facebook_business-19.0.0.tar.gz", hash = "sha256:e12ea2a13d1703922d1b5d3921bc67bd10176596770ce154f287019738775800"},
+    {file = "facebook_business-20.0.0-py3-none-any.whl", hash = "sha256:10a6dd6b7121bfed148f2af06d772c08ed2621e587087977ee9fea89a284b3bd"},
+    {file = "facebook_business-20.0.0.tar.gz", hash = "sha256:d67d81b87e871d2a9b9482bbfb892d8f6f1ee2e6a01a529ce80fa667793323d3"},
 ]
 
 [package.dependencies]
 aiohttp = {version = "*", markers = "python_version >= \"3.5.3\""}
 curlify = ">=2.1.0"
-enum34 = {version = "*", markers = "python_version >= \"3\""}
 pycountry = ">=19.8.18"
 requests = ">=2.3.0"
 six = ">=1.7.3"
@@ -1840,4 +1827,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8"
-content-hash = "128f06458f99b28c0b304f7a72aab481be5cf36c845958780092a5d7f6671791"
+content-hash = "9026cbf2eb77cec3ccb4ad08622a787851999da197a04f24fd3b150e1ab496fa"
