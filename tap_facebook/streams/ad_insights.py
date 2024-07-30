@@ -100,9 +100,9 @@ class AdsInsightStream(Stream):
                 return th.ArrayType(th.ObjectType(*sub_props))
             if "AdsHistogramStats" in d_type:
                 sub_props = []
-                for field in list(AdsHistogramStats.Field.__dict__):
-                    if field not in EXCLUDED_FIELDS:
-                        clean_field = field.replace("field_", "")
+                for f in list(AdsHistogramStats.Field.__dict__):
+                    if f not in EXCLUDED_FIELDS:
+                        clean_field = f.replace("field_", "")
                         if AdsHistogramStats._field_types[clean_field] == "string":  # noqa: SLF001
                             sub_props.append(th.Property(clean_field, th.StringType()))
                         else:
