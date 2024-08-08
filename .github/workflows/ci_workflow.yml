@@ -40,6 +40,7 @@ jobs:
         poetry --version
     - name: Install dependencies
       run: |
+        poetry env use python${{ matrix.python-version }}
         poetry install
     - name: Test with pytest
       id: test_pytest
