@@ -15,7 +15,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.8"
-facebook-business = "~=19.0.0"
+facebook-business = ">=19.0,<20.1"
 pendulum = "~=3.0.0"
 requests = "~=2.32"
 singer-sdk = "~=0.39.0"
