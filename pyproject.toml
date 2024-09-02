@@ -18,11 +18,11 @@ python = ">=3.8"
 facebook-business = "~=19.0.0"
 pendulum = "~=3.0.0"
 requests = "~=2.32"
-singer-sdk = "~=0.39.0"
+singer-sdk = ">=0.39,<0.41"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=8.2"
-singer-sdk = {version = "~=0.39.1", extras = ["testing"]}
+singer-sdk = {version = "~=0.40.0", extras = ["testing"]}
 
 [tool.isort]
 profile = "black"
