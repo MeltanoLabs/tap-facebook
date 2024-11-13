@@ -14,7 +14,7 @@ packages = [
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.9"
 facebook-business = "~=19.0.0"
 pendulum = "~=3.0.0"
 requests = "~=2.32"
@@ -42,7 +42,7 @@ enable = true
 
 [tool.ruff]
 line-length = 100
-target-version = "py38"
+target-version = "py39"
 
 [tool.ruff.lint]
 ignore = ["ANN101", "DJ", "PD", "D101", "D102"]
