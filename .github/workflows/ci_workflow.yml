@@ -28,20 +28,16 @@ jobs:
         - "3.10"
         - "3.11"
         - "3.12"
+        - "3.13"
 
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install Poetry
-      run: |
-        pipx install poetry
-        poetry --version
-    - name: Install dependencies
-      run: |
-        poetry env use python${{ matrix.python-version }}
-        poetry install
+    - uses: astral-sh/setup-uv@v3
+      with:
+        version: ">=0.5.0"
     - name: Test with pytest
       id: test_pytest
       continue-on-error: false
@@ -50,4 +46,4 @@ jobs:
          TAP_FACEBOOK_ACCOUNT_ID: ${{ secrets.tap_facebook_account_id }}
          TAP_FACEBOOK_START_DATE: ${{ secrets.tap_facebook_start_date }}
       run: |
-        poetry run pytest --capture=no
+        uvx tox -e ${{ matrix.python-version }}
