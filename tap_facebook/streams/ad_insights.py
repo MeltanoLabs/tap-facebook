@@ -45,6 +45,15 @@ EXCLUDED_FIELDS = [
     "__module__",
     "__doc__",
     "__dict__",
+    # No longer available >= v19.0: https://developers.facebook.com/docs/marketing-api/marketing-api-changelog/version19.0/
+    "age_targeting",
+    "gender_targeting",
+    "labels",
+    "location",
+    "estimated_ad_recall_rate_lower_bound",
+    "estimated_ad_recall_rate_upper_bound",
+    "estimated_ad_recallers_lower_bound",
+    "estimated_ad_recallers_upper_bound",
 ]
 
 SLEEP_TIME_INCREMENT = 5
