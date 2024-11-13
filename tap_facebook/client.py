@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import abc
 import json
 import typing as t
 from http import HTTPStatus
@@ -15,6 +16,7 @@ from singer_sdk.streams import RESTStream
 
 if t.TYPE_CHECKING:
     import requests
+    from singer_sdk.helpers.types import Context
 
 
 class FacebookStream(RESTStream):
@@ -71,7 +73,7 @@ class FacebookStream(RESTStream):
 
     def get_url_params(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: Context | None,  # noqa: ARG002
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
@@ -143,10 +145,15 @@ class FacebookStream(RESTStream):
         return 20
 
 
-class IncrementalFacebookStream(FacebookStream):
+class IncrementalFacebookStream(FacebookStream, metaclass=abc.ABCMeta):
+    @property
+    @abc.abstractmethod
+    def filter_entity(self) -> str:
+        """The entity to filter on."""
+
     def get_url_params(
         self,
-        context: dict | None,
+        context: Context | None,
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
@@ -164,13 +171,13 @@ class IncrementalFacebookStream(FacebookStream):
         if self.replication_key:
             params["sort"] = "asc"
             params["order_by"] = self.replication_key
-            ts = pendulum.parse(self.get_starting_replication_key_value(context))
+            ts = pendulum.parse(self.get_starting_replication_key_value(context))  # type: ignore[arg-type]
             params["filtering"] = json.dumps(
                 [
                     {
                         "field": f"{self.filter_entity}.{self.replication_key}",
                         "operator": "GREATER_THAN",
-                        "value": int(ts.timestamp()),
+                        "value": int(ts.timestamp()),  # type: ignore[union-attr]
                     },
                 ],
             )

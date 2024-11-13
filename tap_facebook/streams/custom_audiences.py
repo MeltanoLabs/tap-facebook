@@ -16,6 +16,9 @@ from singer_sdk.typing import (
 
 from tap_facebook.client import FacebookStream
 
+if t.TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context
+
 
 class CustomAudiences(FacebookStream):
     """https://developers.facebook.com/docs/marketing-api/reference/custom-audience/."""
@@ -33,7 +36,7 @@ class CustomAudiences(FacebookStream):
     primary_keys = ["id"]  # noqa: RUF012
 
     @property
-    def path(self) -> str:
+    def path(self) -> str:  # type: ignore[override]
         return f"/customaudiences?fields={self.columns}"
 
     @property
@@ -99,7 +102,7 @@ class CustomAudiences(FacebookStream):
 
     def get_url_params(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: Context | None,  # noqa: ARG002
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
