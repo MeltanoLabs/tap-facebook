@@ -45,6 +45,8 @@ EXCLUDED_FIELDS = [
     "__module__",
     "__doc__",
     "__dict__",
+    "__firstlineno__",  # Python 3.13+
+    "__static_attributes__",  # Python 3.13+
     # No longer available >= v19.0: https://developers.facebook.com/docs/marketing-api/marketing-api-changelog/version19.0/
     "age_targeting",
     "gender_targeting",

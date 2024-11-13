@@ -10,44 +10,47 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs: {}
+  schedule:
+  - cron: '0 12 * * *' # Run every day at 12:00 UTC
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  FORCE_COLOR: "1"
+
+permissions:
+  contents: read
+
 jobs:
   pytest:
-
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     strategy:
+      fail-fast: false
+      max-parallel: 2
       matrix:
         python-version:
-        - "3.9"
-        - "3.10"
-        - "3.11"
+        - "3.13"
         - "3.12"
+        - "3.11"
+        - "3.10"
+        - "3.9"
 
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install Poetry
-      run: |
-        pipx install poetry
-        poetry --version
-    - name: Install dependencies
-      run: |
-        poetry env use python${{ matrix.python-version }}
-        poetry install
+    - uses: astral-sh/setup-uv@v3
+      with:
+        version: ">=0.5.0"
     - name: Test with pytest
-      id: test_pytest
-      continue-on-error: false
       env:
          TAP_FACEBOOK_ACCESS_TOKEN: ${{ secrets.tap_facebook_access_token }}
          TAP_FACEBOOK_ACCOUNT_ID: ${{ secrets.tap_facebook_account_id }}
          TAP_FACEBOOK_START_DATE: ${{ secrets.tap_facebook_start_date }}
       run: |
-        poetry run pytest --capture=no
+        uvx --with=tox-uv tox -e ${{ matrix.python-version }}
