@@ -17,6 +17,9 @@ from facebook_business.api import FacebookAdsApi
 from singer_sdk import typing as th
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
 
+if t.TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context
+
 EXCLUDED_FIELDS = [
     "total_postbacks",
     "adset_end",
@@ -75,7 +78,7 @@ class AdsInsightStream(Stream):
         super().__init__(*args, **kwargs)
 
     @property
-    def primary_keys(self) -> list[str] | None:
+    def primary_keys(self) -> t.Sequence[str] | None:
         return ["date_start", "account_id", "ad_id"] + self._report_definition["breakdowns"]
 
     @primary_keys.setter
@@ -88,11 +91,12 @@ class AdsInsightStream(Stream):
         self._primary_keys = new_value
 
     @staticmethod
-    def _get_datatype(field: str) -> th.Type | None:
+    def _get_datatype(field: str) -> th.JSONTypeHelper | None:
         d_type = AdsInsights._field_types[field]  # noqa: SLF001
         if d_type == "string":
             return th.StringType()
         if d_type.startswith("list"):
+            sub_props: list[th.Property]
             if "AdsActionStats" in d_type:
                 sub_props = [
                     th.Property(field.replace("field_", ""), th.StringType())
@@ -122,14 +126,21 @@ class AdsInsightStream(Stream):
     @property
     @lru_cache  # noqa: B019
     def schema(self) -> dict:
-        properties: th.List[th.Property] = []
+        properties: list[th.Property] = []
         columns = list(AdsInsights.Field.__dict__)[1:]
         for field in columns:
             if field in EXCLUDED_FIELDS:
                 continue
-            properties.append(th.Property(field, self._get_datatype(field)))
-        for breakdown in self._report_definition["breakdowns"]:
-            properties.append(th.Property(breakdown, th.StringType()))
+            if data_type := self._get_datatype(field):
+                properties.append(th.Property(field, data_type))
+
+        properties.extend(
+            [
+                th.Property(breakdown, th.StringType())
+                for breakdown in self._report_definition["breakdowns"]
+            ],
+        )
+
         return th.PropertiesList(*properties).to_dict()
 
     def _initialize_client(self) -> None:
@@ -146,7 +157,7 @@ class AdsInsightStream(Stream):
             msg = f"Couldn't find account with id {account_id}"
             raise RuntimeError(msg)
 
-    def _run_job_to_completion(self, params: dict) -> th.Any:
+    def _run_job_to_completion(self, params: dict) -> None:
         job = self.account.get_insights(
             params=params,
             is_async=True,
@@ -212,13 +223,13 @@ class AdsInsightStream(Stream):
 
     def _get_start_date(
         self,
-        context: dict | None,
+        context: Context | None,
     ) -> pendulum.Date:
         lookback_window = self._report_definition["lookback_window"]
 
-        config_start_date = pendulum.parse(self.config["start_date"]).date()
-        incremental_start_date = pendulum.parse(
-            self.get_starting_replication_key_value(context),
+        config_start_date = pendulum.parse(self.config["start_date"]).date()  # type: ignore[union-attr]
+        incremental_start_date = pendulum.parse(  # type: ignore[union-attr]
+            self.get_starting_replication_key_value(context),  # type: ignore[arg-type]
         ).date()
         lookback_start_date = incremental_start_date.subtract(days=lookback_window)
 
@@ -255,13 +266,13 @@ class AdsInsightStream(Stream):
 
     def get_records(
         self,
-        context: dict | None,
+        context: Context | None,
     ) -> t.Iterable[dict | tuple[dict, dict | None]]:
         self._initialize_client()
 
         time_increment = self._report_definition["time_increment_days"]
 
-        sync_end_date = pendulum.parse(
+        sync_end_date = pendulum.parse(  # type: ignore[union-attr]
             self.config.get("end_date", pendulum.today().to_date_string()),
         ).date()
 
@@ -287,7 +298,7 @@ class AdsInsightStream(Stream):
                     "until": report_end.to_date_string(),
                 },
             }
-            job = self._run_job_to_completion(params)
+            job = self._run_job_to_completion(params)  # type: ignore[func-returns-value]
             for obj in job.get_result():
                 yield obj.export_all_data()
             # Bump to the next increment

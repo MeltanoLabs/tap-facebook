@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from singer_sdk import typing as th  # JSON Schema typing helpers
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 
 from tap_facebook.client import IncrementalFacebookStream
+
+if t.TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context, Record
 
 
 class CampaignStream(IncrementalFacebookStream):
@@ -133,9 +138,9 @@ class CampaignStream(IncrementalFacebookStream):
 
     def post_process(
         self,
-        row: dict,
-        context: dict | None,  # noqa: ARG002
-    ) -> dict:
+        row: Record,
+        context: Context | None = None,  # noqa: ARG002
+    ) -> Record | None:
         daily_budget = row.get("daily_budget")
         row["daily_budget"] = int(daily_budget) if daily_budget is not None else None
         return row

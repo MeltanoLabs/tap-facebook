@@ -85,7 +85,7 @@ class TapFacebook(Tap):
                         description=(
                             "A name used to define your custom report. "
                             "This will included in the stream name. "
-                            "Changing this name will affect incremental bookmark values.",
+                            "Changing this name will affect incremental bookmark values."
                         ),
                         required=True,
                     ),
@@ -100,7 +100,7 @@ class TapFacebook(Tap):
                         th.ArrayType(th.StringType),
                         description=(
                             "How to break down action results. "
-                            "Supports more than one breakdowns.",
+                            "Supports more than one breakdowns."
                         ),
                         default=[],
                     ),
@@ -188,14 +188,14 @@ class TapFacebook(Tap):
         ),
     ).to_dict()
 
-    def discover_streams(self) -> list[FacebookStream]:
+    def discover_streams(self) -> list[FacebookStream | AdsInsightStream]:
         """Return a list of discovered streams.
 
         Returns:
             A list of discovered streams.
         """
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
-        report_configs = [
+        report_configs = [  # type: ignore[misc]
             DEFAULT_INSIGHT_REPORT,
             *self.config.get("insight_reports_list"),
         ]

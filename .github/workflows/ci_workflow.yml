@@ -54,3 +54,6 @@ jobs:
          TAP_FACEBOOK_START_DATE: ${{ secrets.tap_facebook_start_date }}
       run: |
         uvx --with=tox-uv tox -e ${{ matrix.python-version }}
+    - name: Check types
+      run: |
+        uvx --with=tox-uv tox -e typing

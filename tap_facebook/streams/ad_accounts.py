@@ -17,6 +17,9 @@ from singer_sdk.typing import (
 
 from tap_facebook.client import FacebookStream
 
+if t.TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context, Record
+
 
 class AdAccountsStream(FacebookStream):
     """https://developers.facebook.com/docs/graph-api/reference/user/accounts/."""
@@ -214,9 +217,9 @@ class AdAccountsStream(FacebookStream):
 
     def post_process(
         self,
-        row: dict,
-        context: dict | None = None,  # noqa: ARG002
-    ) -> dict | None:
+        row: Record,
+        context: Context | None = None,  # noqa: ARG002
+    ) -> Record | None:
         row["amount_spent"] = int(row["amount_spent"]) if "amount_spent" in row else None
         row["balance"] = int(row["balance"]) if "balance" in row else None
         row["min_campaign_group_spend_cap"] = (
@@ -229,7 +232,7 @@ class AdAccountsStream(FacebookStream):
 
     def get_url_params(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: Context | None,  # noqa: ARG002
         next_page_token: t.Any | None,  # noqa: ANN401
     ) -> dict[str, t.Any]:
         """Return a dictionary of values to be used in URL parameterization.
