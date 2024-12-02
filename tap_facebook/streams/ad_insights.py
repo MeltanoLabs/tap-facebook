@@ -262,9 +262,11 @@ class AdsInsightStream(Stream):
 
         time_increment = self._report_definition["time_increment_days"]
 
-        sync_end_date = pendulum.parse(
-            self.config.get("end_date", pendulum.today().to_date_string()),
-        ).date()
+        end_date = self.config.get("end_date")
+        if end_date:
+            sync_end_date = pendulum.parse(end_date).date()
+        else:
+            sync_end_date = pendulum.today().date()
 
         report_start = self._get_start_date(context)
         report_end = report_start.add(days=time_increment)

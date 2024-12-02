@@ -163,7 +163,7 @@ class AdAccountsStream(FacebookStream):
         Property("tax_id_type", StringType),
         Property("timezone_id", IntegerType),
         Property("timezone_name", StringType),
-        Property("timezone_offset_hours_utc", IntegerType),
+        Property("timezone_offset_hours_utc", NumberType),
         Property("agency_client_declaration_agency_representing_client", IntegerType),
         Property("agency_client_declaration_client_based_in_france", IntegerType),
         Property("agency_client_declaration_client_city", StringType),
