@@ -47,6 +47,14 @@ EXCLUDED_FIELDS = [
     "__module__",
     "__doc__",
     "__dict__",
+    "age_targeting", 
+    'gender_targeting', 
+    "labels",
+    "location",
+    "estimated_ad_recall_rate_lower_bound",
+    "estimated_ad_recall_rate_upper_bound",
+    "estimated_ad_recallers_lower_bound",
+    "estimated_ad_recallers_upper_bound",
 ]
 
 SLEEP_TIME_INCREMENT = 5
@@ -312,7 +320,9 @@ class AdsInsightStream(Stream):
         """
         # Make a GET request to the Facebook Graph API to retrieve the usage limit
         check = rq.get(
-            'https://graph.facebook.com/v19.0/act_' +
+            'https://graph.facebook.com/' +
+            self.config["api_version"] +
+            '/act_' +
             self.config["account_id"] +
             '/insights?access_token=' +
             self.config["access_token"]
