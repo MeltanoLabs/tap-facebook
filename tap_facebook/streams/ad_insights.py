@@ -243,15 +243,15 @@ class AdsInsightStream(Stream):
         # HTTP response.
         # https://developers.facebook.com/docs/marketing-api/reference/ad-account/insights/#overview
         today = pendulum.today().date()
-        oldest_allowed_start_date = today.subtract(months=37)
+        oldest_allowed_start_date = today.subtract(months=36)
         if report_start < oldest_allowed_start_date:
-            report_start = oldest_allowed_start_date
             self.logger.info(
                 "Report start date '%s' is older than 37 months. "
                 "Using oldest allowed start date '%s' instead.",
                 report_start,
                 oldest_allowed_start_date,
             )
+            report_start = oldest_allowed_start_date
         return report_start
 
     def get_records(
