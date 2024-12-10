@@ -1629,13 +1629,13 @@ files = [
 
 [[package]]
 name = "singer-sdk"
-version = "0.42.1"
+version = "0.43.0"
 description = "A framework for building Singer taps"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "singer_sdk-0.42.1-py3-none-any.whl", hash = "sha256:cc588927ff87b7aea0087c57c37c85bbe95f9b7c52ebb265abb50a184cec6ad8"},
-    {file = "singer_sdk-0.42.1.tar.gz", hash = "sha256:92019c3f2e476f5c17eaa381e35d3c0ff428814587f8424149a4b28904f75ca0"},
+    {file = "singer_sdk-0.43.0-py3-none-any.whl", hash = "sha256:8c5a9960348fe2d1acdcad541a4eef752c21fe27796ab3c17342617f899af079"},
+    {file = "singer_sdk-0.43.0.tar.gz", hash = "sha256:9d1b19450227390d4aecd04527757d5368f0f26605ef3c1d2dc549bec7e1bbb1"},
 ]
 
 [package.dependencies]
@@ -1657,7 +1657,7 @@ PyYAML = ">=6.0"
 referencing = ">=0.30.0"
 requests = ">=2.25.1"
 setuptools = "<=70.3.0"
-simpleeval = {version = ">=0.9.13,<1.0.1 || >1.0.1", markers = "python_version >= \"3.9\""}
+simpleeval = ">=0.9.13,<1.0.1 || >1.0.1"
 simplejson = ">=3.17.6"
 sqlalchemy = ">=1.4,<3.0"
 typing-extensions = ">=4.5.0"
@@ -1666,7 +1666,7 @@ typing-extensions = ">=4.5.0"
 docs = ["furo (>=2024.5.6)", "myst-parser (>=3)", "pytest (>=7.2.1)", "sphinx (>=7)", "sphinx-copybutton (>=0.5.2)", "sphinx-inline-tabs (>=2023.4.21)", "sphinx-notfound-page (>=1.0.0)", "sphinx-reredirects (>=0.1.5)"]
 faker = ["faker (>=22.5)"]
 jwt = ["PyJWT (>=2.4,<3.0)", "cryptography (>=3.4.6)"]
-parquet = ["numpy (>=1.22)", "numpy (>=1.22,<1.25)", "numpy (>=1.22,<2.1)", "pyarrow (>=13)", "pyarrow (>=13,<18)"]
+parquet = ["numpy (>=1.22)", "numpy (>=1.22,<2.1)", "pyarrow (>=13)"]
 s3 = ["fs-s3fs (>=1.1.1)", "s3fs (>=2024.9.0)"]
 ssh = ["paramiko (>=3.3.0)"]
 testing = ["pytest (>=7.2.1)"]
@@ -1959,4 +1959,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9"
-content-hash = "8f1538b073389d3e7152d3c72dfeef8b0dd2f4399d204b67c9b3c14ba69aebbc"
+content-hash = "e349f1170592eff4a4d3c6bdbbb67c4b5cde1f2bd5df9662a8776cd2afdaa83f"
