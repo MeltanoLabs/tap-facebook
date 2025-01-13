@@ -99,8 +99,7 @@ class TapFacebook(Tap):
                         "action_breakdowns",
                         th.ArrayType(th.StringType),
                         description=(
-                            "How to break down action results. "
-                            "Supports more than one breakdowns."
+                            "How to break down action results. Supports more than one breakdowns."
                         ),
                         default=[],
                     ),
