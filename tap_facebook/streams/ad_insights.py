@@ -11,6 +11,7 @@ from http import HTTPStatus
 
 import facebook_business.adobjects.user as fb_user
 import pendulum
+from custom_logger import internal_logger, user_logger
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.adreportrun import AdReportRun
 from facebook_business.adobjects.adsactionstats import AdsActionStats
@@ -23,9 +24,6 @@ from singer_sdk.exceptions import FatalAPIError
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
 
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
-
-internal_logger = logging.getLogger("internal")
-user_logger = logging.getLogger("user")
 
 EXCLUDED_FIELDS = [
     "account_currency",

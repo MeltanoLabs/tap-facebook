@@ -524,7 +524,7 @@ requests = "*"
 
 [[package]]
 name = "custom-logger"
-version = "0.0.3"
+version = "0.0.6"
 description = ""
 optional = false
 python-versions = ">=3.9"
@@ -538,8 +538,8 @@ wheel = "^0.43.0"
 [package.source]
 type = "git"
 url = "https://github.com/olbycom/nekt-custom-logger-module.git"
-reference = "v0.0.3"
-resolved_reference = "d9f98e97b8245c655becf9e9d81dbea5147ccbdf"
+reference = "v0.0.6"
+resolved_reference = "280c52e2542914eb435e4d8376fdc7d7e32d6c8f"
 
 [[package]]
 name = "exceptiongroup"
@@ -853,8 +853,6 @@ optional = false
 python-versions = "*"
 files = [
     {file = "jsonpath-ng-1.7.0.tar.gz", hash = "sha256:f6f5f7fd4e5ff79c785f1573b394043b39849fb2bb47bcead935d12b00beab3c"},
-    {file = "jsonpath_ng-1.7.0-py2-none-any.whl", hash = "sha256:898c93fc173f0c336784a3fa63d7434297544b7198124a68f9a3ef9597b0ae6e"},
-    {file = "jsonpath_ng-1.7.0-py3-none-any.whl", hash = "sha256:f3d7f9e848cba1b6da28c55b1c26ff915dc9e0b1ba7e752a53d6da8d5cbd00b6"},
 ]
 
 [package.dependencies]
@@ -2049,4 +2047,4 @@ s3 = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9"
-content-hash = "a20709544e4ce6e5fc74fc3b1a4afc82e39e2d152311dc59f55c01edac29dd83"
+content-hash = "c738f93c0fc1910cccfd59d560d101c041d7df0e23344d6a8b4b0944751f64cd"

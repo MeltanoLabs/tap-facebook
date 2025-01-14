@@ -9,15 +9,13 @@ from http import HTTPStatus
 from urllib.parse import urlparse
 
 import pendulum
+from custom_logger import internal_logger, user_logger
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
 
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
-
-internal_logger = logging.getLogger("internal")
-user_logger = logging.getLogger("user")
 
 if t.TYPE_CHECKING:
     import requests

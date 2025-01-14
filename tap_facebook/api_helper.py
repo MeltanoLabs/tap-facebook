@@ -1,15 +1,12 @@
 import json
-import logging
 from time import sleep
 
 CALL_THRESHOLD_PERCENTAGE = 90
 
-internal_logger = logging.getLogger("internal")
+from custom_logger import internal_logger
 
 
 def get_usage_headers(headers: dict, account_id: str):
-    internal_logger.info(f"API Usage | Response headers: {headers}")
-
     # Facebook may return this information in two different ways
     app_usage = headers.get("X-App-Usage") or headers.get("x-app-usage") or {}
     ad_account_usage = headers.get("X-Ad-Account-Usage") or headers.get("x-ad-account-usage") or {}
@@ -17,11 +14,9 @@ def get_usage_headers(headers: dict, account_id: str):
 
     if app_usage:
         app_usage = json.loads(app_usage)
-        internal_logger.info(f"API Usage | X-App-Usage: {app_usage}")
 
     if ad_account_usage:
         ad_account_usage = json.loads(ad_account_usage)
-        internal_logger.info(f"API Usage | X-Ad-Account-Usage: {ad_account_usage}")
 
     if business_case_usage:
         usage_list = json.loads(business_case_usage)
@@ -30,7 +25,6 @@ def get_usage_headers(headers: dict, account_id: str):
         for entry in usage_list.get(account_id, []):
             if entry.get("type") in ["ads_management", "ads_insights", "custom_audience"]:
                 business_case_usage = entry
-                internal_logger.info(f"API Usage | X-Business-Use-Case-Usage: {business_case_usage}")
 
     return app_usage, ad_account_usage, business_case_usage
 

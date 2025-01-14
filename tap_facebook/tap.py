@@ -5,11 +5,9 @@ from __future__ import annotations
 import logging
 import typing as t
 
-from singer_sdk import Tap
-from singer_sdk import typing as th  # JSON schema typing helpers
-
-internal_logger = logging.getLogger("internal")
-user_logger = logging.getLogger("user")
+from custom_logger import internal_logger
+from singer_sdk import Stream, Tap
+from singer_sdk import typing as th
 
 if t.TYPE_CHECKING:
     from tap_facebook.client import FacebookStream
@@ -197,14 +195,11 @@ class TapFacebook(Tap):
 
         return [*streams, *advanced_streams]
 
-    def discover_streams(self) -> list[FacebookStream]:
+    def discover_streams(self) -> list[Stream]:
         try:
             return self._discover_streams()
         except Exception as e:
-            internal_logger.error(
-                f"Error on discover: {e}",
-                exc_info=True,
-            )
+            internal_logger.exception(f"Error on discover: {e}")
             raise
 
 

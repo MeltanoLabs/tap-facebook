@@ -18,7 +18,7 @@ python = ">=3.9"
 requests = "~=2.31.0"
 singer-sdk = ">=0.27,<0.39"
 facebook-business = "^19.0.0"
-custom-logger = {git = "https://github.com/olbycom/nekt-custom-logger-module.git", rev = "v0.0.3"}
+custom-logger = {git = "https://github.com/olbycom/nekt-custom-logger-module.git", rev = "v0.0.6"}
 [tool.poetry.dev-dependencies]
 pytest = ">=7.4.1"
 singer-sdk = {version = ">=0.27,<0.39", extras = ["testing"]}
