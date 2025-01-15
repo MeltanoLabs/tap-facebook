@@ -14,7 +14,6 @@ from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
-
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
 
 if t.TYPE_CHECKING:
@@ -151,6 +150,7 @@ class FacebookStream(RESTStream):
                 f"{response.status_code} Server Error: "
                 f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"
             )
+            user_logger.warning(msg)
             raise RetriableAPIError(msg, response)
 
     def backoff_max_tries(self) -> int:
