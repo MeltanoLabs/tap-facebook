@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-import logging
 import typing as t
 
-from custom_logger import internal_logger
-from singer_sdk import Stream, Tap
+import custom_logger
+
+_ = custom_logger
+from singer_sdk import Tap
 from singer_sdk import typing as th
 
 if t.TYPE_CHECKING:
@@ -181,7 +182,7 @@ class TapFacebook(Tap):
         ),
     ).to_dict()
 
-    def _discover_streams(self) -> list[FacebookStream]:
+    def discover_streams(self) -> list[FacebookStream]:
         """Return a list of discovered streams.
 
         Returns:
@@ -194,13 +195,6 @@ class TapFacebook(Tap):
             advanced_streams = [stream_class(tap=self) for stream_class in ADVANCED_STREAM_TYPES]
 
         return [*streams, *advanced_streams]
-
-    def discover_streams(self) -> list[Stream]:
-        try:
-            return self._discover_streams()
-        except Exception as e:
-            internal_logger.exception(f"Error on discover: {e}")
-            raise
 
 
 if __name__ == "__main__":

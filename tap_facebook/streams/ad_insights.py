@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import logging
+import sys
 import time
 import typing as t
 from functools import lru_cache
@@ -231,8 +231,8 @@ class AdsInsightStream(Stream):
                             )
                 return th.ArrayType(th.ObjectType(*sub_props))
             return th.ArrayType(th.ObjectType())
-        msg = f"Type not found for field: {field}"
-        raise RuntimeError(msg)
+        user_logger.error(f"Type not found for field: {field}")
+        sys.exit(1)
 
     @property
     @lru_cache  # noqa: B019
@@ -259,8 +259,8 @@ class AdsInsightStream(Stream):
         account_id = self.config["account_id"]
         self.account = AdAccount(f"act_{account_id}").api_get()
         if not self.account:
-            msg = f"Couldn't find account with id {account_id}"
-            raise RuntimeError(msg)
+            user_logger.error(f"Couldn't find account with id {account_id}")
+            sys.exit(1)
 
     def _check_facebook_api_usage(self, headers: str) -> None:
         should_sleep = has_reached_api_limit(
@@ -339,8 +339,8 @@ class AdsInsightStream(Stream):
                 POLL_JOB_SLEEP_TIME,
             )
             time.sleep(POLL_JOB_SLEEP_TIME)
-        msg = "Job failed to complete for unknown reason"
-        raise RuntimeError(msg)
+        user_logger.error("Job failed to complete for unknown reason")
+        sys.exit(1)
 
     def _get_selected_columns(self) -> list[str]:
         columns = [keys[1] for keys, data in self.metadata.items() if data.selected and len(keys) > 0]
@@ -486,8 +486,8 @@ class AdsInsightStream(Stream):
                     continue
 
                 user_logger.error(f"An unhandled error occurred: {fb_err}. Stopping execution.")
-                internal_logger.error(f"An unhandled error occurred: {fb_err}. Stopping execution.")
-                raise FatalAPIError(fb_err)
+                internal_logger.exception(f"An unhandled error occurred: {fb_err}. Stopping execution.")
+                sys.exit(1)
 
 
 class AdsInsightByAgeAndGenderStream(AdsInsightStream):

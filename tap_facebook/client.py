@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-import logging
+import sys
 import typing as t
 from http import HTTPStatus
 from urllib.parse import urlparse
@@ -140,9 +140,11 @@ class FacebookStream(RESTStream):
                     headers=response.headers,
                     account_id=self.config.get("account_id"),
                 )
+                user_logger.warning(msg)
                 raise RetriableAPIError(msg, response)
 
-            raise FatalAPIError(msg)
+            user_logger.error(msg)
+            sys.exit(1)
 
         if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
             msg = (
