@@ -279,14 +279,18 @@ class AdsInsightStream(Stream):
         report_start = self._get_start_date(context)
         report_end = report_start.add(days=time_increment)
 
+        self.logger.info(f'NICK DU Fix Product Id Selected columns')
         columns = self._get_selected_columns()
+        breakdowns = self._report_definition.get("breakdowns", [])
+        fields = [col for col in columns if col not in set(breakdowns)]
+
         while report_start <= sync_end_date:
             params = {
                 "level": self._report_definition["level"],
                 "action_breakdowns": self._report_definition["action_breakdowns"],
                 "action_report_time": self._report_definition["action_report_time"],
-                "breakdowns": self._report_definition["breakdowns"],
-                "fields": columns,
+                "breakdowns": breakdowns,
+                "fields": fields,
                 "time_increment": time_increment,
                 "limit": 100,
                 "action_attribution_windows": [
