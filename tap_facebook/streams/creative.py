@@ -46,7 +46,6 @@ class CreativeStream(FacebookStream):
         "effective_authorization_category",
         "effective_instagram_media_id",
         "effective_instagram_story_id",
-        "effective_object_story_id",
         "enable_direct_install",
         "image_hash",
         "image_url",
