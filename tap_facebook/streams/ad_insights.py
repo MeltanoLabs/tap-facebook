@@ -284,10 +284,12 @@ class AdsInsightStream(Stream):
         breakdowns = self._report_definition.get("breakdowns", [])
         fields = [col for col in columns if col not in set(breakdowns)]
 
+        # hardcoded "action_breakdowns": ["action_type"], due to lack of testing on meltanos team
+        # "action_breakdowns": self._report_definition["action_breakdowns"],
         while report_start <= sync_end_date:
             params = {
                 "level": self._report_definition["level"],
-                "action_breakdowns": self._report_definition["action_breakdowns"],
+                "action_breakdowns": ["action_type"],
                 "action_report_time": self._report_definition["action_report_time"],
                 "breakdowns": breakdowns,
                 "fields": fields,
