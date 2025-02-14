@@ -279,7 +279,7 @@ class AdsInsightStream(Stream):
         report_start = self._get_start_date(context)
         report_end = report_start.add(days=time_increment)
 
-        self.logger.info(f'NICK DU Fix Product Id Selected columns')
+        self.logger.info(f'NICK DU Fix Product Id Selected columns with added action_type')
         columns = self._get_selected_columns()
         breakdowns = self._report_definition.get("breakdowns", [])
         fields = [col for col in columns if col not in set(breakdowns)]
