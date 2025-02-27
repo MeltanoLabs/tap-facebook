@@ -320,27 +320,47 @@ class AdsInsightStream(Stream):
         Returns:
             float: The maximum usage among call count, CPU time, and total time.
         """
-        # Make a GET request to the Facebook Graph API to retrieve the usage limit
-        check = rq.get(
-            'https://graph.facebook.com/' +
-            self.config["api_version"] +
-            '/act_' +
-            self.config["account_id"] +
-            '/insights?access_token=' +
-            self.config["access_token"]
-        )
+        try:
+            # Make a GET request to the Facebook Graph API to retrieve the usage limit
+            check = rq.get(
+                'https://graph.facebook.com/' +
+                self.config["api_version"] +
+                '/act_' +
+                self.config["account_id"] +
+                '/insights?access_token=' +
+                self.config["access_token"]
+            )
 
-        # Parse the usage limit from the headers of the response
-        #Call count is % amount of limit used
-        call = float(self.find_between(check.headers["x-business-use-case-usage"], "call_count"))
-        cpu = float(self.find_between(check.headers["x-business-use-case-usage"], "total_cputime"))
-        total = float(self.find_between(check.headers["x-business-use-case-usage"], "total_time"))
+            # Check if the request was successful
+            check.raise_for_status()
 
-        # Find the maximum usage among call count, CPU time, and total time
-        usage = max(call, cpu, total)
+            # Parse the usage limit from the headers of the response
+            usage_data = check.headers.get("x-business-use-case-usage", "")
 
-        # Return the maximum usage
-        return usage
+            if usage_data:
+                # Extract call count, CPU time, and total time
+                call = float(self.find_between(usage_data, "call_count"))
+                cpu = float(self.find_between(usage_data, "total_cputime"))
+                total = float(self.find_between(usage_data, "total_time"))
+
+                # Find the maximum usage among call count, CPU time, and total time
+                usage = max(call, cpu, total)
+                return usage
+            else:
+                self.logger.warning("No usage data found in the response headers.")
+                return 0.0  # Default value if no data is available
+
+        except rq.exceptions.RequestException as e:
+            self.logger.error(f"Request to Facebook API failed: {e}")
+            return 0.0  # Default value in case of request failure
+
+        except KeyError as e:
+            self.logger.error(f"KeyError: {e} - Check if expected headers are present.")
+            return 0.0  # Default value if key is not found
+
+        except ValueError as e:
+            self.logger.error(f"ValueError: {e} - Unable to convert usage data to float.")
+            return 0.0  # Default value if conversion fails
 
     def check_limit(self) -> None:
         #Check if you reached 75% of the limit, if yes then back-off for 5 minutes
