@@ -106,8 +106,6 @@ class CreativeStream(FacebookStream):
         Property("dynamic_ad_voice", StringType),
         Property("effective_authorization_category", StringType),
         Property("effective_instagram_media_id", StringType),
-        Property("effective_instagram_story_id", StringType),
-        Property("effective_object_story_id", StringType),
         Property("enable_direct_install", BooleanType),
         Property("image_hash", StringType),
         Property("image_url", StringType),
