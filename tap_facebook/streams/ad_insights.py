@@ -61,7 +61,7 @@ SLEEP_TIME_INCREMENT = 5
 INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
 INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
 USAGE_LIMIT_THRESHOLD = 75
-
+BATCH_SIZE = 30
 
 class AdsInsightStream(Stream):
     name = "adsinsights"
@@ -141,67 +141,10 @@ class AdsInsightStream(Stream):
         fb_user.User(fbid="me")
 
         account_id = self.config["account_id"]
-        self.account = AdAccount(f"act_{account_id}").api_get()
+        self.account:AdAccount = AdAccount(f"act_{account_id}").api_get()
         if not self.account:
             msg = f"Couldn't find account with id {account_id}"
             raise RuntimeError(msg)
-
-    def _run_job_to_completion(self, params: dict) -> th.Any:
-        job = self.account.get_insights(
-            params=params,
-            is_async=True,
-        )
-        status = None
-        time_start = time.time()
-        while status != "Job Completed":
-            duration = time.time() - time_start
-            job = job.api_get()
-            status = job[AdReportRun.Field.async_status]
-            percent_complete = job[AdReportRun.Field.async_percent_completion]
-
-            job_id = job["id"]
-            self.logger.info(
-                "%s for %s - %s. %s%% done. ",
-                status,
-                params["time_range"]["since"],
-                params["time_range"]["until"],
-                percent_complete,
-            )
-
-            if status == "Job Completed":
-                return job
-            if status == "Job Failed":
-                raise RuntimeError(dict(job))
-            if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
-                error_message = (
-                    f"Insights job {job_id} did not start after "
-                    f"{INSIGHTS_MAX_WAIT_TO_START_SECONDS} seconds. "
-                    "This is an intermittent error and may resolve itself on subsequent "
-                    "queries to the Facebook API. "
-                    "You should deselect fields from the schema that are not necessary, "
-                    "as that may help improve the reliability of the Facebook API."
-                )
-                raise RuntimeError(error_message)
-
-            if duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS:
-                error_message = (
-                    f"Insights job {job_id} did not complete after "
-                    f"{INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
-                    "This is an intermittent error and may resolve itself on "
-                    "subsequent queries to the Facebook API. "
-                    "You should deselect fields from the schema that are not necessary, "
-                    "as that may help improve the reliability of the Facebook API."
-                )
-                raise RuntimeError(error_message)
-
-            self.logger.info(
-                "Sleeping for %s seconds until job is done",
-                SLEEP_TIME_INCREMENT,
-            )
-            time.sleep(SLEEP_TIME_INCREMENT)
-            self.check_limit()
-        msg = "Job failed to complete for unknown reason"
-        raise RuntimeError(msg)
 
     def _get_selected_columns(self) -> list[str]:
         columns = [
@@ -268,35 +211,66 @@ class AdsInsightStream(Stream):
         else:
             sync_end_date = pendulum.today().date()
 
-        report_start = self._get_start_date(context)
-        report_end = report_start.add(days=time_increment)
+        report_start_consolidated = self._get_start_date(context)
 
         columns = self._get_selected_columns()
-        while report_start <= sync_end_date:
-            params = {
-                "level": self._report_definition["level"],
-                "action_breakdowns": self._report_definition["action_breakdowns"],
-                "action_report_time": self._report_definition["action_report_time"],
-                "breakdowns": self._report_definition["breakdowns"],
-                "fields": columns,
-                "time_increment": time_increment,
-                "limit": 100,
-                "action_attribution_windows": [
-                    self._report_definition["action_attribution_windows_view"],
-                    self._report_definition["action_attribution_windows_click"],
-                ],
-                "time_range": {
-                    "since": report_start.to_date_string(),
-                    "until": report_end.to_date_string(),
-                },
-            }
-            job = self._run_job_to_completion(params)
+        self.logger.info(f"Syncing reports starting from {report_start_consolidated.to_date_string()} to {sync_end_date.to_date_string()}")
+        while report_start_consolidated < sync_end_date:
+            report_start = report_start_consolidated
+            # Prepare batch requests
+            batch_requests = []
+            batch_final_dates = []
+            days_to_fetch = min(sync_end_date.diff(report_start).days,BATCH_SIZE)
+            for day_offset in range(1, days_to_fetch+1, time_increment):
+                batch_params = {
+                    "level": self._report_definition["level"],
+                    "action_breakdowns": self._report_definition["action_breakdowns"],
+                    "action_report_time": self._report_definition["action_report_time"],
+                    "breakdowns": self._report_definition["breakdowns"],
+                    "fields": columns,
+                    "time_increment": time_increment,
+                    "limit": 100,
+                    "action_attribution_windows": [
+                        self._report_definition["action_attribution_windows_view"],
+                        self._report_definition["action_attribution_windows_click"],
+                    ],
+                    "time_range": {
+                        "since": (report_start).to_date_string(),
+                        "until": (report_start.add(days=time_increment)).to_date_string(),
+                    },
+                }
+                batch_requests.append({
+                    "method": "GET",
+                    "relative_url": f"act_{self.config['account_id']}/insights",
+                    "body": json.dumps(batch_params),
+                })
+                report_start = report_start.add(days=time_increment)
+                batch_final_dates.append(report_start)
+            # Execute the batch
+            api:FacebookAdsApi = FacebookAdsApi.get_default_api()
             self.check_limit()
-            for obj in job.get_result():
-                yield obj.export_all_data()
-            # Bump to the next increment
-            report_start = report_start.add(days=time_increment)
-            report_end = report_end.add(days=time_increment)
+            batch_response = api.call("POST", ["/"], params={"batch": json.dumps(batch_requests)})
+
+            # Process batch responses
+            for final_date, response in zip(batch_final_dates, batch_response.json()):
+                if response.get("code") == 200:
+                    data = json.loads(response["body"])
+                    if len(data["data"]) > 0:
+                        self.logger.info(f"{len(data['data'])} records fetched for {final_date.to_date_string()}")
+                        for record in data["data"]:
+                            yield record
+                    else:
+                        self.logger.info(f"No records fetched for {final_date.to_date_string()}")
+                    report_start_consolidated = final_date
+                else:
+                    if "#80000" in response["body"]:
+                        self.logger.warning("Rate Limit Reached. Cooling Time 5 Minutes.")
+                        time.sleep(300)
+                        self.logger.info("Trying again ...")
+                        break
+                    else:
+                        raise RuntimeError(f"Batch request failed: {response}")
+        self.logger.info("Syncing reports completed.")
 
     #Function to find the string between two strings or characters
     def find_between(self, usage, find ) -> str:
@@ -366,5 +340,5 @@ class AdsInsightStream(Stream):
         #Check if you reached 75% of the limit, if yes then back-off for 5 minutes
         if (self.get_limit()>USAGE_LIMIT_THRESHOLD):
             #After threshold is reached start throttling all consecutive requests until the limit is reset.
-            self.logger.debug(f"{USAGE_LIMIT_THRESHOLD}% Rate Limit Reached. Cooling Time 5 Minutes.")
+            self.logger.warning(f"{USAGE_LIMIT_THRESHOLD}% Rate Limit Reached. Cooling Time 5 Minutes.")
             time.sleep(300)
