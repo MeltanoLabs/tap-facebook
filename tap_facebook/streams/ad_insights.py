@@ -277,7 +277,7 @@ class AdsInsightStream(Stream):
         ).date()
 
         report_start = self._get_start_date(context)
-        report_end = report_start.add(days=time_increment)
+        report_end = report_start
 
         self.logger.info(f'NICK DU Fix Product Id Selected columns with added action_type')
         columns = self._get_selected_columns()
@@ -296,8 +296,12 @@ class AdsInsightStream(Stream):
                 "time_increment": time_increment,
                 "limit": 100,
                 "action_attribution_windows": [
-                    self._report_definition["action_attribution_windows_view"],
-                    self._report_definition["action_attribution_windows_click"],
+                    "1d_view",
+                    "7d_view",
+                    "28d_view",
+                    "1d_click",
+                    "7d_click",
+                    "28d_click",
                 ],
                 "time_range": {
                     "since": report_start.to_date_string(),
