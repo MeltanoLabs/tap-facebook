@@ -6,6 +6,7 @@ import json
 import time
 import typing as t
 from functools import lru_cache
+from urllib.parse import urlencode
 
 import facebook_business.adobjects.user as fb_user
 import pendulum
@@ -55,6 +56,40 @@ EXCLUDED_FIELDS = [
     "estimated_ad_recall_rate_upper_bound",
     "estimated_ad_recallers_lower_bound",
     "estimated_ad_recallers_upper_bound",
+    "cost_per_15_sec_video_view",
+    "cost_per_2_sec_continuous_video_view",
+    "cost_per_action_type",
+    "cost_per_ad_click",
+    "cost_per_conversion",
+    "cost_per_estimated_ad_recallers",
+    "cost_per_inline_link_click",
+    "cost_per_inline_post_engagement",
+    "cost_per_outbound_click",
+    "cost_per_thruplay",
+    "cost_per_unique_action_type",
+    "cost_per_unique_click",
+    "cost_per_unique_inline_link_click",
+    "cost_per_unique_outbound_click",
+    "marketing_messages_link_btn_click_rate",
+    "marketing_messages_quick_reply_btn_click_rate",
+    "marketing_messages_phone_call_btn_click_rate",
+    "inline_link_click_ctr",
+    "outbound_clicks_ctr",
+    "unique_ctr",
+    "unique_inline_link_click_ctr",
+    "unique_link_clicks_ctr",
+    "unique_outbound_clicks_ctr",
+    "website_ctr",
+    "ctr",
+    "catalog_segment_value_mobile_purchase_roas",
+    "catalog_segment_value_omni_purchase_roas",
+    "catalog_segment_value_website_purchase_roas",
+    "mobile_app_purchase_roas",
+    "purchase_roas",
+    "website_purchase_roas",
+    "shops_assisted_purchases",
+    "marketing_messages_media_view_rate",
+    "wish_bid"
 ]
 
 SLEEP_TIME_INCREMENT = 5
@@ -241,8 +276,7 @@ class AdsInsightStream(Stream):
                 }
                 batch_requests.append({
                     "method": "GET",
-                    "relative_url": f"act_{self.config['account_id']}/insights",
-                    "body": json.dumps(batch_params),
+                    "relative_url": f"act_{self.config['account_id']}/insights?{urlencode(batch_params)}",
                 })
                 report_start = report_start.add(days=time_increment)
                 batch_final_dates.append(report_start)
