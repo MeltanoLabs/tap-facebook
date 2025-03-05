@@ -48,48 +48,27 @@ EXCLUDED_FIELDS = [
     "__module__",
     "__doc__",
     "__dict__",
-    "age_targeting", 
-    'gender_targeting', 
-    "labels",
-    "location",
-    "estimated_ad_recall_rate_lower_bound",
-    "estimated_ad_recall_rate_upper_bound",
-    "estimated_ad_recallers_lower_bound",
-    "estimated_ad_recallers_upper_bound",
-    "cost_per_15_sec_video_view",
-    "cost_per_2_sec_continuous_video_view",
-    "cost_per_action_type",
-    "cost_per_ad_click",
-    "cost_per_conversion",
-    "cost_per_estimated_ad_recallers",
-    "cost_per_inline_link_click",
-    "cost_per_inline_post_engagement",
-    "cost_per_outbound_click",
-    "cost_per_thruplay",
-    "cost_per_unique_action_type",
-    "cost_per_unique_click",
-    "cost_per_unique_inline_link_click",
-    "cost_per_unique_outbound_click",
-    "marketing_messages_link_btn_click_rate",
-    "marketing_messages_quick_reply_btn_click_rate",
-    "marketing_messages_phone_call_btn_click_rate",
-    "inline_link_click_ctr",
-    "outbound_clicks_ctr",
-    "unique_ctr",
-    "unique_inline_link_click_ctr",
-    "unique_link_clicks_ctr",
-    "unique_outbound_clicks_ctr",
-    "website_ctr",
-    "ctr",
-    "catalog_segment_value_mobile_purchase_roas",
-    "catalog_segment_value_omni_purchase_roas",
-    "catalog_segment_value_website_purchase_roas",
-    "mobile_app_purchase_roas",
-    "purchase_roas",
-    "website_purchase_roas",
-    "shops_assisted_purchases",
-    "marketing_messages_media_view_rate",
-    "wish_bid"
+]
+
+COLUMN_LIST = [
+    "ad_id",
+    "account_id",
+    "date_start",
+    "ad_name",
+    "adset_id",
+    "campaign_id",
+    "campaign_name",
+    "clicks",
+    "conversions",
+    "cpc",
+    "cpm",
+    "cpp",
+    "created_time",
+    "date_stop",
+    "impressions",
+    "reach",
+    "spend",
+    "updated_time",
 ]
 
 SLEEP_TIME_INCREMENT = 5
@@ -158,7 +137,7 @@ class AdsInsightStream(Stream):
     @lru_cache  # noqa: B019
     def schema(self) -> dict:
         properties: th.List[th.Property] = []
-        columns = list(AdsInsights.Field.__dict__)[1:]
+        columns = COLUMN_LIST
         for field in columns:
             if field in EXCLUDED_FIELDS:
                 continue
