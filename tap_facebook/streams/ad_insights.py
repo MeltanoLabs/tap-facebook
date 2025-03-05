@@ -6,6 +6,7 @@ import json
 import time
 import typing as t
 from functools import lru_cache
+from urllib.parse import urlencode
 
 import facebook_business.adobjects.user as fb_user
 import pendulum
@@ -241,8 +242,7 @@ class AdsInsightStream(Stream):
                 }
                 batch_requests.append({
                     "method": "GET",
-                    "relative_url": f"act_{self.config['account_id']}/insights",
-                    "body": json.dumps(batch_params),
+                    "relative_url": f"act_{self.config['account_id']}/insights?{urlencode(batch_params)}",
                 })
                 report_start = report_start.add(days=time_increment)
                 batch_final_dates.append(report_start)
