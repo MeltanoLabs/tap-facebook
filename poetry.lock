@@ -429,14 +429,14 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "facebook-business"
-version = "21.0.5"
+version = "22.0.2"
 description = "Facebook Business SDK"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "facebook_business-21.0.5-py3-none-any.whl", hash = "sha256:8497eb7fc1fd6814bf90ffb4ee6d376975781785fa417ff0dbc689215245ef5d"},
-    {file = "facebook_business-21.0.5.tar.gz", hash = "sha256:5b21f06315ff0634a0752affd291a44d5f30686e248eb1de1b8908587511e2c3"},
+    {file = "facebook_business-22.0.2-py3-none-any.whl", hash = "sha256:fae117e7da1fb2cf577b333fcdb514c1c88ac967c2b2871784ee8cfd2a0a2a5a"},
+    {file = "facebook_business-22.0.2.tar.gz", hash = "sha256:9fed149359ac8993f571e5d8c3fd20fe4f0604e868ad6e37d744d5a98d842103"},
 ]
 
 [package.dependencies]
@@ -2026,4 +2026,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9"
-content-hash = "c142e3d856f8079cabc1bcf2dfcc301a34dfd477c440296089d4972f37884ae0"
+content-hash = "48121edfc08790c76bc92909a41307d1983831664a60c7e8dfcd9ef804334cbd"
