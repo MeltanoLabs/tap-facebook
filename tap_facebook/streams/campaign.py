@@ -7,13 +7,13 @@ import typing as t
 from singer_sdk import typing as th  # JSON Schema typing helpers
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 
-from tap_facebook.client import IncrementalFacebookStream
+from tap_facebook.client import FacebookStream
 
 if t.TYPE_CHECKING:
     from singer_sdk.helpers.types import Context, Record
 
 
-class CampaignStream(IncrementalFacebookStream):
+class CampaignStream(FacebookStream):
     """https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group."""
 
     """
@@ -70,7 +70,7 @@ class CampaignStream(IncrementalFacebookStream):
     filter_entity = "campaign"
 
     path = f"/campaigns?fields={columns}"
-    primary_keys = ["id", "updated_time"]  # noqa: RUF012
+    primary_keys = ["id"]  # noqa: RUF012
     tap_stream_id = "campaigns"
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "updated_time"

@@ -85,6 +85,7 @@ class CreativeStream(FacebookStream):
     tap_stream_id = "creatives"
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "id"
+    primary_keys = ["id"]
 
     schema = PropertiesList(
         Property("id", StringType),

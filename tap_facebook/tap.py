@@ -55,6 +55,18 @@ class TapFacebook(Tap):
 
     name = "tap-facebook"
 
+    def validate_config(self) -> None:
+        """Validate the config.
+
+        Raises:
+            RuntimeError: If neither account_id nor account_ids is provided
+        """
+        super().validate_config()
+        
+        if not self.config.get("account_id") and not self.config.get("account_ids"):
+            msg = "Either 'account_id' or 'account_ids' must be provided in the config"
+            raise RuntimeError(msg)
+
     # add parameters you have in config.json
     config_jsonschema = th.PropertiesList(
         th.Property(
@@ -72,8 +84,14 @@ class TapFacebook(Tap):
         th.Property(
             "account_id",
             th.StringType,
-            description="Your Facebook Account ID.",
-            required=True,
+            description="Your Facebook Account ID. Required if account_ids is not provided.",
+            required=False,
+        ),
+        th.Property(
+            "account_ids",
+            th.StringType,
+            description="Comma-separated list of Facebook Account IDs to sync. If provided, will override account_id.",
+            required=False,
         ),
         th.Property(
             "insight_reports_list",

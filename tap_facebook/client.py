@@ -25,11 +25,20 @@ class FacebookStream(RESTStream):
     # add account id in the url
     # path and fields will be added to this url in streams.pys
 
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._current_account_id = None
+
     @property
     def url_base(self) -> str:
         version: str = self.config["api_version"]
-        account_id: str = self.config["account_id"]
+        account_id: str = self.current_account_id
         return f"https://graph.facebook.com/{version}/act_{account_id}"
+
+    @property
+    def current_account_id(self) -> str:
+        """Get the current account ID being processed."""
+        return self._current_account_id or self.config["account_id"]
 
     records_jsonpath = "$.data[*]"  # Or override `parse_response`.
     next_page_token_jsonpath = "$.paging.cursors.after"  # noqa: S105
@@ -143,6 +152,25 @@ class FacebookStream(RESTStream):
             int: limit
         """
         return 20
+
+    def get_records(
+        self,
+        context: Context | None,
+    ) -> t.Iterable[dict]:
+        """Get records from the stream."""
+        # Process accounts - either from account_ids or single account_id
+        account_ids_str = self.config.get("account_ids", "")
+        accounts_to_process = [aid.strip() for aid in account_ids_str.split(",") if aid.strip()] if account_ids_str else [self.config["account_id"]]
+        
+        # Remove duplicates while preserving order
+        accounts_to_process = list(dict.fromkeys(accounts_to_process))
+        
+        self.logger.info("Processing accounts: %s", accounts_to_process)
+
+        for account_id in accounts_to_process:
+            self.logger.info("Starting to process account: %s", account_id)
+            self._current_account_id = account_id
+            yield from super().get_records(context)
 
 
 class IncrementalFacebookStream(FacebookStream, metaclass=abc.ABCMeta):

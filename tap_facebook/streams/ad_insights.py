@@ -76,6 +76,7 @@ class AdsInsightStream(Stream):
         self._report_definition = kwargs.pop("report_definition")
         kwargs["name"] = f"{self.name}_{self._report_definition['name']}"
         super().__init__(*args, **kwargs)
+        self._current_account_id = None
 
     @property
     def primary_keys(self) -> t.Sequence[str] | None:
@@ -89,6 +90,15 @@ class AdsInsightStream(Stream):
             new_value: TODO
         """
         self._primary_keys = new_value
+
+    @property
+    def current_account_id(self) -> str:
+        """Get the current account ID being processed.
+
+        Returns:
+            The current account ID, falling back to the configured account_id.
+        """
+        return self._current_account_id or self.config["account_id"]
 
     @staticmethod
     def _get_datatype(field: str) -> th.JSONTypeHelper | None:
@@ -151,7 +161,7 @@ class AdsInsightStream(Stream):
         )
         fb_user.User(fbid="me")
 
-        account_id = self.config["account_id"]
+        account_id = self.current_account_id
         self.account = AdAccount(f"act_{account_id}").api_get()
         if not self.account:
             msg = f"Couldn't find account with id {account_id}"
@@ -268,39 +278,63 @@ class AdsInsightStream(Stream):
         self,
         context: Context | None,
     ) -> t.Iterable[dict | tuple[dict, dict | None]]:
-        self._initialize_client()
+        """Get records from the stream.
 
-        time_increment = self._report_definition["time_increment_days"]
+        Args:
+            context: The stream context.
 
-        sync_end_date = pendulum.parse(  # type: ignore[union-attr]
-            self.config.get("end_date", pendulum.today().to_date_string()),
-        ).date()
+        Yields:
+            A record from the stream.
+        """
+        # Process accounts - either from account_ids or single account_id
+        account_ids_str = self.config.get("account_ids", "")
+        accounts_to_process = [aid.strip() for aid in account_ids_str.split(",") if aid.strip()] if account_ids_str else [self.config["account_id"]]
+        
+        self.logger.info("Found accounts to process: %s", accounts_to_process)
 
-        report_start = self._get_start_date(context)
-        report_end = report_start.add(days=time_increment)
+        for account_id in accounts_to_process:
+            self.logger.info("Starting to process account: %s", account_id)
+            self._current_account_id = account_id
+            self._initialize_client()
 
-        columns = self._get_selected_columns()
-        while report_start <= sync_end_date:
-            params = {
-                "level": self._report_definition["level"],
-                "action_breakdowns": self._report_definition["action_breakdowns"],
-                "action_report_time": self._report_definition["action_report_time"],
-                "breakdowns": self._report_definition["breakdowns"],
-                "fields": columns,
-                "time_increment": time_increment,
-                "limit": 100,
-                "action_attribution_windows": [
-                    self._report_definition["action_attribution_windows_view"],
-                    self._report_definition["action_attribution_windows_click"],
-                ],
-                "time_range": {
-                    "since": report_start.to_date_string(),
-                    "until": report_end.to_date_string(),
-                },
-            }
-            job = self._run_job_to_completion(params)  # type: ignore[func-returns-value]
-            for obj in job.get_result():
-                yield obj.export_all_data()
-            # Bump to the next increment
-            report_start = report_start.add(days=time_increment)
-            report_end = report_end.add(days=time_increment)
+            time_increment = self._report_definition["time_increment_days"]
+
+            sync_end_date = pendulum.parse(  # type: ignore[union-attr]
+                self.config.get("end_date", pendulum.today().to_date_string()),
+            ).date()
+
+            report_start = self._get_start_date(context)
+            report_end = report_start.add(days=time_increment)
+
+            self.logger.info(
+                "Processing account %s from %s to %s", 
+                account_id,
+                report_start.to_date_string(),
+                sync_end_date.to_date_string()
+            )
+
+            columns = self._get_selected_columns()
+            while report_start <= sync_end_date:
+                params = {
+                    "level": self._report_definition["level"],
+                    "action_breakdowns": self._report_definition["action_breakdowns"],
+                    "action_report_time": self._report_definition["action_report_time"],
+                    "breakdowns": self._report_definition["breakdowns"],
+                    "fields": columns,
+                    "time_increment": time_increment,
+                    "limit": 100,
+                    "action_attribution_windows": [
+                        self._report_definition["action_attribution_windows_view"],
+                        self._report_definition["action_attribution_windows_click"],
+                    ],
+                    "time_range": {
+                        "since": report_start.to_date_string(),
+                        "until": report_end.to_date_string(),
+                    },
+                }
+                job = self._run_job_to_completion(params)  # type: ignore[func-returns-value]
+                for obj in job.get_result():
+                    yield obj.export_all_data()
+                # Bump to the next increment
+                report_start = report_start.add(days=time_increment)
+                report_end = report_end.add(days=time_increment)

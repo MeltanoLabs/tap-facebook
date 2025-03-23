@@ -123,7 +123,7 @@ class AdAccountsStream(FacebookStream):
     name = "adaccounts"
     path = f"/adaccounts?fields={columns}"
     tap_stream_id = "adaccounts"
-    primary_keys = ["created_time"]  # noqa: RUF012
+    primary_keys = ["id"]  # noqa: RUF012
     replication_key = "created_time"
     replication_method = REPLICATION_INCREMENTAL
 

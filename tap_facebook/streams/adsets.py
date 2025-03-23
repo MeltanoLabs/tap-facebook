@@ -14,10 +14,10 @@ from singer_sdk.typing import (
     StringType,
 )
 
-from tap_facebook.client import IncrementalFacebookStream
+from tap_facebook.client import FacebookStream
 
 
-class AdsetsStream(IncrementalFacebookStream):
+class AdsetsStream(FacebookStream):
     """https://developers.facebook.com/docs/marketing-api/reference/ad-campaign/."""
 
     """
@@ -94,7 +94,7 @@ class AdsetsStream(IncrementalFacebookStream):
     filter_entity = "adset"
 
     path = f"/adsets?fields={columns}"
-    primary_keys = ["id", "updated_time"]  # noqa: RUF012
+    primary_keys = ["id"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "updated_time"
 

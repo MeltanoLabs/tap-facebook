@@ -12,10 +12,10 @@ from singer_sdk.typing import (
     StringType,
 )
 
-from tap_facebook.client import IncrementalFacebookStream
+from tap_facebook.client import FacebookStream
 
 
-class AdsStream(IncrementalFacebookStream):
+class AdsStream(FacebookStream):
     """Ads stream class.
 
     columns: columns which will be added to fields parameter in api
@@ -56,7 +56,7 @@ class AdsStream(IncrementalFacebookStream):
 
     path = f"/ads?fields={columns}"
 
-    primary_keys = ["id", "updated_time"]  # noqa: RUF012
+    primary_keys = ["id"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "updated_time"
 
