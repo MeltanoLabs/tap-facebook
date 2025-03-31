@@ -1684,15 +1684,13 @@ files = [
 
 [[package]]
 name = "singer-sdk"
-version = "0.45.1"
+version = "0.45.4.dev3+gb337b252"
 description = "A framework for building Singer taps"
 optional = false
 python-versions = ">=3.9"
 groups = ["main", "dev"]
-files = [
-    {file = "singer_sdk-0.45.1-py3-none-any.whl", hash = "sha256:1f72e4a81828b574ef66a2a87a22b2345ce5848f98eb4de1d4d61e77ef4efe10"},
-    {file = "singer_sdk-0.45.1.tar.gz", hash = "sha256:f331385ace98026f7385de11e5503006f3030691c0226ad0d4864df8b0eaf332"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 backoff = {version = ">=2.0.0", markers = "python_version < \"4\""}
@@ -1726,6 +1724,12 @@ parquet = ["numpy (>=1.22)", "pyarrow (>=13)"]
 s3 = ["fs-s3fs (>=1.1.1)", "s3fs (>=2024.9.0)"]
 ssh = ["paramiko (>=3.3.0)"]
 testing = ["pytest (>=7.2.1)"]
+
+[package.source]
+type = "git"
+url = "https://github.com/meltano/sdk.git"
+reference = "edgarrmondragon/fix/always-override-with-catalog-schema-private"
+resolved_reference = "b337b252eee656becea81218fd6d53eb502a810d"
 
 [[package]]
 name = "six"
@@ -2026,4 +2030,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9"
-content-hash = "18ed0757f257a79704fe0f881825a18ae0f7ec8916a1b001843996d220b8f303"
+content-hash = "a23cd8317d5e8dc7b96d4c4a90ad415fd5bbe47df50bff6ff766378c06f037d9"
