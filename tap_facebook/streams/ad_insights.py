@@ -315,6 +315,9 @@ class AdsInsightStream(Stream):
 
             columns = self._get_selected_columns()
             while report_start <= sync_end_date:
+                actual_until = min(report_end.subtract(days=1), sync_end_date)
+                self.logger.info(f"Fetching from {report_start} to {actual_until}")
+
                 params = {
                     "level": self._report_definition["level"],
                     "action_breakdowns": self._report_definition["action_breakdowns"],
@@ -329,7 +332,7 @@ class AdsInsightStream(Stream):
                     ],
                     "time_range": {
                         "since": report_start.to_date_string(),
-                        "until": report_end.to_date_string(),
+                        "until": actual_until.to_date_string(),
                     },
                 }
                 job = self._run_job_to_completion(params)  # type: ignore[func-returns-value]
