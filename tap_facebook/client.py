@@ -14,6 +14,7 @@ from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from singer_sdk.helpers.jsonpath import extract_jsonpath
 from singer_sdk.streams import RESTStream
+
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
 
 if t.TYPE_CHECKING:
@@ -91,9 +92,6 @@ class FacebookStream(RESTStream):
         params: dict = {"limit": 25}
         if next_page_token is not None:
             params["after"] = next_page_token
-        if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
 
         return params
 
@@ -183,8 +181,6 @@ class IncrementalFacebookStream(FacebookStream):
         if next_page_token is not None:
             params["after"] = next_page_token
         if self.replication_key:
-            params["sort"] = "asc"
-            params["order_by"] = self.replication_key
             ts = pendulum.parse(self.get_starting_replication_key_value(context))
             params["filtering"] = json.dumps(
                 [
