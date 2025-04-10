@@ -224,11 +224,20 @@ class AdsInsightStream(Stream):
         raise RuntimeError(msg)
 
     def _get_selected_columns(self) -> list[str]:
+        self.logger.info("********** METADATA CONTENT **********")
+        self.logger.info("%s", self.metadata.items())
+        self.logger.info("************************************")
         columns = [
             keys[1] for keys, data in self.metadata.items() if data.selected and len(keys) > 0
         ]
+        self.logger.info("********** COLUMNS FROM METADATA **********")
+        self.logger.info("%s", columns)
+        self.logger.info("****************************************")
         if not columns and self.name == "adsinsights_default":
             columns = list(self.schema["properties"])
+            self.logger.info("********** USING ALL SCHEMA PROPERTIES **********")
+            self.logger.info("%s", columns)
+            self.logger.info("********************************************")
         return columns
 
     def _get_start_date(
@@ -290,33 +299,47 @@ class AdsInsightStream(Stream):
         account_ids_str = self.config.get("account_ids", "")
         accounts_to_process = [aid.strip() for aid in account_ids_str.split(",") if aid.strip()] if account_ids_str else [self.config["account_id"]]
         
-        self.logger.info("Found accounts to process: %s", accounts_to_process)
+        self.logger.info("********** ACCOUNTS TO PROCESS **********")
+        self.logger.info("%s", accounts_to_process)
+        self.logger.info("************************************")
 
         for account_id in accounts_to_process:
-            self.logger.info("Starting to process account: %s", account_id)
+            self.logger.info("********** PROCESSING ACCOUNT **********")
+            self.logger.info("%s", account_id)
+            self.logger.info("************************************")
             self._current_account_id = account_id
             self._initialize_client()
 
             time_increment = self._report_definition["time_increment_days"]
 
-            sync_end_date = pendulum.parse(  # type: ignore[union-attr]
-                self.config.get("end_date", pendulum.today().to_date_string()),
-            ).date()
+            # Handle end_date being None
+            config_end_date = self.config.get("end_date")
+            if config_end_date is None:
+                self.logger.info("********** END DATE CONFIG **********")
+                self.logger.info("end_date is None, using today's date")
+                self.logger.info("************************************")
+                sync_end_date = pendulum.today().date()
+            else:
+                sync_end_date = pendulum.parse(config_end_date).date()
 
             report_start = self._get_start_date(context)
             report_end = report_start.add(days=time_increment)
 
+            self.logger.info("********** DATE RANGE FOR ACCOUNT **********")
             self.logger.info(
-                "Processing account %s from %s to %s", 
+                "Account: %s\nFrom: %s\nTo: %s", 
                 account_id,
                 report_start.to_date_string(),
                 sync_end_date.to_date_string()
             )
+            self.logger.info("************************************")
 
             columns = self._get_selected_columns()
             while report_start <= sync_end_date:
                 actual_until = min(report_end.subtract(days=1), sync_end_date)
-                self.logger.info(f"Fetching from {report_start} to {actual_until}")
+                self.logger.info("********** FETCHING DATE RANGE **********")
+                self.logger.info("From: %s\nTo: %s", report_start, actual_until)
+                self.logger.info("************************************")
 
                 params = {
                     "level": self._report_definition["level"],
@@ -335,6 +358,9 @@ class AdsInsightStream(Stream):
                         "until": actual_until.to_date_string(),
                     },
                 }
+                self.logger.info("********** API REQUEST PARAMS **********")
+                self.logger.info("%s", params)
+                self.logger.info("************************************")
                 job = self._run_job_to_completion(params)  # type: ignore[func-returns-value]
                 for obj in job.get_result():
                     yield obj.export_all_data()
