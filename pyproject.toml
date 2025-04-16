@@ -15,7 +15,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9"
-facebook-business = "~=21.0.3"
+facebook-business = "~=22.0.4"
 pendulum = "~=3.0.0"
 requests = "~=2.32"
 
