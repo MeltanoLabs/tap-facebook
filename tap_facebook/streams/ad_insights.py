@@ -80,7 +80,18 @@ class AdsInsightStream(Stream):
 
     @property
     def primary_keys(self) -> t.Sequence[str] | None:
-        return ["date_start", "account_id", "ad_id"] + self._report_definition["breakdowns"]
+        level = self._report_definition["level"]
+        base_keys = ["date_start", "account_id"]
+        
+        # Add the appropriate ID field based on the level
+        if level == "campaign":
+            base_keys.append("campaign_id")
+        elif level == "adset":
+            base_keys.append("adset_id")
+        elif level == "ad":
+            base_keys.append("ad_id")
+        
+        return base_keys + self._report_definition["breakdowns"]
 
     @primary_keys.setter
     def primary_keys(self, new_value: list[str] | None) -> None:
@@ -310,7 +321,11 @@ class AdsInsightStream(Stream):
             self._current_account_id = account_id
             self._initialize_client()
 
-            time_increment = self._report_definition["time_increment_days"]
+            # Handle time increment - can be either days or 'monthly'
+            time_increment = self._report_definition.get("time_increment", "daily")
+            time_increment_days = self._report_definition.get("time_increment_days", 1)
+            
+            is_monthly = time_increment == "monthly"
 
             # Handle end_date being None
             config_end_date = self.config.get("end_date")
@@ -323,7 +338,11 @@ class AdsInsightStream(Stream):
                 sync_end_date = pendulum.parse(config_end_date).date()
 
             report_start = self._get_start_date(context)
-            report_end = report_start.add(days=time_increment)
+            if is_monthly:
+                report_start = report_start.start_of('month')
+                report_end = report_start.end_of('month').add(days=1)
+            else:
+                report_end = report_start.add(days=time_increment_days)
 
             self.logger.info("********** DATE RANGE FOR ACCOUNT **********")
             self.logger.info(
@@ -347,7 +366,7 @@ class AdsInsightStream(Stream):
                     "action_report_time": self._report_definition["action_report_time"],
                     "breakdowns": self._report_definition["breakdowns"],
                     "fields": columns,
-                    "time_increment": time_increment,
+                    "time_increment": "monthly" if is_monthly else time_increment_days,
                     "limit": 100,
                     "action_attribution_windows": [
                         self._report_definition["action_attribution_windows_view"],
@@ -365,5 +384,9 @@ class AdsInsightStream(Stream):
                 for obj in job.get_result():
                     yield obj.export_all_data()
                 # Bump to the next increment
-                report_start = report_start.add(days=time_increment)
-                report_end = report_end.add(days=time_increment)
+                if is_monthly:
+                    report_start = report_start.add(months=1).start_of('month')
+                    report_end = report_start.end_of('month').add(days=1)
+                else:
+                    report_start = report_start.add(days=time_increment_days)
+                    report_end = report_end.add(days=time_increment_days)

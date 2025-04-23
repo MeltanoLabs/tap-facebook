@@ -44,6 +44,7 @@ DEFAULT_INSIGHT_REPORT = {
     "level": "ad",
     "action_breakdowns": [],
     "breakdowns": [],
+    "time_increment": "daily",
     "time_increment_days": 1,
     "action_attribution_windows_view": "1d_view",
     "action_attribution_windows_click": "7d_click",
@@ -134,6 +135,15 @@ class TapFacebook(Tap):
                             "The option impression_device cannot be used by itself"
                         ),
                         default=[],
+                    ),
+                    th.Property(
+                        "time_increment",
+                        th.StringType,
+                        description=(
+                            "The time increment for aggregating stats. Use 'monthly' for monthly aggregation "
+                            "or 'daily' (default) to use time_increment_days."
+                        ),
+                        default="daily",
                     ),
                     th.Property(
                         "time_increment_days",
