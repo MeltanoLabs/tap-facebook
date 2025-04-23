@@ -395,6 +395,7 @@ class AdsInsightStream(Stream):
                         self._report_definition["action_attribution_windows_view"],
                         self._report_definition["action_attribution_windows_click"],
                     ],
+                    "use_unified_attribution_setting": True,
                     "time_range": {
                         "since": report_start.to_date_string(),
                         "until": actual_until.to_date_string(),
