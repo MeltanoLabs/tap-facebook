@@ -168,59 +168,83 @@ class AdsInsightStream(Stream):
             raise RuntimeError(msg)
 
     def _run_job_to_completion(self, params: dict) -> None:
-        job = self.account.get_insights(
-            params=params,
-            is_async=True,
-        )
-        status = None
-        time_start = time.time()
-        while status != "Job Completed":
-            duration = time.time() - time_start
-            job = job.api_get()
-            status = job[AdReportRun.Field.async_status]
-            percent_complete = job[AdReportRun.Field.async_percent_completion]
-
-            job_id = job["id"]
-            self.logger.info(
-                "%s for %s - %s. %s%% done. ",
-                status,
-                params["time_range"]["since"],
-                params["time_range"]["until"],
-                percent_complete,
-            )
-
-            if status == "Job Completed":
-                return job
-            if status == "Job Failed":
-                raise RuntimeError(dict(job))
-            if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
-                error_message = (
-                    f"Insights job {job_id} did not start after "
-                    f"{INSIGHTS_MAX_WAIT_TO_START_SECONDS} seconds. "
-                    "This is an intermittent error and may resolve itself on subsequent "
-                    "queries to the Facebook API. "
-                    "You should deselect fields from the schema that are not necessary, "
-                    "as that may help improve the reliability of the Facebook API."
+        max_retries = 3
+        retry_count = 0
+        
+        while retry_count < max_retries:
+            try:
+                job = self.account.get_insights(
+                    params=params,
+                    is_async=True,
                 )
-                raise RuntimeError(error_message)
+                status = None
+                time_start = time.time()
+                while status != "Job Completed":
+                    duration = time.time() - time_start
+                    job = job.api_get()
+                    status = job[AdReportRun.Field.async_status]
+                    percent_complete = job[AdReportRun.Field.async_percent_completion]
 
-            if duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS:
-                error_message = (
-                    f"Insights job {job_id} did not complete after "
-                    f"{INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
-                    "This is an intermittent error and may resolve itself on "
-                    "subsequent queries to the Facebook API. "
-                    "You should deselect fields from the schema that are not necessary, "
-                    "as that may help improve the reliability of the Facebook API."
-                )
-                raise RuntimeError(error_message)
+                    job_id = job["id"]
+                    self.logger.info(
+                        "%s for %s - %s. %s%% done. ",
+                        status,
+                        params["time_range"]["since"],
+                        params["time_range"]["until"],
+                        percent_complete,
+                    )
 
-            self.logger.info(
-                "Sleeping for %s seconds until job is done",
-                SLEEP_TIME_INCREMENT,
-            )
-            time.sleep(SLEEP_TIME_INCREMENT)
-        msg = "Job failed to complete for unknown reason"
+                    if status == "Job Completed":
+                        return job
+                    if status == "Job Failed":
+                        if retry_count < max_retries - 1:
+                            self.logger.warning(
+                                "Job %s failed. Retrying... (Attempt %d of %d)",
+                                job_id,
+                                retry_count + 1,
+                                max_retries,
+                            )
+                            retry_count += 1
+                            time.sleep(SLEEP_TIME_INCREMENT * (retry_count + 1))  # Exponential backoff
+                            break  # Break inner while loop to retry
+                        else:
+                            raise RuntimeError(dict(job))
+                            
+                    if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
+                        error_message = (
+                            f"Insights job {job_id} did not start after "
+                            f"{INSIGHTS_MAX_WAIT_TO_START_SECONDS} seconds. "
+                            "This is an intermittent error and may resolve itself on subsequent "
+                            "queries to the Facebook API. "
+                            "You should deselect fields from the schema that are not necessary, "
+                            "as that may help improve the reliability of the Facebook API."
+                        )
+                        raise RuntimeError(error_message)
+
+                    if duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS:
+                        error_message = (
+                            f"Insights job {job_id} did not complete after "
+                            f"{INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS // 60} seconds. "
+                            "This is an intermittent error and may resolve itself on "
+                            "subsequent queries to the Facebook API. "
+                            "You should deselect fields from the schema that are not necessary, "
+                            "as that may help improve the reliability of the Facebook API."
+                        )
+                        raise RuntimeError(error_message)
+
+                    self.logger.info(
+                        "Sleeping for %s seconds until job is done",
+                        SLEEP_TIME_INCREMENT,
+                    )
+                    time.sleep(SLEEP_TIME_INCREMENT)
+            except RuntimeError as e:
+                if retry_count >= max_retries - 1:
+                    raise e
+                retry_count += 1
+                time.sleep(SLEEP_TIME_INCREMENT * (retry_count + 1))  # Exponential backoff
+                continue
+                
+        msg = "Job failed to complete after all retries"
         raise RuntimeError(msg)
 
     def _get_selected_columns(self) -> list[str]:
