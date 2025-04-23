@@ -44,7 +44,6 @@ EXCLUDED_FIELDS = [
     "unique_conversions",
     "unique_video_continuous_2_sec_watched_actions",
     "unique_video_view_15_sec",
-    "video_thruplay_watched_actions",
     "__module__",
     "__doc__",
     "__dict__",
