@@ -180,6 +180,8 @@ class AdsInsightStream(Stream):
     def _run_job_to_completion(self, params: dict) -> None:
         max_retries = 3
         retry_count = 0
+        base_wait_time = 5  # Start with 5 seconds
+        max_wait_time = 300  # Maximum wait of 5 minutes
         
         while retry_count < max_retries:
             try:
@@ -207,18 +209,54 @@ class AdsInsightStream(Stream):
                     if status == "Job Completed":
                         return job
                     if status == "Job Failed":
+                        error_message = str(job.get("error", {}).get("message", "Unknown error"))
+                        error_code = job.get("error", {}).get("code", None)
+                        
+                        # Check for rate limit errors
+                        rate_limit_codes = [4, 17, 32, 613, 80000, 80001, 80002, 80003, 80004]
+                        rate_limit_messages = [
+                            "rate limit",
+                            "too many calls",
+                            "request limit",
+                            "quota exceeded",
+                            "throttled",
+                            "application request limit",
+                            "user request limit",
+                            "ad account request limit"
+                        ]
+                        
+                        is_rate_limit = (
+                            error_code in rate_limit_codes or
+                            any(msg in error_message.lower() for msg in rate_limit_messages)
+                        )
+                        
+                        if is_rate_limit:
+                            wait_time = min(base_wait_time * (2 ** retry_count), max_wait_time)
+                            self.logger.warning(
+                                "Rate limit encountered for job %s. Waiting %d seconds before retry (attempt %d of %d). Error: %s",
+                                job_id,
+                                wait_time,
+                                retry_count + 1,
+                                max_retries,
+                                error_message
+                            )
+                            time.sleep(wait_time)
+                            retry_count += 1
+                            break  # Break inner while loop to retry
+                            
                         if retry_count < max_retries - 1:
                             self.logger.warning(
-                                "Job %s failed. Retrying... (Attempt %d of %d)",
+                                "Job %s failed. Retrying... (Attempt %d of %d). Error: %s",
                                 job_id,
                                 retry_count + 1,
                                 max_retries,
+                                error_message
                             )
                             retry_count += 1
                             time.sleep(SLEEP_TIME_INCREMENT * (retry_count + 1))  # Exponential backoff
                             break  # Break inner while loop to retry
                         else:
-                            raise RuntimeError(dict(job))
+                            raise RuntimeError(f"Job failed after {max_retries} attempts. Error: {error_message}")
                             
                     if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
                         error_message = (
@@ -247,15 +285,20 @@ class AdsInsightStream(Stream):
                         SLEEP_TIME_INCREMENT,
                     )
                     time.sleep(SLEEP_TIME_INCREMENT)
-            except RuntimeError as e:
-                if retry_count >= max_retries - 1:
-                    raise e
-                retry_count += 1
-                time.sleep(SLEEP_TIME_INCREMENT * (retry_count + 1))  # Exponential backoff
-                continue
-                
-        msg = "Job failed to complete after all retries"
-        raise RuntimeError(msg)
+            except Exception as e:
+                if retry_count < max_retries - 1:
+                    wait_time = min(base_wait_time * (2 ** retry_count), max_wait_time)
+                    self.logger.warning(
+                        "Exception encountered. Waiting %d seconds before retry (attempt %d of %d). Error: %s",
+                        wait_time,
+                        retry_count + 1,
+                        max_retries,
+                        str(e)
+                    )
+                    time.sleep(wait_time)
+                    retry_count += 1
+                else:
+                    raise RuntimeError(f"Failed after {max_retries} attempts. Error: {str(e)}")
 
     def _get_selected_columns(self) -> list[str]:
         self.logger.info("********** METADATA CONTENT **********")

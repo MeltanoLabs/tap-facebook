@@ -7,6 +7,7 @@ import json
 import typing as t
 from http import HTTPStatus
 from urllib.parse import urlparse
+import random
 
 import pendulum
 from singer_sdk.authenticators import BearerTokenAuthenticator
@@ -124,14 +125,25 @@ class FacebookStream(RESTStream):
                 f"{response.status_code} Client Error: "
                 f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"
             )
-            # Retry on reaching rate limit
-            if (
-                response.status_code == HTTPStatus.BAD_REQUEST
-                and "too many calls" in str(response.content).lower()
-            ) or (
-                response.status_code == HTTPStatus.BAD_REQUEST
-                and "request limit reached" in str(response.content).lower()
-            ):
+            
+            # Check for various rate limit and transient error patterns
+            error_content = str(response.content).lower()
+            rate_limit_patterns = [
+                "too many calls",
+                "request limit reached",
+                "rate limit exceeded",
+                "throttled",
+                "quota exceeded",
+                "application request limit reached",
+                "user request limit reached",
+                "ad account request limit reached"
+            ]
+            
+            if any(pattern in error_content for pattern in rate_limit_patterns):
+                self.logger.warning(
+                    "Rate limit encountered. Will retry with exponential backoff. Error: %s",
+                    msg
+                )
                 raise RetriableAPIError(msg, response)
 
             raise FatalAPIError(msg)
@@ -140,6 +152,10 @@ class FacebookStream(RESTStream):
             msg = (
                 f"{response.status_code} Server Error: "
                 f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"
+            )
+            self.logger.warning(
+                "Server error encountered. Will retry with exponential backoff. Error: %s",
+                msg
             )
             raise RetriableAPIError(msg, response)
 
@@ -152,6 +168,32 @@ class FacebookStream(RESTStream):
             int: limit
         """
         return 20
+
+    def backoff_wait_generator(self):
+        """Generate wait times for retries with exponential backoff and jitter.
+
+        Returns:
+            Generator yielding wait times in seconds
+        """
+        base_wait = 1  # Start with 1 second
+        max_wait = 300  # Maximum wait of 5 minutes
+        factor = 2  # Exponential factor
+        
+        for attempt in range(self.backoff_max_tries()):
+            # Calculate wait time with exponential backoff
+            wait_time = min(base_wait * (factor ** attempt), max_wait)
+            
+            # Add jitter (random variation) to prevent thundering herd
+            jitter = random.uniform(0.5, 1.5)
+            final_wait = wait_time * jitter
+            
+            self.logger.info(
+                "Retry attempt %d/%d. Waiting %.2f seconds before next attempt.",
+                attempt + 1,
+                self.backoff_max_tries(),
+                final_wait
+            )
+            yield final_wait
 
     def get_records(
         self,
