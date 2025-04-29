@@ -377,6 +377,10 @@ class AdsInsightStream(Stream):
             self.logger.info("************************************")
 
             columns = self._get_selected_columns()
+
+            # >>> FIX: Remove breakdowns from columns
+            columns = [col for col in columns if col not in self._report_definition["breakdowns"]]
+
             while report_start <= sync_end_date:
                 actual_until = min(report_end.subtract(days=1), sync_end_date)
                 self.logger.info("********** FETCHING DATE RANGE **********")
