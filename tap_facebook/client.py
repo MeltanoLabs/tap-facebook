@@ -9,6 +9,7 @@ from http import HTTPStatus
 from urllib.parse import urlparse
 
 import pendulum
+import random
 from singer_sdk.authenticators import BearerTokenAuthenticator
 from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
 from singer_sdk.helpers.jsonpath import extract_jsonpath
@@ -111,35 +112,58 @@ class FacebookStream(RESTStream):
             RetriableAPIError: If the request is retriable.
         """
         full_path = urlparse(response.url).path
-        if response.status_code in self.tolerated_http_errors:
-            msg = (
-                f"{response.status_code} Tolerated Status Code "
-                f"(Reason: {response.reason}) for path: {full_path}"
+
+        status_code = response.status_code
+
+        try:
+            error_json = response.json().get("error", {})
+            self.logger.debug("Full Facebook error JSON: %s", json.dumps(error_json, indent=2))
+        except Exception:
+            error_json = {}
+
+        error_code = error_json.get("code")
+        error_message = error_json.get("message", "")
+        is_transient = error_json.get("is_transient", False)
+
+        retryable_codes = {1, 2, 4, 17, 32, 341, 368, 613}
+
+        if status_code in self.tolerated_http_errors:
+            self.logger.info(
+                "%s Tolerated Status Code (Reason: %s) for path: %s",
+                status_code, response.reason, full_path
             )
-            self.logger.info(msg)
             return
 
-        if HTTPStatus.BAD_REQUEST <= response.status_code < HTTPStatus.INTERNAL_SERVER_ERROR:
-            msg = (
-                f"{response.status_code} Client Error: "
-                f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"
+        if (
+            status_code >= 500
+            or error_code in retryable_codes
+            or is_transient
+            or "temporarily" in error_message.lower()
+            or "too many calls" in error_message.lower()
+            or "request limit" in error_message.lower()
+        ):
+            self.logger.warning(
+                "Retryable Facebook error (code %s): %s",
+                error_code,
+                error_message,
             )
-            # Retry on reaching rate limit
-            if (
-                response.status_code == HTTPStatus.BAD_REQUEST
-                and "too many calls" in str(response.content).lower()
-            ) or (
-                response.status_code == HTTPStatus.BAD_REQUEST
-                and "request limit reached" in str(response.content).lower()
-            ):
-                raise RetriableAPIError(msg, response)
+            msg = (
+                f"Retriable error {status_code} (code {error_code}): "
+                f"{error_message} | path: {full_path}"
+            )
+            raise RetriableAPIError(msg, response)
 
+        if 400 <= status_code < 500:
+            msg = (
+                f"{status_code} Client Error: {error_message} "
+                f"(Reason: {response.reason}) for path: {full_path}"
+            )
             raise FatalAPIError(msg)
 
-        if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
+        if status_code >= 500:
             msg = (
-                f"{response.status_code} Server Error: "
-                f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"
+                f"{status_code} Server Error: {error_message} "
+                f"(Reason: {response.reason}) for path: {full_path}"
             )
             raise RetriableAPIError(msg, response)
 
@@ -152,6 +176,17 @@ class FacebookStream(RESTStream):
             int: limit
         """
         return 20
+
+    def backoff_wait_generator(self) -> t.Iterator[float]:
+        max_retries = self.backoff_max_tries()
+        base = 2
+        max_sleep = 300  # 5 minutes max sleep
+        for i in range(max_retries):
+            wait = min(base ** i, max_sleep)
+            jitter = random.uniform(0, 1)
+            wait += jitter
+            self.logger.warning(f"Retry attempt {i+1}/{max_retries} - sleeping for {wait} seconds")
+            yield wait
 
     def get_records(
         self,
