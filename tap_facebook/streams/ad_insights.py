@@ -204,6 +204,7 @@ class AdsInsightStream(Stream):
                         error_body = getattr(fb_err, "body", {})
                         error_info = error_body.get("error", {})
                         code = error_info.get("code")
+                        subcode = error_info.get("error_subcode")
                         is_transient = error_info.get("is_transient", False)
                         message = error_info.get("message", "Unknown")
 
@@ -218,6 +219,14 @@ class AdsInsightStream(Stream):
                             )
                             time.sleep(sleep_time)
                             break  # Retry outer job loop
+                        elif code == 100 and subcode == 33:
+                            fields = params.get("fields", [])
+                            self.logger.warning(
+                                "❌ Facebook error 100/33 (Unsupported Post Request): %s\n"
+                                "This may be due to invalid fields or permissions. Fields in this request:\n%s",
+                                message, fields
+                            )
+                            return None  # Skip this job entirely
                         else:
                             raise  # Fatal Facebook error
 
