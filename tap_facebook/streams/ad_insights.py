@@ -396,20 +396,20 @@ class AdsInsightStream(Stream):
             )
         return report_start
 
-    def _generate_hash_id(self, adinsight: AdsInsights):
+    def _generate_hash_id(self, adinsight: AdsInsights, report_breakdowns: list[str]):
         # Extract the relevant properties from the AdsInsights object
         date_start = adinsight.get("date_start", "")
         campaign_id = adinsight.get("campaign_id", "")
         adset_id = adinsight.get("adset_id", "")
         ad_id = adinsight.get("ad_id", "")
 
-        # Concatenate the properties into a string
-        properties_string = f"{date_start}-{campaign_id}-{adset_id}-{ad_id}"
+        # Get breakdown values for each breakdown field
+        breakdown_values = []
+        for breakdown in report_breakdowns:
+            breakdown_values.append(str(adinsight.get(breakdown, "")))
+        breakdown_string = "-".join(breakdown_values)
 
-        # Create an MD5 hash from the concatenated string
-        hash_object = md5(properties_string.encode())
-
-        # Return the hexadecimal representation of the hash
+        hash_object = md5(f"{date_start}-{campaign_id}-{adset_id}-{ad_id}-{breakdown_string}".encode())
         return hash_object.hexdigest()
 
     def get_records(
@@ -467,7 +467,7 @@ class AdsInsightStream(Stream):
 
                 for obj in job.get_result():
                     if isinstance(obj, AdsInsights):
-                        obj["id"] = self._generate_hash_id(adinsight=obj)
+                        obj["id"] = self._generate_hash_id(adinsight=obj, report_breakdowns=self.report_breakdowns)
                         yield obj.export_all_data()
                     else:
                         # stop the for loop and retry the same date after a while
