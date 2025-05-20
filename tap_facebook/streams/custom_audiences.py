@@ -62,6 +62,7 @@ class CustomAudiences(FacebookStream):
             "rule_aggregation",
             "opt_out_link",
             "name",
+            "run_id",
         ]
 
     schema = PropertiesList(
@@ -98,6 +99,7 @@ class CustomAudiences(FacebookStream):
         Property("rule_aggregation", StringType),
         Property("opt_out_link", StringType),
         Property("name", StringType),
+        Property("run_id", StringType),
     ).to_dict()
 
     def get_url_params(

@@ -143,4 +143,5 @@ class CampaignStream(FacebookStream):
     ) -> Record | None:
         daily_budget = row.get("daily_budget")
         row["daily_budget"] = int(daily_budget) if daily_budget is not None else None
+        row = super().post_process(row, context)
         return row

@@ -53,4 +53,5 @@ class CustomConversions(FacebookStream):
         Property("is_archived", BooleanType),
         Property("is_unavailable", BooleanType),
         Property("last_fired_time", StringType),
+        Property("run_id", StringType),
     ).to_dict()
