@@ -44,5 +44,5 @@ class AdLabelsStream(FacebookStream):
         Property("created_time", StringType),
         Property("updated_time", StringType),
         Property("name", StringType),
-        Property("run_id", StringType),
+        Property("run_id", IntegerType),
     ).to_dict()

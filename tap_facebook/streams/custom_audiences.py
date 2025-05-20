@@ -99,7 +99,7 @@ class CustomAudiences(FacebookStream):
         Property("rule_aggregation", StringType),
         Property("opt_out_link", StringType),
         Property("name", StringType),
-        Property("run_id", StringType),
+        Property("run_id", IntegerType),
     ).to_dict()
 
     def get_url_params(

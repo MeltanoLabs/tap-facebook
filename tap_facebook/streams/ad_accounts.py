@@ -209,7 +209,7 @@ class AdAccountsStream(FacebookStream):
         Property("salesforce_invoice_group_id", StringType),
         Property("business_zip", StringType),
         Property("tax_id", StringType),
-        Property("run_id", StringType),
+        Property("run_id", IntegerType),
     ).to_dict()
 
     def post_process(
