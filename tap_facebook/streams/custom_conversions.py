@@ -9,6 +9,7 @@ from singer_sdk.typing import (
     PropertiesList,
     Property,
     StringType,
+    IntegerType,
 )
 
 from tap_facebook.client import FacebookStream
@@ -53,5 +54,5 @@ class CustomConversions(FacebookStream):
         Property("is_archived", BooleanType),
         Property("is_unavailable", BooleanType),
         Property("last_fired_time", StringType),
-        Property("run_id", StringType),
+        Property("run_id", IntegerType),
     ).to_dict()

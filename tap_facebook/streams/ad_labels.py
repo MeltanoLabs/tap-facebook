@@ -6,6 +6,7 @@ from singer_sdk.typing import (
     PropertiesList,
     Property,
     StringType,
+    IntegerType,
 )
 
 from tap_facebook.client import FacebookStream
@@ -44,5 +45,5 @@ class AdLabelsStream(FacebookStream):
         Property("created_time", StringType),
         Property("updated_time", StringType),
         Property("name", StringType),
-        Property("run_id", StringType),
+        Property("run_id", IntegerType),
     ).to_dict()

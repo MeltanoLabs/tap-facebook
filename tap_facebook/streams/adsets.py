@@ -309,7 +309,7 @@ class AdsetsStream(FacebookStream):
         ),
         Property("lifetime_min_spend_target", StringType),
         Property("lifetime_spend_cap", StringType),
-        Property("run_id", StringType),
+        Property("run_id", IntegerType),
     ).to_dict()
 
     tap_stream_id = "adsets"

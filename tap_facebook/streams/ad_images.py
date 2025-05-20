@@ -69,5 +69,5 @@ class AdImages(FacebookStream):
         Property("url", StringType),
         Property("url_128", StringType),
         Property("width", IntegerType),
-        Property("run_id", StringType),
+        Property("run_id", IntegerType),
     ).to_dict()

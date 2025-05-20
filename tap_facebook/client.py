@@ -37,14 +37,14 @@ class FacebookStream(RESTStream):
         
         # Generate a unique run_id for this tap run if not already set
         if FacebookStream._shared_run_id is None:
-            FacebookStream._shared_run_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"
+            FacebookStream._shared_run_id = int(datetime.now().timestamp() * 1000)
             self.logger.info("Generated new run_id: %s", FacebookStream._shared_run_id)
 
     @property
     def run_id(self) -> str:
         """Return the unique run_id for this tap run."""
         if FacebookStream._shared_run_id is None:
-            FacebookStream._shared_run_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"
+            FacebookStream._shared_run_id = int(datetime.now().timestamp() * 1000)
             self.logger.info("Generated new run_id in property: %s", FacebookStream._shared_run_id)
         return FacebookStream._shared_run_id
 
