@@ -221,6 +221,10 @@ class FacebookStream(RESTStream):
             self._current_account_id = account_id
             yield from super().get_records(context)
 
+    def post_process(self, row: dict, context: t.Any = None) -> dict:
+        row["run_id"] = self.run_id
+        return row
+
 
 class IncrementalFacebookStream(FacebookStream, metaclass=abc.ABCMeta):
     @property

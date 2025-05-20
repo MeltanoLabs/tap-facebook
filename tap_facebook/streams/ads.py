@@ -156,6 +156,7 @@ class AdsStream(FacebookStream):
             ),
         ),
         Property("configured_status", StringType),
+        Property("run_id", StringType),
     ).to_dict()
 
     tap_stream_id = "ads"

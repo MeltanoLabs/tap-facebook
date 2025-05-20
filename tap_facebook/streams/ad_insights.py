@@ -165,6 +165,8 @@ class AdsInsightStream(Stream):
             ],
         )
 
+        properties.append(th.Property("run_id", th.StringType()))
+
         return th.PropertiesList(*properties).to_dict()
 
     def _initialize_client(self) -> None:

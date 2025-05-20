@@ -116,4 +116,5 @@ class AdVideos(FacebookStream):
         Property("universal_video_id", StringType),
         Property("updated_time", StringType),
         Property("views", IntegerType),
+        Property("run_id", StringType),
     ).to_dict()

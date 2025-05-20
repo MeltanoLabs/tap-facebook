@@ -200,4 +200,5 @@ class CreativeStream(FacebookStream):
         ),
         Property("product_set_id", StringType),
         Property("carousel_ad_link", StringType),
+        Property("run_id", StringType),
     ).to_dict()

@@ -209,6 +209,7 @@ class AdAccountsStream(FacebookStream):
         Property("salesforce_invoice_group_id", StringType),
         Property("business_zip", StringType),
         Property("tax_id", StringType),
+        Property("run_id", StringType),
     ).to_dict()
 
     def post_process(
@@ -224,6 +225,7 @@ class AdAccountsStream(FacebookStream):
             else None
         )
         row["spend_cap"] = int(row["spend_cap"]) if "spend_cap" in row else None
+        row = super().post_process(row, context)
         return row
 
     def get_url_params(
