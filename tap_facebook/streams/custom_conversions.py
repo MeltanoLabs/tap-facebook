@@ -9,6 +9,7 @@ from singer_sdk.typing import (
     PropertiesList,
     Property,
     StringType,
+    IntegerType,
 )
 
 from tap_facebook.client import FacebookStream

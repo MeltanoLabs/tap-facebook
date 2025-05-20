@@ -165,7 +165,7 @@ class AdsInsightStream(Stream):
             ],
         )
 
-        properties.append(th.Property("run_id", th.StringType()))
+        properties.append(th.Property("run_id", th.IntegerType()))
 
         return th.PropertiesList(*properties).to_dict()
 

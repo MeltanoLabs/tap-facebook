@@ -134,6 +134,7 @@ class CampaignStream(FacebookStream):
         Property("last_budget_toggling_time", StringType),
         Property("daily_budget", IntegerType),
         Property("special_ad_category_country", ArrayType),
+        Property("run_id", IntegerType),
     ).to_dict()
 
     def post_process(
