@@ -225,7 +225,6 @@ class AdAccountsStream(FacebookStream):
             else None
         )
         row["spend_cap"] = int(row["spend_cap"]) if "spend_cap" in row else None
-        row = super().post_process(row, context)
         return row
 
     def get_url_params(

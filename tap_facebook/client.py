@@ -38,10 +38,14 @@ class FacebookStream(RESTStream):
         # Generate a unique run_id for this tap run if not already set
         if FacebookStream._shared_run_id is None:
             FacebookStream._shared_run_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"
+            self.logger.info("Generated new run_id: %s", FacebookStream._shared_run_id)
 
     @property
     def run_id(self) -> str:
         """Return the unique run_id for this tap run."""
+        if FacebookStream._shared_run_id is None:
+            FacebookStream._shared_run_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"
+            self.logger.info("Generated new run_id in property: %s", FacebookStream._shared_run_id)
         return FacebookStream._shared_run_id
 
     @property
@@ -219,12 +223,17 @@ class FacebookStream(RESTStream):
         for account_id in accounts_to_process:
             self.logger.info("Starting to process account: %s", account_id)
             self._current_account_id = account_id
-            yield from super().get_records(context)
-
-    def post_process(self, row: dict, context: t.Any = None) -> dict:
-        row["run_id"] = self.run_id
-        return row
-
+            
+            # Get the current run_id
+            current_run_id = self.run_id
+            self.logger.info("Using run_id: %s", current_run_id)
+            
+            # Get records from parent class
+            for record in super().get_records(context):
+                # Create a new dict with run_id added
+                record_with_run_id = dict(record)
+                record_with_run_id["run_id"] = current_run_id
+                yield record_with_run_id
 
 class IncrementalFacebookStream(FacebookStream, metaclass=abc.ABCMeta):
     @property
