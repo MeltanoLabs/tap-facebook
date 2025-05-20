@@ -5,8 +5,10 @@ from __future__ import annotations
 import abc
 import json
 import typing as t
+from datetime import datetime
 from http import HTTPStatus
 from urllib.parse import urlparse
+import uuid
 
 import pendulum
 import random
@@ -26,9 +28,21 @@ class FacebookStream(RESTStream):
     # add account id in the url
     # path and fields will be added to this url in streams.pys
 
+    # Class variable to store the run_id shared across all streams
+    _shared_run_id = None
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._current_account_id = None
+        
+        # Generate a unique run_id for this tap run if not already set
+        if FacebookStream._shared_run_id is None:
+            FacebookStream._shared_run_id = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{str(uuid.uuid4())[:8]}"
+
+    @property
+    def run_id(self) -> str:
+        """Return the unique run_id for this tap run."""
+        return FacebookStream._shared_run_id
 
     @property
     def url_base(self) -> str:
