@@ -295,7 +295,8 @@ class AdsInsightStream(Stream):
         self.logger.info("%s", columns)
         self.logger.info("****************************************")
         if not columns and self.name == "adsinsights_default":
-            columns = list(self.schema["properties"])
+            # Get all schema properties except run_id
+            columns = [prop for prop in self.schema["properties"] if prop != "run_id"]
             self.logger.info("********** USING ALL SCHEMA PROPERTIES **********")
             self.logger.info("%s", columns)
             self.logger.info("********************************************")
@@ -405,8 +406,8 @@ class AdsInsightStream(Stream):
 
             columns = self._get_selected_columns()
 
-            # >>> FIX: Remove breakdowns from columns
-            columns = [col for col in columns if col not in self._report_definition["breakdowns"]]
+            # >>> FIX: Remove breakdowns and run_id from columns
+            columns = [col for col in columns if col not in self._report_definition["breakdowns"] and col != "run_id"]
 
             while report_start <= sync_end_date:
                 actual_until = min(report_end.subtract(days=1), sync_end_date)
