@@ -295,7 +295,8 @@ class AdsInsightStream(Stream):
         self.logger.info("%s", columns)
         self.logger.info("****************************************")
         if not columns and self.name == "adsinsights_default":
-            columns = list(self.schema["properties"])
+            # Get all schema properties except run_id
+            columns = [prop for prop in self.schema["properties"] if prop != "run_id"]
             self.logger.info("********** USING ALL SCHEMA PROPERTIES **********")
             self.logger.info("%s", columns)
             self.logger.info("********************************************")
