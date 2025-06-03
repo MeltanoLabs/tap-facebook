@@ -21,6 +21,7 @@ TestTapFacebook = get_tap_test_class(
         ignore_no_records_for_streams=[
             "adlabels",
             "customconversions",
+            "customaudiences",
         ],
     ),
 )

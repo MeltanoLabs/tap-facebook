@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import typing as t
+
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from singer_sdk.typing import (
     ArrayType,
     BooleanType,
+    DateTimeType,
     IntegerType,
     PropertiesList,
     Property,
@@ -13,6 +16,9 @@ from singer_sdk.typing import (
 )
 
 from tap_facebook.client import FacebookStream
+
+if t.TYPE_CHECKING:
+    from singer_sdk.helpers.types import Context
 
 
 class AdImages(FacebookStream):
@@ -50,12 +56,12 @@ class AdImages(FacebookStream):
     path = f"/adimages?fields={columns}"
     tap_stream_id = "images"
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "id"
+    replication_key = "updated_time"
 
     schema = PropertiesList(
         Property("id", StringType),
         Property("account_id", StringType),
-        Property("created_time", StringType),
+        Property("created_time", DateTimeType),
         Property("creatives", ArrayType(StringType)),
         Property("hash", StringType),
         Property("height", IntegerType),
@@ -65,8 +71,17 @@ class AdImages(FacebookStream):
         Property("original_width", IntegerType),
         Property("permalink_url", StringType),
         Property("status", StringType),
-        Property("updated_time", StringType),
+        Property("updated_time", DateTimeType),
         Property("url", StringType),
         Property("url_128", StringType),
         Property("width", IntegerType),
     ).to_dict()
+
+    def get_url_params(
+        self,
+        context: Context | None,
+        next_page_token: t.Any | None,  # noqa: ANN401
+    ) -> dict[str, t.Any]:
+        params = super().get_url_params(context, next_page_token)
+        params.pop("sort")
+        return params
