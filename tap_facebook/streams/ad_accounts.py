@@ -215,11 +215,10 @@ class AdAccountsStream(FacebookStream):
         Property("tax_id", StringType),
     ).to_dict()
 
-    def post_process(
-        self,
-        row: Record,
-        context: Context | None = None,  # noqa: ARG002
-    ) -> Record | None:
+    def post_process(self, row: Record, context: Context | None = None) -> Record | None:
+        if "created_time" not in row:
+            self.logger.warning(f"Skipping record without created_time: {row.get('id')}")
+            return None
         row["amount_spent"] = int(row["amount_spent"]) if "amount_spent" in row else None
         row["balance"] = int(row["balance"]) if "balance" in row else None
         row["min_campaign_group_spend_cap"] = (
@@ -229,6 +228,7 @@ class AdAccountsStream(FacebookStream):
         )
         row["spend_cap"] = int(row["spend_cap"]) if "spend_cap" in row else None
         return row
+
 
     def get_url_params(
         self,
