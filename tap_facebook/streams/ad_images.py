@@ -71,3 +71,9 @@ class AdImages(FacebookStream):
         Property("width", IntegerType),
         Property("run_id", IntegerType),
     ).to_dict()
+
+    def get_url_params(self, context, next_page_token):
+        params = {"limit": 25}
+        if next_page_token is not None:
+            params["after"] = next_page_token
+        return params
