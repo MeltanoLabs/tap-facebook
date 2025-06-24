@@ -85,7 +85,7 @@ class AdsInsightStream(Stream):
         return ["date_start", "account_id", "ad_id"] + self._report_definition["breakdowns"]
 
     @primary_keys.setter
-    def primary_keys(self, new_value: list[str] | None) -> None:
+    def primary_keys(self, new_value: t.Sequence[str] | None) -> None:
         """Set primary key(s) for the stream.
 
         Args:
