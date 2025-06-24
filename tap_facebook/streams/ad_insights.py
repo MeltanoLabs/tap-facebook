@@ -59,6 +59,9 @@ EXCLUDED_FIELDS = [
     "estimated_ad_recall_rate_upper_bound",
     "estimated_ad_recallers_lower_bound",
     "estimated_ad_recallers_upper_bound",
+    "marketing_messages_media_view_rate",
+    "marketing_messages_phone_call_btn_click_rate",
+    "wish_bid",
 ]
 
 SLEEP_TIME_INCREMENT = 5
