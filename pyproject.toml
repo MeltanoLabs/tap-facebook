@@ -20,13 +20,13 @@ pendulum = "~=3.1.0"
 requests = "~=2.32"
 
 [tool.poetry.dependencies."singer-sdk"]
-version = "~=0.46.0"
+version = "~=0.47.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.2"
 
 [tool.poetry.group.dev.dependencies."singer-sdk"]
-version = "~=0.46.0"
+version = "~=0.47.0"
 extras = ["testing"]
 
 [tool.poetry.group.typing.dependencies]
