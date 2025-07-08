@@ -4,11 +4,8 @@ from __future__ import annotations
 
 import typing as t
 
-import custom_logger
-
-_ = custom_logger
-from singer_sdk import Tap
-from singer_sdk import typing as th
+from nekt_singer_sdk import Tap
+from nekt_singer_sdk import typing as th
 
 if t.TYPE_CHECKING:
     from tap_facebook.client import FacebookStream
