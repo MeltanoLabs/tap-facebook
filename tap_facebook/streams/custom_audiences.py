@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import typing as t
 
-from singer_sdk.typing import (
+from nekt_singer_sdk.typing import (
     BooleanType,
     IntegerType,
     NumberType,

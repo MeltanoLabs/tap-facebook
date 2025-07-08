@@ -9,11 +9,11 @@ from http import HTTPStatus
 from urllib.parse import urlparse
 
 import pendulum
-from custom_logger import internal_logger, user_logger
-from singer_sdk.authenticators import BearerTokenAuthenticator
-from singer_sdk.exceptions import FatalAPIError, RetriableAPIError
-from singer_sdk.helpers.jsonpath import extract_jsonpath
-from singer_sdk.streams import RESTStream
+from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
+from nekt_singer_sdk.custom_logger import user_logger
+from nekt_singer_sdk.exceptions import RetriableAPIError
+from nekt_singer_sdk.helpers.jsonpath import extract_jsonpath
+from nekt_singer_sdk.streams import RESTStream
 
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
 
@@ -137,10 +137,10 @@ class FacebookStream(RESTStream):
                     headers=response.headers,
                     account_id=self.config.get("account_id"),
                 )
-                user_logger.warning(msg)
+                user_logger.warning(f"[{self.name}] {msg}")
                 raise RetriableAPIError(msg, response)
 
-            user_logger.error(msg)
+            user_logger.error(f"[{self.name}] {msg}")
             sys.exit(1)
 
         if response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
@@ -148,7 +148,7 @@ class FacebookStream(RESTStream):
                 f"{response.status_code} Server Error: "
                 f"{response.content!s} (Reason: {response.reason}) for path: {full_path}"
             )
-            user_logger.warning(msg)
+            user_logger.warning(f"[{self.name}] {msg}")
             raise RetriableAPIError(msg, response)
 
     def backoff_max_tries(self) -> int:

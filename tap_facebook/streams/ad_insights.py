@@ -11,7 +11,6 @@ from http import HTTPStatus
 
 import facebook_business.adobjects.user as fb_user
 import pendulum
-from custom_logger import internal_logger, user_logger
 from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.adreportrun import AdReportRun
 from facebook_business.adobjects.adsactionstats import AdsActionStats
@@ -19,9 +18,9 @@ from facebook_business.adobjects.adshistogramstats import AdsHistogramStats
 from facebook_business.adobjects.adsinsights import AdsInsights
 from facebook_business.api import FacebookAdsApi, FacebookRequest
 from facebook_business.exceptions import FacebookRequestError
-from singer_sdk import typing as th
-from singer_sdk.exceptions import FatalAPIError
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
+from nekt_singer_sdk import typing as th
+from nekt_singer_sdk.custom_logger import internal_logger, user_logger
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
 
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
 
@@ -259,7 +258,7 @@ class AdsInsightStream(Stream):
         account_id = self.config["account_id"]
         self.account = AdAccount(f"act_{account_id}").api_get()
         if not self.account:
-            user_logger.error(f"Couldn't find account with id {account_id}")
+            user_logger.error(f"[{self.name}] Couldn't find account with id {account_id}")
             sys.exit(1)
 
     def _check_facebook_api_usage(self, headers: str) -> None:
@@ -268,8 +267,8 @@ class AdsInsightStream(Stream):
             account_id=self.config.get("account_id"),
         )
         if should_sleep:
-            internal_logger.warning(
-                f"Call count limit nearing threshold of {CALL_THRESHOLD_PERCENTAGE}%, sleeping for {self.api_sleep_time} seconds..."
+            user_logger.warning(
+                f"[{self.name}]Call count limit nearing threshold of {CALL_THRESHOLD_PERCENTAGE}%, sleeping for {self.api_sleep_time} seconds..."
             )
             time.sleep(self.api_sleep_time)
             self.api_sleep_time = min(self.api_sleep_time * 2, 300)  # Double the sleep time, but cap it at 5min
@@ -303,43 +302,30 @@ class AdsInsightStream(Stream):
             percent_complete = job[AdReportRun.Field.async_percent_completion]
 
             job_id = job["id"]
-            internal_logger.info(
-                "ID: %s - %s for %s - %s%% done. ",
-                job_id,
-                status,
-                report_date,
-                percent_complete,
-            )
+            user_logger.info(f"[{self.name}] ID: {job_id} - {status} for {report_date} - {percent_complete}% done. ")
 
             if status == "Job Completed":
                 return job
             if status == "Job Failed":
-                internal_logger.info(
-                    "Insights job %s failed, trying again in a minute." + JOB_STALE_ERROR_MESSAGE,
-                    job_id,
+                user_logger.error(
+                    f"[{self.name}] Insights job {job_id} failed, trying again in a minute." + JOB_STALE_ERROR_MESSAGE
                 )
                 return
             if duration > INSIGHTS_MAX_WAIT_TO_START_SECONDS and percent_complete == 0:
-                internal_logger.info(
-                    "Insights job %s did not start after %s seconds." + JOB_STALE_ERROR_MESSAGE,
-                    job_id,
-                    duration,
+                user_logger.warning(
+                    f"[{self.name}] Insights job {job_id} did not start after {duration} seconds."
+                    + JOB_STALE_ERROR_MESSAGE
                 )
                 return
             if duration > INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS:
-                internal_logger.info(
-                    "Insights job %s did not complete after %s seconds",
-                    job_id,
-                    INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS,
+                user_logger.warning(
+                    f"[{self.name}] Insights job {job_id} did not complete after {INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS} seconds"
                 )
                 return
 
-            internal_logger.info(
-                "Sleeping for %s seconds until job is done",
-                POLL_JOB_SLEEP_TIME,
-            )
+            internal_logger.info(f"[{self.name}] Sleeping for {POLL_JOB_SLEEP_TIME} seconds until job is done")
             time.sleep(POLL_JOB_SLEEP_TIME)
-        user_logger.error("Job failed to complete for unknown reason")
+        user_logger.error(f"[{self.name}] Job failed to complete for unknown reason")
         sys.exit(1)
 
     def _get_selected_columns(self) -> list[str]:
@@ -369,15 +355,12 @@ class AdsInsightStream(Stream):
         # Don't use lookback if this is the first sync. Just start where the user requested.
         if config_start_date >= incremental_start_date:
             report_start = config_start_date
-            internal_logger.info("Using configured start_date as report start filter %s.", report_start)
+            user_logger.info(f"[{self.name}] Using configured start_date as report start filter {report_start}.")
         else:
-            internal_logger.info(
-                "Incremental sync, applying lookback '%s' to the "
-                "bookmark start_date '%s'. Syncing "
-                "reports starting on '%s'.",
-                lookback_window,
-                incremental_start_date,
-                lookback_start_date,
+            user_logger.info(
+                f"[{self.name}] Incremental sync, applying lookback '{lookback_window}' to the "
+                f"bookmark start_date '{incremental_start_date}'. Syncing "
+                f"reports starting on '{lookback_start_date}'."
             )
             report_start = lookback_start_date
 
@@ -389,10 +372,9 @@ class AdsInsightStream(Stream):
         oldest_allowed_start_date = today.subtract(months=37)
         if report_start < oldest_allowed_start_date:
             report_start = oldest_allowed_start_date
-            internal_logger.info(
-                "Report start date '%s' is older than 37 months. " "Using oldest allowed start date '%s' instead.",
-                report_start,
-                oldest_allowed_start_date,
+            user_logger.warning(
+                f"[{self.name}] Report start date '{report_start}' is older than 37 months. "
+                f"Using oldest allowed start date '{oldest_allowed_start_date}' instead."
             )
         return report_start
 
@@ -482,11 +464,11 @@ class AdsInsightStream(Stream):
                 if fb_err.api_error_code == HTTPStatus.BAD_REQUEST and "unsupported get request" in str(
                     fb_err.api_error_message.lower()
                 ):
-                    internal_logger.warning(f"API Error: {fb_err.api_error_message()}. Trying again..")
+                    user_logger.warning(f"[{self.name}] API Error: {fb_err.api_error_message()}. Trying again..")
                     continue
 
-                user_logger.error(f"An unhandled error occurred: {fb_err}. Stopping execution.")
-                internal_logger.exception(f"An unhandled error occurred: {fb_err}. Stopping execution.")
+                user_logger.error(f"[{self.name}] An unhandled error occurred: {fb_err}. Stopping execution.")
+                user_logger.exception(f"[{self.name}] An unhandled error occurred: {fb_err}. Stopping execution.")
                 sys.exit(1)
 
 

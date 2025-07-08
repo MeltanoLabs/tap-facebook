@@ -1,12 +1,7 @@
 """Stream class for AdLabels."""
 
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL
-from singer_sdk.typing import (
-    ObjectType,
-    PropertiesList,
-    Property,
-    StringType,
-)
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from nekt_singer_sdk.typing import ObjectType, PropertiesList, Property, StringType
 
 from tap_facebook.client import FacebookStream
 

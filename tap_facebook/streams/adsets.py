@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL
-from singer_sdk.typing import (
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from nekt_singer_sdk.typing import (
     ArrayType,
     BooleanType,
     DateTimeType,

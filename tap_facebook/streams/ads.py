@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Context, Record
-from singer_sdk.typing import (
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from nekt_singer_sdk.typing import (
     ArrayType,
     DateTimeType,
     IntegerType,

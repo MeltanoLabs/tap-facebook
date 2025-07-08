@@ -3,7 +3,7 @@ from time import sleep
 
 CALL_THRESHOLD_PERCENTAGE = 90
 
-from custom_logger import internal_logger
+from nekt_singer_sdk.custom_logger import internal_logger
 
 
 def get_usage_headers(headers: dict, account_id: str):
@@ -41,7 +41,7 @@ def has_reached_api_limit(headers: dict, account_id: str) -> bool:
         )  # This time is in minutes according to the docs
         reset_time_duration = int(ad_account_usage.get("reset_time_duration", 0))
 
-        internal_logger.warning(
+        internal_logger.info(
             f"API Usage | Call Count: {call_count}%, CPU Time: {total_cputime}%, Total Time: {total_time}%, Ad Account Usage: {acc_id_util_pct}%"
         )
         internal_logger.info(

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import typing as t
 
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL
-from singer_sdk.typing import (
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from nekt_singer_sdk.typing import (
     ArrayType,
     BooleanType,
     IntegerType,
@@ -220,9 +220,7 @@ class AdAccountsStream(FacebookStream):
         row["amount_spent"] = int(row["amount_spent"]) if "amount_spent" in row else None
         row["balance"] = int(row["balance"]) if "balance" in row else None
         row["min_campaign_group_spend_cap"] = (
-            int(row["min_campaign_group_spend_cap"])
-            if "min_campaign_group_spend_cap" in row
-            else None
+            int(row["min_campaign_group_spend_cap"]) if "min_campaign_group_spend_cap" in row else None
         )
         row["spend_cap"] = int(row["spend_cap"]) if "spend_cap" in row else None
         return row

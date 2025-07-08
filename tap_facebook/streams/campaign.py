@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from singer_sdk import typing as th  # JSON Schema typing helpers
-from singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from nekt_singer_sdk import typing as th  # JSON Schema typing helpers
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
 
 from tap_facebook.client import IncrementalFacebookStream
 
