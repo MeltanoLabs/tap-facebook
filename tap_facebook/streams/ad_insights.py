@@ -20,7 +20,11 @@ from facebook_business.api import FacebookAdsApi, FacebookRequest
 from facebook_business.exceptions import FacebookRequestError
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import internal_logger, user_logger
-from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
+from nekt_singer_sdk.streams.core import (
+    REPLICATION_FULL_TABLE,
+    REPLICATION_INCREMENTAL,
+    Stream,
+)
 
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
 
@@ -345,21 +349,19 @@ class AdsInsightStream(Stream):
         context: dict | None,
     ) -> pendulum.Date:
         lookback_window = self.config.get("report_definition", {}).get("lookback_window")
-
         config_start_date = pendulum.parse(self.config["start_date"]).date()
         incremental_start_date = pendulum.parse(
             self.get_starting_replication_key_value(context),
         ).date()
-        lookback_start_date = incremental_start_date.subtract(days=lookback_window)
 
-        # Don't use lookback if this is the first sync. Just start where the user requested.
-        if config_start_date >= incremental_start_date:
+        if self.replication_method == REPLICATION_FULL_TABLE or config_start_date == incremental_start_date:
             report_start = config_start_date
-            user_logger.info(f"[{self.name}] Using configured start_date as report start filter {report_start}.")
+            user_logger.info(f"[{self.name}] Using configured start date as report start filter {report_start}.")
         else:
+            lookback_start_date = incremental_start_date.subtract(days=lookback_window)
             user_logger.info(
                 f"[{self.name}] Incremental sync, applying lookback '{lookback_window}' to the "
-                f"bookmark start_date '{incremental_start_date}'. Syncing "
+                f"bookmark start date '{incremental_start_date}'. Syncing "
                 f"reports starting on '{lookback_start_date}'."
             )
             report_start = lookback_start_date
