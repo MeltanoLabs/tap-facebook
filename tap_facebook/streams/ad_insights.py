@@ -184,7 +184,6 @@ JOB_STALE_ERROR_MESSAGE = (
 
 class AdsInsightStream(Stream):
     name = "adsinsights"
-    replication_method = REPLICATION_INCREMENTAL
     replication_key = "date_start"
     api_sleep_time = 60
 
@@ -350,9 +349,10 @@ class AdsInsightStream(Stream):
     ) -> pendulum.Date:
         lookback_window = self.config.get("report_definition", {}).get("lookback_window")
         config_start_date = pendulum.parse(self.config["start_date"]).date()
-        incremental_start_date = pendulum.parse(
-            self.get_starting_replication_key_value(context),
-        ).date()
+        if incremental_start_date := self.get_starting_replication_key_value(context):
+            incremental_start_date = pendulum.parse(incremental_start_date).date()
+        else:
+            incremental_start_date = config_start_date
 
         if self.replication_method == REPLICATION_FULL_TABLE or config_start_date == incremental_start_date:
             report_start = config_start_date
