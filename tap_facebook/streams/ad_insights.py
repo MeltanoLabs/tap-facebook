@@ -410,7 +410,13 @@ class AdsInsightStream(Stream):
         report_date = self._get_start_date(context)
         columns = self._get_selected_columns()
 
+        retry_count = 0
+
         while report_date <= sync_end_date:
+            if retry_count > 10:
+                user_logger.error(f"[{self.name}] Failed to get insights after 10 retries. Stopping execution.")
+                sys.exit(1)
+
             params = {
                 "level": self.config.get("report_definition", {}).get("level"),
                 "action_breakdowns": self.config.get("report_definition", {}).get("action_breakdowns"),
@@ -447,6 +453,7 @@ class AdsInsightStream(Stream):
                 if not isinstance(job, AdReportRun):
                     # retry if facebook job report generation got stuck
                     time.sleep(AD_REPORT_RETRY_TIME)
+                    retry_count += 1
                     continue
 
                 for obj in job.get_result():
@@ -456,17 +463,25 @@ class AdsInsightStream(Stream):
                     else:
                         # stop the for loop and retry the same date after a while
                         time.sleep(AD_REPORT_RETRY_TIME)
+                        retry_count += 1
                         break
                 else:
-                    # bump to the next increment
+                    # successfully got the insights data, bump to the next date increment
                     time.sleep(AD_REPORT_INCREMENT_SLEEP_TIME)
                     report_date = report_date.add(days=time_increment)
 
             except FacebookRequestError as fb_err:
+                if fb_err.api_error_code >= HTTPStatus.INTERNAL_SERVER_ERROR:
+                    user_logger.warning(f"[{self.name}] API Error: {fb_err.api_error_message()}. Trying again..")
+                    time.sleep(60)
+                    retry_count += 1
+                    continue
+
                 if fb_err.api_error_code == HTTPStatus.BAD_REQUEST and "unsupported get request" in str(
                     fb_err.api_error_message.lower()
                 ):
                     user_logger.warning(f"[{self.name}] API Error: {fb_err.api_error_message()}. Trying again..")
+                    retry_count += 1
                     continue
 
                 user_logger.error(f"[{self.name}] An unhandled error occurred: {fb_err}. Stopping execution.")
