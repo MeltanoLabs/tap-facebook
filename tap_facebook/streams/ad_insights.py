@@ -441,7 +441,7 @@ class AdsInsightStream(Stream):
                 )
 
                 self._check_facebook_api_usage(headers=response._headers)
-                if response._http_status != HTTPStatus.OK:
+                if response.http_status() != HTTPStatus.OK:
                     continue
 
                 report_run_id = response.json()["report_run_id"]
@@ -471,13 +471,13 @@ class AdsInsightStream(Stream):
                     report_date = report_date.add(days=time_increment)
 
             except FacebookRequestError as fb_err:
-                if fb_err._http_status >= HTTPStatus.INTERNAL_SERVER_ERROR:
+                if fb_err.http_status() >= HTTPStatus.INTERNAL_SERVER_ERROR:
                     user_logger.warning(f"[{self.name}] API Error: {fb_err.api_error_message()}. Trying again..")
                     time.sleep(60)
                     retry_count += 1
                     continue
 
-                if fb_err._http_status == HTTPStatus.BAD_REQUEST and "unsupported get request" in str(
+                if fb_err.http_status() == HTTPStatus.BAD_REQUEST and "unsupported get request" in str(
                     fb_err.api_error_message.lower()
                 ):
                     user_logger.warning(f"[{self.name}] API Error: {fb_err.api_error_message()}. Trying again..")
