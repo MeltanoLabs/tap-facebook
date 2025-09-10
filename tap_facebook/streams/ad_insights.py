@@ -9,24 +9,22 @@ from functools import lru_cache
 from hashlib import md5
 from http import HTTPStatus
 
-import facebook_business.adobjects.user as fb_user
 import pendulum
-from facebook_business.adobjects.adaccount import AdAccount
 from facebook_business.adobjects.adreportrun import AdReportRun
 from facebook_business.adobjects.adsactionstats import AdsActionStats
 from facebook_business.adobjects.adshistogramstats import AdsHistogramStats
 from facebook_business.adobjects.adsinsights import AdsInsights
-from facebook_business.api import FacebookAdsApi, FacebookRequest
+from facebook_business.api import FacebookRequest
 from facebook_business.exceptions import FacebookRequestError
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import internal_logger, user_logger
 from nekt_singer_sdk.streams.core import (
     REPLICATION_FULL_TABLE,
     REPLICATION_INCREMENTAL,
-    Stream,
 )
 
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
+from tap_facebook.client import FacebookSDKStream
 
 EXCLUDED_FIELDS = [
     "account_currency",
@@ -182,7 +180,7 @@ JOB_STALE_ERROR_MESSAGE = (
 )
 
 
-class AdsInsightStream(Stream):
+class AdsInsightStream(FacebookSDKStream):
     name = "adsinsights"
     replication_key = "date_start"
     api_sleep_time = 60
@@ -250,20 +248,6 @@ class AdsInsightStream(Stream):
             properties.append(th.Property(breakdown, th.StringType()))
         return th.PropertiesList(*properties).to_dict()
 
-    def _initialize_client(self) -> None:
-        self.facebook_api = FacebookAdsApi.init(
-            access_token=self.config["access_token"],
-            timeout=300,
-            api_version=self.config["api_version"],
-        )
-        self.facebook_id = fb_user.User(fbid="me")
-
-        account_id = self.config["account_id"]
-        self.account = AdAccount(f"act_{account_id}").api_get()
-        if not self.account:
-            user_logger.error(f"[{self.name}] Couldn't find account with id {account_id}")
-            sys.exit(1)
-
     def _check_facebook_api_usage(self, headers: str) -> None:
         should_sleep = has_reached_api_limit(
             headers=headers,
@@ -287,7 +271,7 @@ class AdsInsightStream(Stream):
             endpoint="/insights",
             api_type="EDGE",
             include_summary=False,
-            api=FacebookAdsApi.get_default_api(),
+            api=self.facebook_api,
         )
 
         request.add_params(params)
@@ -441,7 +425,7 @@ class AdsInsightStream(Stream):
                 )
 
                 self._check_facebook_api_usage(headers=response._headers)
-                if response.http_status() != HTTPStatus.OK:
+                if response.status() != HTTPStatus.OK:
                     continue
 
                 report_run_id = response.json()["report_run_id"]
@@ -471,16 +455,16 @@ class AdsInsightStream(Stream):
                     report_date = report_date.add(days=time_increment)
 
             except FacebookRequestError as fb_err:
-                if fb_err.http_status() >= HTTPStatus.INTERNAL_SERVER_ERROR:
+                # Handle specific insights API errors first
+                if fb_err.http_status() == HTTPStatus.BAD_REQUEST and "unsupported get request" in str(
+                    fb_err.api_error_message().lower()
+                ):
                     user_logger.warning(f"[{self.name}] API Error: {fb_err.api_error_message()}. Trying again..")
-                    time.sleep(60)
                     retry_count += 1
                     continue
 
-                if fb_err.http_status() == HTTPStatus.BAD_REQUEST and "unsupported get request" in str(
-                    fb_err.api_error_message.lower()
-                ):
-                    user_logger.warning(f"[{self.name}] API Error: {fb_err.api_error_message()}. Trying again..")
+                # Use base class error handling for common errors (rate limits, server errors)
+                if self._handle_facebook_request_error(fb_err, retry_count, 10):
                     retry_count += 1
                     continue
 

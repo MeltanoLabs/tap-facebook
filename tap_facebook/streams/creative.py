@@ -3,16 +3,13 @@
 from __future__ import annotations
 
 import sys
-import time
 import typing as t
 from http import HTTPStatus
 
-import facebook_business.adobjects.user as fb_user
-from facebook_business.adobjects.adaccount import AdAccount
-from facebook_business.api import FacebookAdsApi, FacebookRequest
+from facebook_business.api import FacebookRequest
 from facebook_business.exceptions import FacebookRequestError
 from nekt_singer_sdk.custom_logger import user_logger
-from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from nekt_singer_sdk.typing import (
     BooleanType,
     IntegerType,
@@ -22,17 +19,16 @@ from nekt_singer_sdk.typing import (
     StringType,
 )
 
-from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
+from tap_facebook.client import FacebookSDKStream
 
 # Error subcodes for specific issues
 PROBLEMATIC_CREATIVE_ERROR_SUBCODE = 2446289
-RATE_LIMIT_ERROR_CODE = 80004
 
 # Optimal page size for creative extraction
 OPTIMAL_PAGE_SIZE = 100
 
 
-class CreativeStream(Stream):
+class CreativeStream(FacebookSDKStream):
     """Facebook Ad Creative stream using Facebook Business SDK.
 
     This stream fetches ad creatives using the official Facebook Business SDK
@@ -212,20 +208,6 @@ class CreativeStream(Stream):
         """Return the primary key(s) for the stream."""
         return ["id"]
 
-    def _initialize_client(self) -> None:
-        """Initialize the Facebook Business SDK client."""
-        self.facebook_api = FacebookAdsApi.init(
-            access_token=self.config["access_token"],
-            timeout=300,
-            api_version=self.config["api_version"],
-        )
-        self.facebook_id = fb_user.User(fbid="me")
-
-        account_id = self.config["account_id"]
-        self.account = AdAccount(f"act_{account_id}").api_get()
-        if not self.account:
-            user_logger.error(f"[{self.name}] Couldn't find account with id {account_id}")
-            sys.exit(1)
 
     def get_records(
         self,
@@ -344,33 +326,12 @@ class CreativeStream(Stream):
 
             except FacebookRequestError as fb_err:
                 retry_count += 1
-
-                if fb_err.http_status() == HTTPStatus.BAD_REQUEST and fb_err.api_error_code() == RATE_LIMIT_ERROR_CODE:
-                    # Handle rate limiting
-                    if retry_count <= max_retries:
-                        wait_time = min(60 * retry_count, 300)  # Progressive backoff, max 5 min
-                        user_logger.warning(
-                            f"[{self.name}] Rate limit exceeded. Waiting {wait_time}s "
-                            f"before retry {retry_count}/{max_retries}..."
-                        )
-                        time.sleep(wait_time)
-                        continue
-                elif fb_err.http_status() >= HTTPStatus.INTERNAL_SERVER_ERROR:
-                    # Handle server errors
-                    if retry_count <= max_retries:
-                        user_logger.warning(
-                            f"[{self.name}] Server error: {fb_err.api_error_message()}. "
-                            f"Retry {retry_count}/{max_retries} in 60s..."
-                        )
-                        time.sleep(60)
-                        continue
-
-                # Don't retry client errors or if max retries reached
-                user_logger.error(
-                    f"[{self.name}] Error: {fb_err.api_error_message()}. "
-                    f"Code: {fb_err.api_error_code()}, Subcode: {fb_err.api_error_subcode()}"
-                )
-                raise
+                
+                # Use base class error handling method
+                if self._handle_facebook_request_error(fb_err, retry_count, max_retries):
+                    continue
+                else:
+                    raise
 
         user_logger.error(f"[{self.name}] Failed after {max_retries} retries")
         sys.exit(1)

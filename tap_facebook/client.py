@@ -1,21 +1,30 @@
-"""REST client handling, including facebookStream base class."""
+"""REST client handling, including Facebook stream base classes."""
 
 from __future__ import annotations
 
 import json
 import sys
+import time
 import typing as t
 from http import HTTPStatus
 from urllib.parse import urlparse
 
+import facebook_business.adobjects.user as fb_user
 import pendulum
+from facebook_business.adobjects.adaccount import AdAccount
+from facebook_business.api import FacebookAdsApi
+from facebook_business.exceptions import FacebookRequestError
 from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
 from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.exceptions import RetriableAPIError
 from nekt_singer_sdk.helpers.jsonpath import extract_jsonpath
 from nekt_singer_sdk.streams import RESTStream
+from nekt_singer_sdk.streams.core import Stream
 
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
+
+# Common Facebook API error codes
+RATE_LIMIT_ERROR_CODE = 80004
 
 if t.TYPE_CHECKING:
     import requests
@@ -160,6 +169,78 @@ class FacebookStream(RESTStream):
             int: limit
         """
         return 15
+
+
+class FacebookSDKStream(Stream):
+    """Base class for Facebook streams using Facebook Business SDK.
+    
+    This class provides common functionality for streams that use the 
+    Facebook Business SDK, including client initialization, error handling,
+    and retry logic.
+    """
+    
+    api_sleep_time = 60
+    
+    def _initialize_client(self) -> None:
+        """Initialize the Facebook Business SDK client."""
+        self.facebook_api = FacebookAdsApi.init(
+            access_token=self.config["access_token"],
+            timeout=300,
+            api_version=self.config["api_version"],
+        )
+        self.facebook_id = fb_user.User(fbid="me")
+
+        account_id = self.config["account_id"]
+        self.account = AdAccount(f"act_{account_id}").api_get()
+        if not self.account:
+            user_logger.error(f"[{self.name}] Couldn't find account with id {account_id}")
+            sys.exit(1)
+
+    def _handle_facebook_request_error(
+        self, 
+        fb_err: FacebookRequestError, 
+        retry_count: int, 
+        max_retries: int
+    ) -> bool:
+        """Handle FacebookRequestError with common retry logic.
+        
+        Args:
+            fb_err: The FacebookRequestError that occurred
+            retry_count: Current retry attempt number
+            max_retries: Maximum number of retries allowed
+            
+        Returns:
+            True if should retry, False if should exit/raise
+        """
+        if (
+            fb_err.http_status() == HTTPStatus.BAD_REQUEST 
+            and fb_err.api_error_code() == RATE_LIMIT_ERROR_CODE
+        ):
+            # Handle rate limiting
+            if retry_count <= max_retries:
+                wait_time = min(60 * retry_count, 300)  # Progressive backoff, max 5 min
+                user_logger.warning(
+                    f"[{self.name}] Rate limit exceeded. Waiting {wait_time}s "
+                    f"before retry {retry_count}/{max_retries}..."
+                )
+                time.sleep(wait_time)
+                return True
+        elif fb_err.http_status() >= HTTPStatus.INTERNAL_SERVER_ERROR:
+            # Handle server errors
+            if retry_count <= max_retries:
+                user_logger.warning(
+                    f"[{self.name}] Server error: {fb_err.api_error_message()}. "
+                    f"Retry {retry_count}/{max_retries} in 60s..."
+                )
+                time.sleep(60)
+                return True
+
+        # Don't retry client errors or if max retries reached
+        user_logger.error(
+            f"[{self.name}] Error: {fb_err.api_error_message()}. "
+            f"Code: {fb_err.api_error_code()}, Subcode: {fb_err.api_error_subcode()}"
+        )
+        return False
 
 
 class IncrementalFacebookStream(FacebookStream):
