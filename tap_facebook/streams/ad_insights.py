@@ -278,6 +278,113 @@ class AdsInsightStream(FacebookSDKStream):
 
         return request.execute()
 
+    def _create_report_batch(
+        self,
+        start_date: pendulum.Date,
+        batch_size: int,
+        end_date: pendulum.Date,
+        columns: list[str],
+        time_increment: int,
+    ) -> list[dict]:
+        """Create a batch of report requests without waiting for completion.
+
+        Args:
+            start_date: Starting date for the batch
+            batch_size: Number of reports to create in this batch
+            end_date: End date (to not exceed)
+            columns: Report columns
+            time_increment: Days per report
+
+        Returns:
+            List of report metadata dicts with report_run_id and date info
+        """
+        batch_reports = []
+        current_date = start_date
+
+        for _ in range(batch_size):
+            if current_date > end_date:
+                break
+
+            params = {
+                "level": self.config.get("report_definition", {}).get("level"),
+                "action_breakdowns": self.config.get("report_definition", {}).get("action_breakdowns"),
+                "action_report_time": self.config.get("report_definition", {}).get("action_report_time"),
+                "breakdowns": self.report_breakdowns,
+                "fields": columns,
+                "time_increment": time_increment,
+                "limit": 100,
+                "action_attribution_windows": [
+                    self.config.get("report_definition", {}).get("action_attribution_windows_view"),
+                    self.config.get("report_definition", {}).get("action_attribution_windows_click"),
+                ],
+                "time_range": {
+                    "since": current_date.to_date_string(),
+                    "until": current_date.to_date_string(),
+                },
+            }
+
+            try:
+                response = self._trigger_async_insight_report_creation(
+                    params=params, account_id=self.config["account_id"]
+                )
+
+                self._check_facebook_api_usage(headers=response._headers)
+                if response.status() == HTTPStatus.OK:
+                    report_run_id = response.json()["report_run_id"]
+                    batch_reports.append(
+                        {
+                            "report_run_id": report_run_id,
+                            "date": current_date.to_date_string(),
+                            "date_obj": current_date,
+                        }
+                    )
+                    user_logger.info(f"[{self.name}] Queued report for {current_date.to_date_string()}")
+                else:
+                    user_logger.warning(f"[{self.name}] Failed to queue report for {current_date.to_date_string()}")
+
+            except FacebookRequestError as fb_err:
+                user_logger.warning(
+                    f"[{self.name}] Error queueing report for {current_date.to_date_string()}: {fb_err.api_error_message()}"
+                )
+
+            current_date = current_date.add(days=time_increment)
+
+        return batch_reports
+
+    def _process_report_batch(self, batch_reports: list[dict]) -> t.Iterator[dict]:
+        """Process a batch of reports, waiting for all to complete and yielding results.
+
+        Args:
+            batch_reports: List of report metadata from _create_report_batch
+
+        Yields:
+            Individual insight records
+        """
+        user_logger.info(f"[{self.name}] Processing batch of {len(batch_reports)} reports...")
+
+        for report_info in batch_reports:
+            report_run_id = report_info["report_run_id"]
+            report_date = report_info["date"]
+
+            try:
+                job = self._run_job_to_completion(
+                    report_instance=AdReportRun(report_run_id),
+                    report_date=report_date,
+                )
+
+                if isinstance(job, AdReportRun):
+                    for obj in job.get_result():
+                        if isinstance(obj, AdsInsights):
+                            obj["id"] = self._generate_hash_id(adinsight=obj, report_breakdowns=self.report_breakdowns)
+                            yield obj.export_all_data()
+                        else:
+                            user_logger.warning(f"[{self.name}] Unexpected result type for {report_date}")
+                else:
+                    user_logger.warning(f"[{self.name}] Report job failed for {report_date}")
+
+            except Exception as e:
+                user_logger.error(f"[{self.name}] Error processing report for {report_date}: {e}")
+
     def _run_job_to_completion(self, report_instance: AdReportRun, report_date: str) -> th.Any:
         status = None
         time_start = time.time()
@@ -395,64 +502,40 @@ class AdsInsightStream(FacebookSDKStream):
         columns = self._get_selected_columns()
 
         retry_count = 0
+        batch_size = self.config.get("ad_insights_report_batch_size")
 
+        # Use batch processing for parallel report creation
         while report_date <= sync_end_date:
             if retry_count > 10:
                 user_logger.error(f"[{self.name}] Failed to get insights after 10 retries. Stopping execution.")
                 sys.exit(1)
 
-            params = {
-                "level": self.config.get("report_definition", {}).get("level"),
-                "action_breakdowns": self.config.get("report_definition", {}).get("action_breakdowns"),
-                "action_report_time": self.config.get("report_definition", {}).get("action_report_time"),
-                "breakdowns": self.report_breakdowns,
-                "fields": columns,
-                "time_increment": time_increment,
-                "limit": 100,
-                "action_attribution_windows": [
-                    self.config.get("report_definition", {}).get("action_attribution_windows_view"),
-                    self.config.get("report_definition", {}).get("action_attribution_windows_click"),
-                ],
-                "time_range": {
-                    "since": report_date.to_date_string(),
-                    "until": report_date.to_date_string(),
-                },
-            }
-
             try:
-                response = self._trigger_async_insight_report_creation(
-                    params=params, account_id=self.config["account_id"]
+                # Create a batch of reports in parallel
+                batch_reports = self._create_report_batch(
+                    start_date=report_date,
+                    batch_size=batch_size,
+                    end_date=sync_end_date,
+                    columns=columns,
+                    time_increment=time_increment,
                 )
 
-                self._check_facebook_api_usage(headers=response._headers)
-                if response.status() != HTTPStatus.OK:
-                    continue
-
-                report_run_id = response.json()["report_run_id"]
-                job = self._run_job_to_completion(
-                    report_instance=AdReportRun(report_run_id),
-                    report_date=report_date.to_date_string(),
-                )
-
-                if not isinstance(job, AdReportRun):
-                    # retry if facebook job report generation got stuck
-                    time.sleep(AD_REPORT_RETRY_TIME)
-                    retry_count += 1
-                    continue
-
-                for obj in job.get_result():
-                    if isinstance(obj, AdsInsights):
-                        obj["id"] = self._generate_hash_id(adinsight=obj, report_breakdowns=self.report_breakdowns)
-                        yield obj.export_all_data()
-                    else:
-                        # stop the for loop and retry the same date after a while
-                        time.sleep(AD_REPORT_RETRY_TIME)
-                        retry_count += 1
-                        break
-                else:
-                    # successfully got the insights data, bump to the next date increment
-                    time.sleep(AD_REPORT_INCREMENT_SLEEP_TIME)
+                if not batch_reports:
+                    # No reports created, advance date and continue
                     report_date = report_date.add(days=time_increment)
+                    continue
+
+                # Process all reports in the batch
+                for record in self._process_report_batch(batch_reports):
+                    yield record
+
+                # Successfully processed batch, advance to next batch
+                last_date = batch_reports[-1]["date_obj"]
+                report_date = last_date.add(days=time_increment)
+                retry_count = 0  # Reset retry count on success
+
+                # Brief pause between batches to avoid overwhelming API
+                time.sleep(AD_REPORT_INCREMENT_SLEEP_TIME)
 
             except FacebookRequestError as fb_err:
                 # Handle specific insights API errors first

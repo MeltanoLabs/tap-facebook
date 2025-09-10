@@ -177,6 +177,12 @@ class TapFacebook(Tap):
             default=False,
             description="Define whether the user should have access to advanced report streams or not. Should be used with caution since the extraction time can increase significantly.",
         ),
+        th.Property(
+            "ad_insights_report_batch_size",
+            th.IntegerType,
+            description="The number of reports to request before checking the state and processing them.",
+            default=30,
+        ),
     ).to_dict()
 
     def discover_streams(self) -> list[FacebookStream]:
