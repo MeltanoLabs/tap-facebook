@@ -40,6 +40,7 @@ class CreativeStream(FacebookSDKStream):
     tap_stream_id = "creatives"
     replication_method = REPLICATION_INCREMENTAL
     replication_key = "id"
+    primary_keys = ["id"]  # noqa: RUF012
     api_sleep_time = 60
 
     columns = [
@@ -203,12 +204,6 @@ class CreativeStream(FacebookSDKStream):
         Property("carousel_ad_link", StringType),
     ).to_dict()
 
-    @property
-    def primary_keys(self) -> list[str] | None:
-        """Return the primary key(s) for the stream."""
-        return ["id"]
-
-
     def get_records(
         self,
         context: dict | None,  # noqa: ARG002
@@ -326,7 +321,7 @@ class CreativeStream(FacebookSDKStream):
 
             except FacebookRequestError as fb_err:
                 retry_count += 1
-                
+
                 # Use base class error handling method
                 if self._handle_facebook_request_error(fb_err, retry_count, max_retries):
                     continue
