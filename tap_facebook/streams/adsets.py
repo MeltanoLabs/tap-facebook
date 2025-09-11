@@ -126,7 +126,7 @@ class AdsetsStream(IncrementalFacebookStream):
                 Property("application_id", StringType),
                 Property("product_set_id", StringType),
                 Property("offer_id", StringType),
-                Property("custom_conversion_id", IntegerType),
+                Property("custom_conversion_id", StringType),
                 Property("custom_event_str", StringType),
                 Property("event_id", IntegerType),
                 Property("offline_conversion_data_set_id", IntegerType),
