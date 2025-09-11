@@ -19,6 +19,10 @@ from nekt_singer_sdk.typing import (
     StringType,
 )
 
+from tap_facebook.api_helper import (
+    has_reached_api_limit,
+    sleep_if_rate_limited,
+)
 from tap_facebook.client import FacebookSDKStream
 
 # Error subcodes for specific issues
@@ -94,6 +98,13 @@ class CreativeStream(FacebookSDKStream):
         "use_page_actor_override",
         "video_id",
     ]
+
+    def _check_facebook_api_usage(self, headers: dict) -> None:
+        """Check Facebook API usage and sleep if approaching limits."""
+        account_id = self.config.get("account_id")
+        should_sleep = has_reached_api_limit(headers=headers, account_id=account_id)
+        if should_sleep:
+            sleep_if_rate_limited(headers=headers, account_id=account_id)
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -246,6 +257,8 @@ class CreativeStream(FacebookSDKStream):
                         )
                         request.add_params(params)
                         response = request.execute()
+
+                        self._check_facebook_api_usage(headers=response.headers())
 
                         data = response.json() if hasattr(response, "json") else response
                         creatives = data.get("data", [])

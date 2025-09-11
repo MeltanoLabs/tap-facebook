@@ -21,7 +21,7 @@ from nekt_singer_sdk.helpers.jsonpath import extract_jsonpath
 from nekt_singer_sdk.streams import RESTStream
 from nekt_singer_sdk.streams.core import Stream
 
-from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
+from tap_facebook.api_helper import has_reached_api_limit, sleep_if_rate_limited
 
 # Common Facebook API error codes
 RATE_LIMIT_ERROR_CODE = 80004
@@ -173,14 +173,14 @@ class FacebookStream(RESTStream):
 
 class FacebookSDKStream(Stream):
     """Base class for Facebook streams using Facebook Business SDK.
-    
-    This class provides common functionality for streams that use the 
+
+    This class provides common functionality for streams that use the
     Facebook Business SDK, including client initialization, error handling,
     and retry logic.
     """
-    
+
     api_sleep_time = 60
-    
+
     def _initialize_client(self) -> None:
         """Initialize the Facebook Business SDK client."""
         self.facebook_api = FacebookAdsApi.init(
@@ -196,28 +196,23 @@ class FacebookSDKStream(Stream):
             user_logger.error(f"[{self.name}] Couldn't find account with id {account_id}")
             sys.exit(1)
 
-    def _handle_facebook_request_error(
-        self, 
-        fb_err: FacebookRequestError, 
-        retry_count: int, 
-        max_retries: int
-    ) -> bool:
+    def _handle_facebook_request_error(self, fb_err: FacebookRequestError, retry_count: int, max_retries: int) -> bool:
         """Handle FacebookRequestError with common retry logic.
-        
+
         Args:
             fb_err: The FacebookRequestError that occurred
             retry_count: Current retry attempt number
             max_retries: Maximum number of retries allowed
-            
+
         Returns:
             True if should retry, False if should exit/raise
         """
-        if (
-            fb_err.http_status() == HTTPStatus.BAD_REQUEST 
-            and fb_err.api_error_code() == RATE_LIMIT_ERROR_CODE
-        ):
+        if fb_err.http_status() == HTTPStatus.BAD_REQUEST and fb_err.api_error_code() == RATE_LIMIT_ERROR_CODE:
             # Handle rate limiting
             if retry_count <= max_retries:
+                slept = sleep_if_rate_limited(headers=fb_err.http_headers(), account_id=self.config["account_id"])
+                if slept:
+                    return True
                 wait_time = min(60 * retry_count, 300)  # Progressive backoff, max 5 min
                 user_logger.warning(
                     f"[{self.name}] Rate limit exceeded. Waiting {wait_time}s "

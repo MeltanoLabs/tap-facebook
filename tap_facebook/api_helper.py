@@ -62,3 +62,46 @@ def has_reached_api_limit(headers: dict, account_id: str) -> bool:
     else:
         internal_logger.warning("API Usage | No usage data found in headers.")
         return False
+
+
+def get_suggested_sleep_time(headers: dict, account_id: str) -> int:
+    """Get Facebook's suggested sleep time from usage headers.
+    
+    Args:
+        headers: Response headers from Facebook API
+        account_id: Facebook account ID
+        
+    Returns:
+        Suggested sleep time in seconds (0 if no sleep needed)
+    """
+    app_usage, ad_account_usage, business_case_usage = get_usage_headers(headers=headers, account_id=account_id)
+    
+    if app_usage or ad_account_usage or business_case_usage:
+        estimated_time_to_regain_access = (
+            int(business_case_usage.get("estimated_time_to_regain_access", 0)) * 60
+        )
+        reset_time_duration = int(ad_account_usage.get("reset_time_duration", 0))
+        
+        return max(estimated_time_to_regain_access, reset_time_duration)
+    
+    return 0
+
+
+def sleep_if_rate_limited(headers: dict, account_id: str) -> bool:
+    """Check headers and sleep if Facebook suggests waiting due to rate limits.
+    
+    Args:
+        headers: Response headers from Facebook API
+        account_id: Facebook account ID
+        
+    Returns:
+        True if sleep was performed, False otherwise
+    """
+    suggested_sleep_time = get_suggested_sleep_time(headers, account_id)
+    
+    if suggested_sleep_time > 0:
+        internal_logger.warning(f"API Usage | Rate limit reached, sleeping for {suggested_sleep_time}s.")
+        sleep(suggested_sleep_time)
+        return True
+    
+    return False
