@@ -2,34 +2,19 @@
 
 from __future__ import annotations
 
-import sys
 import typing as t
-from http import HTTPStatus
 
-from facebook_business.api import FacebookRequest
-from facebook_business.exceptions import FacebookRequestError
-from nekt_singer_sdk.custom_logger import user_logger
-from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
+from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
 from nekt_singer_sdk.typing import (
     BooleanType,
+    DateTimeType,
     IntegerType,
-    ObjectType,
     PropertiesList,
     Property,
     StringType,
 )
 
-from tap_facebook.api_helper import (
-    has_reached_api_limit,
-    sleep_if_rate_limited,
-)
-from tap_facebook.client import FacebookSDKStream
-
-# Error subcodes for specific issues
-PROBLEMATIC_CREATIVE_ERROR_SUBCODE = 2446289
-
-# Optimal page size for creative extraction
-OPTIMAL_PAGE_SIZE = 25
+from tap_facebook.streams.ads import AdsStream
 
 # Field sets for different extraction modes
 MINIMAL_FIELDS = [
@@ -51,8 +36,6 @@ STANDARD_FIELDS = [
     "object_id",
     "object_type",
     "object_url",
-    "page_link",
-    "page_message",
     "use_page_actor_override",
 ]
 
@@ -90,20 +73,21 @@ FULL_FIELDS = [
 ]
 
 
-class CreativeStream(FacebookSDKStream):
-    """Facebook Ad Creative stream using Facebook Business SDK.
+class CreativeStream(Stream):
+    """Facebook Ad Creative stream using child context from AdsStream.
 
-    This stream fetches ad creatives using the official Facebook Business SDK
-    with comprehensive retry logic for rate limits, server errors, and
-    problematic creatives.
+    This stream extracts creative data from the ads stream without making
+    additional API calls, providing true incremental sync and avoiding
+    rate limiting issues.
     """
 
     name = "creatives"
     tap_stream_id = "creatives"
     replication_method = REPLICATION_INCREMENTAL
-    replication_key = "id"
+    replication_key = "ad_updated_time"
     primary_keys = ["id"]  # noqa: RUF012
-    api_sleep_time = 60
+    parent_stream_type = AdsStream
+    state_partitioning_keys = []
 
     @property
     def columns(self) -> list[str]:
@@ -112,17 +96,9 @@ class CreativeStream(FacebookSDKStream):
 
         if fields_mode == "minimal":
             return MINIMAL_FIELDS
-        elif fields_mode == "full":
+        if fields_mode == "full":
             return FULL_FIELDS
-        else:  # default to "standard"
-            return STANDARD_FIELDS
-
-    def _check_facebook_api_usage(self, headers: dict) -> None:
-        """Check Facebook API usage and sleep if approaching limits."""
-        account_id = self.config.get("account_id")
-        should_sleep = has_reached_api_limit(headers=headers, account_id=account_id)
-        if should_sleep:
-            sleep_if_rate_limited(headers=headers, account_id=account_id)
+        return STANDARD_FIELDS
 
     schema = PropertiesList(
         Property("id", StringType),
@@ -157,8 +133,6 @@ class CreativeStream(FacebookSDKStream):
         Property("object_story_id", StringType),
         Property("object_type", StringType),
         Property("object_url", StringType),
-        Property("page_link", StringType),
-        Property("page_message", StringType),
         Property("place_page_set_id", IntegerType),
         Property("playable_asset_id", IntegerType),
         Property("source_instagram_media_id", StringType),
@@ -170,208 +144,30 @@ class CreativeStream(FacebookSDKStream):
         Property("url_tags", StringType),
         Property("use_page_actor_override", BooleanType),
         Property("video_id", StringType),
-        Property(
-            "template_url_spec",
-            ObjectType(
-                Property(
-                    "android",
-                    ObjectType(
-                        Property("app_name", StringType),
-                        Property("package", StringType),
-                        Property("url", StringType),
-                    ),
-                ),
-                Property(
-                    "config",
-                    ObjectType(
-                        Property("app_id", StringType),
-                    ),
-                ),
-                Property(
-                    "ios",
-                    ObjectType(
-                        Property("app_name", StringType),
-                        Property("app_store_id", StringType),
-                        Property("url", StringType),
-                    ),
-                ),
-                Property(
-                    "ipad",
-                    ObjectType(
-                        Property("app_name", StringType),
-                        Property("app_store_id", StringType),
-                        Property("url", StringType),
-                    ),
-                ),
-                Property(
-                    "iphone",
-                    ObjectType(
-                        Property("app_name", StringType),
-                        Property("app_store_id", StringType),
-                        Property("url", StringType),
-                    ),
-                ),
-                Property(
-                    "web",
-                    ObjectType(
-                        Property("should_fallback", StringType),
-                        Property("url", StringType),
-                    ),
-                ),
-                Property(
-                    "windows_phone",
-                    ObjectType(
-                        Property("app_id", StringType),
-                        Property("app_name", StringType),
-                        Property("url", StringType),
-                    ),
-                ),
-            ),
-        ),
-        Property("product_set_id", StringType),
-        Property("carousel_ad_link", StringType),
+        # Additional fields from parent ad context
+        Property("ad_id", StringType),
+        Property("ad_updated_time", DateTimeType),
     ).to_dict()
 
     def get_records(
         self,
-        context: dict | None,  # noqa: ARG002
+        context: dict | None,
     ) -> t.Iterable[dict | tuple[dict, dict | None]]:
-        """Get ad creative records with comprehensive retry logic.
+        """Get creative records from parent ads stream context.
 
         Args:
-            context: Stream partition or context dictionary.
+            context: Context from parent AdsStream containing creative data.
 
         Yields:
             Individual creative record dictionaries.
         """
-        retry_count = 0
-        max_retries = 10
-        
-        # Preserve state across retries
-        last_successful_cursor = None
-        total_record_count = 0
-        extraction_started = False
+        if not context or "creative" not in context:
+            return
 
-        while retry_count <= max_retries:
-            try:
-                self._initialize_client()
+        creative_data = {
+            **context["creative"],
+            "ad_id": context.get("ad_id"),
+            "ad_updated_time": context.get("ad_updated_time"),
+        }
 
-                if not extraction_started:
-                    fields_mode = self.config.get("creative_fields_mode", "standard")
-                    user_logger.info(f"[{self.name}] Starting creative extraction using '{fields_mode}' field mode...")
-                    user_logger.info(f"[{self.name}] Extracting {len(self.columns)} fields per creative")
-                    extraction_started = True
-                else:
-                    user_logger.info(f"[{self.name}] Resuming extraction from cursor after error (processed {total_record_count} so far)...")
-
-                after_cursor = last_successful_cursor
-                record_count = 0  # Count for this retry attempt
-                page_size = OPTIMAL_PAGE_SIZE
-
-                while True:
-                    params = {
-                        "fields": self.columns,
-                        "limit": page_size,
-                    }
-                    if after_cursor:
-                        params["after"] = after_cursor
-
-                    try:
-                        request = FacebookRequest(
-                            node_id=f"act_{self.config['account_id']}",
-                            method="GET",
-                            endpoint="/adcreatives",
-                            api=self.facebook_api,
-                        )
-                        request.add_params(params)
-                        response = request.execute()
-
-                        self._check_facebook_api_usage(headers=response.headers())
-
-                        data = response.json() if hasattr(response, "json") else response
-                        creatives = data.get("data", [])
-
-                        if not creatives:
-                            user_logger.info(f"[{self.name}] No more creatives to process")
-                            break
-
-                        # Process each creative
-                        for creative_data in creatives:
-                            record_count += 1
-                            total_record_count += 1
-                            if total_record_count % 1000 == 0:
-                                user_logger.info(f"[{self.name}] Processed {total_record_count} creatives...")
-                            yield creative_data
-
-                        # Get next page cursor and preserve it
-                        paging = data.get("paging", {})
-                        cursors = paging.get("cursors", {})
-                        after_cursor = cursors.get("after")
-                        
-                        # Update last successful cursor after processing page
-                        last_successful_cursor = after_cursor
-
-                        if not after_cursor:
-                            user_logger.info(f"[{self.name}] Reached end of pagination")
-                            break
-
-                        # Reset page size after successful page
-                        if page_size < OPTIMAL_PAGE_SIZE:
-                            page_size = OPTIMAL_PAGE_SIZE
-                            user_logger.info(f"[{self.name}] Reset page size to {page_size}")
-
-                    except FacebookRequestError as page_err:
-                        if (
-                            page_err.http_status() == HTTPStatus.BAD_REQUEST
-                            and page_err.api_error_subcode() == PROBLEMATIC_CREATIVE_ERROR_SUBCODE
-                        ):
-                            # Handle problematic creative with adaptive page size
-                            if page_size > 1:
-                                new_page_size = max(1, page_size // 2)
-                                user_logger.warning(
-                                    f"[{self.name}] Problematic creative at cursor {after_cursor}. "
-                                    f"Reducing page size from {page_size} to {new_page_size}..."
-                                )
-                                page_size = new_page_size
-                                continue
-                            else:
-                                user_logger.warning(
-                                    f"[{self.name}] Skipping problematic creative at cursor {after_cursor}"
-                                )
-                                break
-                        elif (
-                            page_err.http_status() >= HTTPStatus.INTERNAL_SERVER_ERROR
-                            and "reduce the amount of data" in page_err.api_error_message().lower()
-                        ):
-                            # Handle "reduce data" server error
-                            if page_size > 1:
-                                new_page_size = max(1, page_size // 2)
-                                user_logger.warning(
-                                    f"[{self.name}] Server requested data reduction. "
-                                    f"Reducing page size from {page_size} to {new_page_size}..."
-                                )
-                                page_size = new_page_size
-                                continue
-                            else:
-                                user_logger.warning(
-                                    f"[{self.name}] Server still requesting data reduction at page size 1"
-                                )
-                                break
-                        else:
-                            # Re-raise to be handled by outer retry loop
-                            raise
-
-                user_logger.info(f"[{self.name}] Successfully processed {total_record_count} total creatives")
-                return  # Success - exit retry loop
-
-            except FacebookRequestError as fb_err:
-                retry_count += 1
-
-                # Use base class error handling method
-                if self._handle_facebook_request_error(fb_err, retry_count, max_retries):
-                    continue
-                else:
-                    raise
-
-        user_logger.error(f"[{self.name}] Failed after {max_retries} retries")
-        sys.exit(1)
+        yield creative_data

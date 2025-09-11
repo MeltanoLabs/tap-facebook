@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from functools import cached_property
+from typing import TYPE_CHECKING, Any, Dict
 
 from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from nekt_singer_sdk.typing import (
@@ -17,6 +18,9 @@ from nekt_singer_sdk.typing import (
 
 from tap_facebook.client import IncrementalFacebookStream
 
+if TYPE_CHECKING:
+    from tap_facebook.streams.creative import CreativeStream
+
 
 class AdsStream(IncrementalFacebookStream):
     """Ads stream class.
@@ -29,35 +33,37 @@ class AdsStream(IncrementalFacebookStream):
     tap_stream_id = stream id.
     """
 
-    columns = [  # noqa: RUF012
-        "id",
-        "account_id",
-        "adset_id",
-        "campaign_id",
-        "bid_type",
-        "bid_info",
-        "status",
-        "updated_time",
-        "created_time",
-        "name",
-        "effective_status",
-        "last_updated_by_app_id",
-        "source_ad_id",
-        "creative",
-        "tracking_specs",
-        "conversion_specs",
-        "recommendations",
-        "configured_status",
-        "conversion_domain",
-        "bid_amount",
-    ]
-
-    columns_remaining = ["adlabels"]  # noqa: RUF012
-
     name = "ads"
     filter_entity = "ad"
 
-    path = f"/ads?fields={columns}"
+    @cached_property
+    def path(self) -> str:
+        columns = [
+            "id",
+            "account_id",
+            "adset_id",
+            "campaign_id",
+            "bid_type",
+            "bid_info",
+            "status",
+            "updated_time",
+            "created_time",
+            "name",
+            "effective_status",
+            "last_updated_by_app_id",
+            "source_ad_id",
+            "tracking_specs",
+            "conversion_specs",
+            "recommendations",
+            "configured_status",
+            "conversion_domain",
+            "bid_amount",
+        ]
+
+        if "creatives" in self._tap.streams:
+            creative_stream: CreativeStream = self._tap.streams["creatives"]
+            return f"/ads?fields={','.join(columns)},creative{{{','.join(creative_stream.columns)}}}"
+        return f"/ads?fields={','.join([*columns, 'creative'])}"
 
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     replication_method = REPLICATION_INCREMENTAL
@@ -172,6 +178,17 @@ class AdsStream(IncrementalFacebookStream):
             return [self.sanitize_field_names(item) for item in record]
         else:
             return record
+
+    def get_child_context(self, record: dict, context: dict | None) -> dict | None:
+        """Provide context for child streams (creatives)."""
+        creative_data = record.get("creative")
+        if creative_data and isinstance(creative_data, dict):
+            return {
+                "creative": creative_data,
+                "ad_id": record.get("id"),
+                "ad_updated_time": record.get("updated_time"),
+            }
+        return None
 
     def post_process(self, row: Dict[str, Any], context: Dict | None = None) -> dict | None:
         return super().post_process(self.sanitize_field_names(row), context)
