@@ -31,6 +31,64 @@ PROBLEMATIC_CREATIVE_ERROR_SUBCODE = 2446289
 # Optimal page size for creative extraction
 OPTIMAL_PAGE_SIZE = 25
 
+# Field sets for different extraction modes
+MINIMAL_FIELDS = [
+    "account_id",
+    "body",
+    "id",
+    "name",
+    "status",
+    "title",
+]
+
+STANDARD_FIELDS = [
+    *MINIMAL_FIELDS,
+    "actor_id",
+    "authorization_category",
+    "call_to_action_type",
+    "enable_direct_install",
+    "link_url",
+    "object_id",
+    "object_type",
+    "object_url",
+    "page_link",
+    "page_message",
+    "use_page_actor_override",
+]
+
+FULL_FIELDS = [
+    *STANDARD_FIELDS,
+    "applink_treatment",
+    "branded_content_sponsor_page_id",
+    "bundle_folder_id",
+    "categorization_criteria",
+    "category_media_source",
+    "degrees_of_freedom_spec",
+    "destination_set_id",
+    "dynamic_ad_voice",
+    "effective_authorization_category",
+    "effective_instagram_media_id",
+    "effective_instagram_story_id",
+    "effective_object_story_id",
+    "image_hash",
+    "image_url",
+    "instagram_actor_id",
+    "instagram_permalink_url",
+    "instagram_story_id",
+    "link_destination_display_url",
+    "link_og_id",
+    "object_store_url",
+    "object_story_id",
+    "place_page_set_id",
+    "playable_asset_id",
+    "source_instagram_media_id",
+    "template_url",
+    "thumbnail_id",
+    "thumbnail_url",
+    "url_tags",
+    "video_id",
+]
+
 
 class CreativeStream(FacebookSDKStream):
     """Facebook Ad Creative stream using Facebook Business SDK.
@@ -47,54 +105,17 @@ class CreativeStream(FacebookSDKStream):
     primary_keys = ["id"]  # noqa: RUF012
     api_sleep_time = 60
 
-    columns = [
-        "id",
-        "account_id",
-        "actor_id",
-        "applink_treatment",
-        "authorization_category",
-        "body",
-        "branded_content_sponsor_page_id",
-        "bundle_folder_id",
-        "call_to_action_type",
-        "categorization_criteria",
-        "category_media_source",
-        "degrees_of_freedom_spec",
-        "destination_set_id",
-        "dynamic_ad_voice",
-        "effective_authorization_category",
-        "effective_instagram_media_id",
-        "effective_instagram_story_id",
-        "effective_object_story_id",
-        "enable_direct_install",
-        "image_hash",
-        "image_url",
-        "instagram_actor_id",
-        "instagram_permalink_url",
-        "instagram_story_id",
-        "link_destination_display_url",
-        "link_og_id",
-        "link_url",
-        "name",
-        "object_id",
-        "object_store_url",
-        "object_story_id",
-        "object_type",
-        "object_url",
-        "page_link",
-        "page_message",
-        "place_page_set_id",
-        "playable_asset_id",
-        "source_instagram_media_id",
-        "status",
-        "template_url",
-        "thumbnail_id",
-        "thumbnail_url",
-        "title",
-        "url_tags",
-        "use_page_actor_override",
-        "video_id",
-    ]
+    @property
+    def columns(self) -> list[str]:
+        """Get columns based on creative_fields_mode configuration."""
+        fields_mode = self.config.get("creative_fields_mode", "standard")
+
+        if fields_mode == "minimal":
+            return MINIMAL_FIELDS
+        elif fields_mode == "full":
+            return FULL_FIELDS
+        else:  # default to "standard"
+            return STANDARD_FIELDS
 
     def _check_facebook_api_usage(self, headers: dict) -> None:
         """Check Facebook API usage and sleep if approaching limits."""
@@ -230,7 +251,9 @@ class CreativeStream(FacebookSDKStream):
             try:
                 self._initialize_client()
 
-                user_logger.info(f"[{self.name}] Starting creative extraction...")
+                fields_mode = self.config.get("creative_fields_mode", "standard")
+                user_logger.info(f"[{self.name}] Starting creative extraction using '{fields_mode}' field mode...")
+                user_logger.info(f"[{self.name}] Extracting {len(self.columns)} fields per creative")
 
                 after_cursor = None
                 record_count = 0

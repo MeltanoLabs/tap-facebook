@@ -183,6 +183,16 @@ class TapFacebook(Tap):
             description="The number of reports to request before checking the state and processing them.",
             default=30,
         ),
+        th.Property(
+            "creative_fields_mode",
+            th.StringType,
+            description=(
+                "Controls which fields to extract from creatives. "
+                "Options: 'minimal' (essential fields only), 'standard' (common fields without complex processing), "
+                "'full' (all available fields). Use 'minimal' for faster extraction with lower rate limits."
+            ),
+            default="standard",
+        ),
     ).to_dict()
 
     def discover_streams(self) -> list[FacebookStream]:
