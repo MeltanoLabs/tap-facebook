@@ -25,7 +25,7 @@ from tap_facebook.client import FacebookSDKStream
 PROBLEMATIC_CREATIVE_ERROR_SUBCODE = 2446289
 
 # Optimal page size for creative extraction
-OPTIMAL_PAGE_SIZE = 100
+OPTIMAL_PAGE_SIZE = 25
 
 
 class CreativeStream(FacebookSDKStream):
