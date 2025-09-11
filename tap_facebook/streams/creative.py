@@ -246,17 +246,26 @@ class CreativeStream(FacebookSDKStream):
         """
         retry_count = 0
         max_retries = 10
+        
+        # Preserve state across retries
+        last_successful_cursor = None
+        total_record_count = 0
+        extraction_started = False
 
         while retry_count <= max_retries:
             try:
                 self._initialize_client()
 
-                fields_mode = self.config.get("creative_fields_mode", "standard")
-                user_logger.info(f"[{self.name}] Starting creative extraction using '{fields_mode}' field mode...")
-                user_logger.info(f"[{self.name}] Extracting {len(self.columns)} fields per creative")
+                if not extraction_started:
+                    fields_mode = self.config.get("creative_fields_mode", "standard")
+                    user_logger.info(f"[{self.name}] Starting creative extraction using '{fields_mode}' field mode...")
+                    user_logger.info(f"[{self.name}] Extracting {len(self.columns)} fields per creative")
+                    extraction_started = True
+                else:
+                    user_logger.info(f"[{self.name}] Resuming extraction from cursor after error (processed {total_record_count} so far)...")
 
-                after_cursor = None
-                record_count = 0
+                after_cursor = last_successful_cursor
+                record_count = 0  # Count for this retry attempt
                 page_size = OPTIMAL_PAGE_SIZE
 
                 while True:
@@ -289,14 +298,18 @@ class CreativeStream(FacebookSDKStream):
                         # Process each creative
                         for creative_data in creatives:
                             record_count += 1
-                            if record_count % 1000 == 0:
-                                user_logger.info(f"[{self.name}] Processed {record_count} creatives...")
+                            total_record_count += 1
+                            if total_record_count % 1000 == 0:
+                                user_logger.info(f"[{self.name}] Processed {total_record_count} creatives...")
                             yield creative_data
 
-                        # Get next page cursor
+                        # Get next page cursor and preserve it
                         paging = data.get("paging", {})
                         cursors = paging.get("cursors", {})
                         after_cursor = cursors.get("after")
+                        
+                        # Update last successful cursor after processing page
+                        last_successful_cursor = after_cursor
 
                         if not after_cursor:
                             user_logger.info(f"[{self.name}] Reached end of pagination")
@@ -348,7 +361,7 @@ class CreativeStream(FacebookSDKStream):
                             # Re-raise to be handled by outer retry loop
                             raise
 
-                user_logger.info(f"[{self.name}] Successfully processed {record_count} total creatives")
+                user_logger.info(f"[{self.name}] Successfully processed {total_record_count} total creatives")
                 return  # Success - exit retry loop
 
             except FacebookRequestError as fb_err:
