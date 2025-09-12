@@ -17,17 +17,13 @@ from nekt_singer_sdk.typing import (
 from tap_facebook.streams.ads import AdsStream
 
 # Field sets for different extraction modes
-MINIMAL_FIELDS = [
+BASIC_FIELDS = [
     "account_id",
     "body",
     "id",
     "name",
     "status",
     "title",
-]
-
-STANDARD_FIELDS = [
-    *MINIMAL_FIELDS,
     "actor_id",
     "authorization_category",
     "call_to_action_type",
@@ -39,8 +35,8 @@ STANDARD_FIELDS = [
     "use_page_actor_override",
 ]
 
-FULL_FIELDS = [
-    *STANDARD_FIELDS,
+ADVANCED_FIELDS = [
+    *BASIC_FIELDS,
     "applink_treatment",
     "branded_content_sponsor_page_id",
     "bundle_folder_id",
@@ -92,13 +88,13 @@ class CreativeStream(Stream):
     @property
     def columns(self) -> list[str]:
         """Get columns based on creative_fields_mode configuration."""
-        fields_mode = self.config.get("creative_fields_mode", "standard")
+        fields_mode = self.config.get("creative_fields_mode", "basic")
 
-        if fields_mode == "minimal":
-            return MINIMAL_FIELDS
-        if fields_mode == "full":
-            return FULL_FIELDS
-        return STANDARD_FIELDS
+        if fields_mode == "basic":
+            return BASIC_FIELDS
+        if fields_mode == "advanced":
+            return ADVANCED_FIELDS
+        return BASIC_FIELDS
 
     schema = PropertiesList(
         Property("id", StringType),

@@ -188,10 +188,11 @@ class TapFacebook(Tap):
             th.StringType,
             description=(
                 "Controls which fields to extract from creatives. "
-                "Options: 'minimal' (essential fields only), 'standard' (common fields without complex processing), "
-                "'full' (all available fields). Use 'minimal' for faster extraction with lower rate limits."
+                "Options: 'basic' (common fields without complex processing), "
+                "'advanced' (requires more computation from Facebook). "
+                "Use 'basic' for faster extraction with lower rate limits."
             ),
-            default="standard",
+            default="basic",
         ),
     ).to_dict()
 
