@@ -30,7 +30,7 @@ EXCLUDED_FIELDS = [
     "account_currency",
     # "account_id",
     # "account_name",
-    "action_values",
+    # "action_values",
     # "actions",
     "ad_click_actions",
     # "ad_id",
