@@ -62,7 +62,12 @@ class AdsStream(IncrementalFacebookStream):
 
         if "creatives" in self._tap.streams:
             creative_stream: CreativeStream = self._tap.streams["creatives"]
-            return f"/ads?fields={','.join(columns)},creative{{{','.join(creative_stream.columns)}}}"
+            thumbnail_width = self.config.get("creative_thumbnail_width", 1024)
+            thumbnail_height = self.config.get("creative_thumbnail_height", 1024)
+            return (
+                f"/ads?fields={','.join(columns)},"
+                f"creative.thumbnail_width({thumbnail_width}).thumbnail_height({thumbnail_height}){{{','.join(creative_stream.columns)}}}"
+            )
         return f"/ads?fields={','.join([*columns, 'creative'])}"
 
     primary_keys = ["id", "updated_time"]  # noqa: RUF012

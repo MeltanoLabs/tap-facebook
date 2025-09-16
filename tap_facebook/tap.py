@@ -192,7 +192,19 @@ class TapFacebook(Tap):
                 "'advanced' (requires more computation from Facebook). "
                 "Use 'basic' for faster extraction with lower rate limits."
             ),
-            default="basic",
+            default="advanced",
+        ),
+        th.Property(
+            "creative_thumbnail_width",
+            th.IntegerType,
+            description="The width for creative thumbnails.",
+            default=1024,
+        ),
+        th.Property(
+            "creative_thumbnail_height",
+            th.IntegerType,
+            description="The height for creative thumbnails.",
+            default=1024,
         ),
     ).to_dict()
 
