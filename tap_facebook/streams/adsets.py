@@ -100,7 +100,7 @@ class AdsetsStream(IncrementalFacebookStream):
 
     schema = PropertiesList(
         Property("name", StringType),
-        Property("end_time", StringType),
+        Property("end_time", DateTimeType),
         Property("billing_event", StringType),
         Property("campaign_attribution", StringType),
         Property("destination_type", StringType),
@@ -139,13 +139,13 @@ class AdsetsStream(IncrementalFacebookStream):
         ),
         Property("id", StringType),
         Property("account_id", StringType),
-        Property("updated_time", StringType),
+        Property("updated_time", DateTimeType),
         Property("daily_budget", StringType),
         Property("budget_remaining", StringType),
         Property("effective_status", StringType),
         Property("campaign_id", StringType),
-        Property("created_time", StringType),
-        Property("start_time", StringType),
+        Property("created_time", DateTimeType),
+        Property("start_time", DateTimeType),
         Property("lifetime_budget", StringType),
         Property(
             "bid_info",

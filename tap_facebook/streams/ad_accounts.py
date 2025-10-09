@@ -13,6 +13,7 @@ from singer_sdk.typing import (
     PropertiesList,
     Property,
     StringType,
+    DateTimeType,
 )
 
 from tap_facebook.client import FacebookStream
@@ -142,7 +143,7 @@ class AdAccountsStream(FacebookStream):
         Property("business_street2", StringType),
         Property("can_create_brand_lift_study", BooleanType),
         Property("capabilities", ArrayType(StringType)),
-        Property("created_time", StringType),
+        Property("created_time", DateTimeType),
         Property("currency", StringType),
         Property("disable_reason", IntegerType),
         Property("end_advertiser", StringType),

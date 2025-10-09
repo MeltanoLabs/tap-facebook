@@ -85,7 +85,7 @@ class AdVideos(FacebookStream):
         Property("backdated_time_granularity", StringType),
         Property("content_category", StringType),
         Property("content_tags", StringType),
-        Property("created_time", StringType),
+        Property("created_time", DateTimeType),
         Property("custom_labels", StringType),
         Property("description", StringType),
         Property("embed_html", StringType),
@@ -114,6 +114,6 @@ class AdVideos(FacebookStream):
         Property("status_value", StringType),
         Property("title", StringType),
         Property("universal_video_id", StringType),
-        Property("updated_time", StringType),
+        Property("updated_time", DateTimeType),
         Property("views", IntegerType),
     ).to_dict()

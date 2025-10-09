@@ -108,10 +108,10 @@ class CampaignStream(IncrementalFacebookStream):
         Property("spend_cap", StringType),
         Property("budget_remaining", StringType),
         Property("daily_budget", IntegerType),
-        Property("start_time", StringType),
-        Property("stop_time", StringType),
-        Property("updated_time", StringType),
-        Property("created_time", StringType),
+        Property("start_time", DateTimeType),
+        Property("stop_time", DateTimeType),
+        Property("updated_time", DateTimeType),
+        Property("created_time", DateTimeType),
         Property(
             "adlabels",
             th.ArrayType(

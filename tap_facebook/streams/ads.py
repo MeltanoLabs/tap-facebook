@@ -10,6 +10,7 @@ from singer_sdk.typing import (
     PropertiesList,
     Property,
     StringType,
+    DateTimeType
 )
 
 from tap_facebook.client import IncrementalFacebookStream
@@ -82,8 +83,8 @@ class AdsStream(IncrementalFacebookStream):
             ObjectType(Property("creative_id", StringType), Property("id", StringType)),
         ),
         Property("id", StringType),
-        Property("updated_time", StringType),
-        Property("created_time", StringType),
+        Property("updated_time", DateTimeType),
+        Property("created_time", DateTimeType),
         Property("name", StringType),
         Property("effective_status", StringType),
         Property("last_updated_by_app_id", StringType),
