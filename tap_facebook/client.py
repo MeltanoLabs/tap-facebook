@@ -37,6 +37,7 @@ class FacebookStream(RESTStream):
     # path and fields will be added to this url in streams.pys
 
     api_sleep_time = 60
+    page_size = 25
 
     @property
     def url_base(self) -> str:
@@ -98,7 +99,7 @@ class FacebookStream(RESTStream):
         Returns:
             A dictionary of URL query parameters.
         """
-        params: dict = {"limit": 25}
+        params: dict = {"limit": self.page_size}
         if next_page_token is not None:
             params["after"] = next_page_token
 
@@ -168,7 +169,7 @@ class FacebookStream(RESTStream):
         Returns:
             int: limit
         """
-        return 15
+        return 10
 
 
 class FacebookSDKStream(Stream):
