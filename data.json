@@ -1,8 +1,0 @@
-{
-  "name": "tap-facebook",
-  "namespace": "tap_facebook",
-  "pip_url": "-e ./extract/tap-facebook",
-  "executable": "tap-facebook",
-  "variant": "meltanolabs",
-  "capabilities": ["state", "catalog", "discover"]
-}

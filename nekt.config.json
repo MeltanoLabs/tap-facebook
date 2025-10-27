@@ -1,0 +1,232 @@
+{
+  "meltano": {
+    "name": "tap-facebook",
+    "namespace": "tap_facebook",
+    "pip_url": "-e ./extract/tap-facebook",
+    "executable": "tap-facebook",
+    "variant": "meltanolabs",
+    "capabilities": ["state", "catalog", "discover"]
+  },
+  "connectors": [
+    {
+      "connector_slug": "facebook",
+      "config_template": {
+        "type": "object",
+        "required": ["access_token", "account_id", "start_date"],
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "order": 1,
+            "title": "Access token",
+            "format": "facebook-oauth",
+            "secret": true,
+            "el_type": "extractor",
+            "description": "The token to authenticate against the API service."
+          },
+          "account_id": {
+            "type": "string",
+            "order": 2,
+            "title": "Account ID",
+            "format": "facebook-accounts-picker",
+            "el_type": "extractor",
+            "docs_url": "https://www.facebook.com/business/help/1492627900875762",
+            "description": "The unique ID number given to your ad account."
+          },
+          "start_date": {
+            "type": "string",
+            "order": 3,
+            "title": "Start date",
+            "format": "date",
+            "el_type": "extractor",
+            "description": "Records created or updated after the start date will be extracted from the source."
+          },
+          "enable_advanced_reports": {
+            "type": "boolean",
+            "order": 4,
+            "title": "Enable advanced reports",
+            "default": false,
+            "el_type": "extractor",
+            "description": "Allows the selection of breakdown reports, such as gender, country, age and device platform. Should be used with caution since the extraction time can increase significantly."
+          },
+          "ad_insights_report_batch_size": {
+            "type": "integer",
+            "order": 5,
+            "title": "Ad Insights batch size",
+            "default": 30,
+            "el_type": "extractor",
+            "description": "The number of reports to request before checking the state and processing them.",
+            "advanced_settings": true
+          },
+          "report_definition": {
+            "type": "object",
+            "order": 6,
+            "format": "parent",
+            "el_type": "extractor",
+            "required": ["lookback_window", "action_report_time"],
+            "properties": {
+              "lookback_window": {
+                "type": "integer",
+                "order": 10,
+                "title": "Fixed lookback window (days)",
+                "default": 7,
+                "el_type": "extractor",
+                "description": "Fixed window to reprocess data. Facebook freezes insight data 28 days after it was generated.",
+                "advanced_settings": true
+              },
+              "action_report_time": {
+                "type": "string",
+                "order": 9,
+                "title": "Action report time",
+                "format": "dropdown",
+                "default": "mixed",
+                "el_type": "extractor",
+                "description": "Determines the report time of action stats. For example, if a person saw the ad on Jan 1st but converted on Jan 2nd, when you select **impression**, you see a conversion on Jan 1st. When you select **conversion**, you see a conversion on Jan 2nd.",
+                "allowed_values": [
+                  {
+                    "label": "Mixed",
+                    "value": "mixed"
+                  },
+                  {
+                    "label": "Impression",
+                    "value": "impression"
+                  },
+                  {
+                    "label": "Conversion",
+                    "value": "conversion"
+                  }
+                ],
+                "advanced_settings": true
+              },
+              "action_attribution_windows_view": {
+                "type": "string",
+                "order": 7,
+                "title": "Action attribution windows: Views",
+                "format": "dropdown",
+                "default": "1d_view",
+                "el_type": "extractor",
+                "description": "The attribution window for the view actions.",
+                "allowed_values": [
+                  {
+                    "label": "1 day",
+                    "value": "1d_view"
+                  },
+                  {
+                    "label": "1 day (All conversions)",
+                    "value": "1d_view_all_conversions"
+                  },
+                  {
+                    "label": "1 day (First conversion)",
+                    "value": "1d_view_first_conversion"
+                  },
+                  {
+                    "label": "7 days",
+                    "value": "7d_view"
+                  },
+                  {
+                    "label": "7 days (All conversions)",
+                    "value": "7d_view_all_conversions"
+                  },
+                  {
+                    "label": "7 days (First conversion)",
+                    "value": "7d_view_first_conversion"
+                  },
+                  {
+                    "label": "28 days",
+                    "value": "28d_view"
+                  },
+                  {
+                    "label": "28 days (All conversions)",
+                    "value": "28d_view_all_conversions"
+                  },
+                  {
+                    "label": "28 days (First conversion)",
+                    "value": "28d_view_first_conversion"
+                  }
+                ],
+                "advanced_settings": true
+              },
+              "action_attribution_windows_click": {
+                "type": "string",
+                "order": 8,
+                "title": "Action attribution windows: Clicks",
+                "format": "dropdown",
+                "default": "7d_click",
+                "el_type": "extractor",
+                "description": "The attribution window for the click actions.",
+                "allowed_values": [
+                  {
+                    "label": "1 day",
+                    "value": "1d_click"
+                  },
+                  {
+                    "label": "1 day (All conversions)",
+                    "value": "1d_click_all_conversions"
+                  },
+                  {
+                    "label": "1 day (First conversion)",
+                    "value": "1d_click_first_conversion"
+                  },
+                  {
+                    "label": "7 days",
+                    "value": "7d_click"
+                  },
+                  {
+                    "label": "7 days (All conversions)",
+                    "value": "7d_click_all_conversions"
+                  },
+                  {
+                    "label": "7 days (First conversion)",
+                    "value": "7d_click_first_conversion"
+                  },
+                  {
+                    "label": "28 days",
+                    "value": "28d_click"
+                  },
+                  {
+                    "label": "28 days (All conversions)",
+                    "value": "28d_click_all_conversions"
+                  },
+                  {
+                    "label": "28 days (First conversion)",
+                    "value": "28d_click_first_conversion"
+                  }
+                ],
+                "advanced_settings": true
+              }
+            },
+            "advanced_settings": true
+          },
+          "creative_fields_mode": {
+            "type": "string",
+            "order": 11,
+            "title": "Creative fields to extract",
+            "format": "dropdown",
+            "default": "basic",
+            "el_type": "extractor",
+            "docs_url": "https://docs.nekt.com/sources/facebook-ads#creatives",
+            "description": "Controls which fields to extract from creatives. Use 'Basic' for faster extraction with lower rate limits, and only use 'Advanced' if you are sure you need that information, as it incur in higher extraction times.",
+            "allowed_values": [
+              {
+                "label": "Basic (essential fields only)",
+                "value": "basic"
+              },
+              {
+                "label": "Advanced (all fields, requires more computation from Facebook)",
+                "value": "advanced"
+              }
+            ],
+            "advanced_settings": true
+          },
+          "api_version": {
+            "type": "string",
+            "title": "API version",
+            "hidden": true,
+            "default": "v20.0",
+            "el_type": "extractor",
+            "description": "The API version to use with this connector."
+          }
+        }
+      }
+    }
+  ]
+}
