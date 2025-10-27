@@ -9,7 +9,7 @@
   },
   "connectors": [
     {
-      "connector_slug": "facebook",
+      "connector_slug": "facebook-ads",
       "config_template": {
         "type": "object",
         "required": ["access_token", "account_id", "start_date"],
