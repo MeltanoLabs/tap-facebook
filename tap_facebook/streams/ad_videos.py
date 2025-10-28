@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+from http import HTTPStatus
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
+import requests
+from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.streams.core import REPLICATION_INCREMENTAL
 from nekt_singer_sdk.typing import (
     ArrayType,
@@ -35,14 +40,14 @@ class AdVideos(FacebookStream):
         "updated_time",
         "account_id",
         "ad_breaks",
-        "backdated_time",
-        "backdated_time_granularity",
+        # "backdated_time",
+        # "backdated_time_granularity",
         "content_category",
         "content_tags",
         "created_time",
         "custom_labels",
         "description",
-        "embed_html",
+        # "embed_html",
         "embeddable",
         "event",
         "format",
@@ -60,7 +65,7 @@ class AdVideos(FacebookStream):
         "place",
         "post_views",
         "premiere_living_room_status",
-        "privacy",
+        # "privacy",
         "published",
         "scheduled_publish_time",
         "source",
@@ -128,3 +133,30 @@ class AdVideos(FacebookStream):
         Property("updated_time", StringType),
         Property("views", IntegerType),
     ).to_dict()
+
+    def validate_response(self, response: requests.Response) -> None:
+        if response.status_code == HTTPStatus.OK:
+            self.page_size = min(self.page_size + 5, 25)
+        elif (
+            response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+            and "reduce the amount of data" in response.text.lower()
+        ):
+            self.page_size = max(self.page_size - 5, 1)
+            user_logger.warning(
+                f"[{self.name}] Reducing page size to {self.page_size} due to reaching API limit on the amount of data being requested."
+            )
+        return super().validate_response(response)
+
+    def _request(
+        self,
+        prepared_request: requests.PreparedRequest,
+        context: dict | None,
+    ) -> requests.Response:
+        # Parse URL to get parameters
+        parsed = urlparse(prepared_request.url)
+        params = parse_qs(parsed.query)
+        params["limit"] = [str(self.page_size)]
+        # Update limit parameter and rebuild URL
+        new_query = urlencode(params, doseq=True)
+        prepared_request.url = urlunparse(parsed._replace(query=new_query))
+        return super()._request(prepared_request, context)
