@@ -43,7 +43,6 @@ class CustomConversions(FacebookStream):
     path = f"/customconversions?fields={columns}"
     tap_stream_id = "customconversions"
     primary_keys = ["id"]  # noqa: RUF012
-    replication_method = REPLICATION_INCREMENTAL
     replication_key = "creation_time"
 
     schema = PropertiesList(

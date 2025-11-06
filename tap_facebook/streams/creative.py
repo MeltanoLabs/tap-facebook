@@ -79,7 +79,6 @@ class CreativeStream(Stream):
 
     name = "creatives"
     tap_stream_id = "creatives"
-    replication_method = REPLICATION_INCREMENTAL
     replication_key = "ad_updated_time"
     primary_keys = ["id"]  # noqa: RUF012
     parent_stream_type = AdsStream

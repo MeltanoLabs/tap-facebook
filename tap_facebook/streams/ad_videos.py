@@ -79,7 +79,6 @@ class AdVideos(FacebookStream):
     name = "advideos"
     path = f"/advideos?fields={columns}"
     tap_stream_id = "advideos"
-    replication_method = REPLICATION_INCREMENTAL
     replication_key = "id"
 
     schema = PropertiesList(

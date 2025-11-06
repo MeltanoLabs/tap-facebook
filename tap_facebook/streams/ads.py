@@ -71,7 +71,6 @@ class AdsStream(IncrementalFacebookStream):
         return f"/ads?fields={','.join([*columns, 'creative'])}"
 
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
-    replication_method = REPLICATION_INCREMENTAL
     replication_key = "updated_time"
 
     schema = PropertiesList(

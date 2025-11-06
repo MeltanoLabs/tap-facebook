@@ -67,7 +67,6 @@ class CampaignStream(IncrementalFacebookStream):
     path = f"/campaigns?fields={columns}"
     primary_keys = ["id", "updated_time"]  # noqa: RUF012
     tap_stream_id = "campaigns"
-    replication_method = REPLICATION_INCREMENTAL
     replication_key = "updated_time"
 
     PropertiesList = th.PropertiesList

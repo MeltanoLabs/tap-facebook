@@ -18,7 +18,7 @@ from nekt_singer_sdk.authenticators import BearerTokenAuthenticator
 from nekt_singer_sdk.custom_logger import user_logger
 from nekt_singer_sdk.exceptions import RetriableAPIError
 from nekt_singer_sdk.helpers.jsonpath import extract_jsonpath
-from nekt_singer_sdk.streams import RESTStream
+from nekt_singer_sdk.streams import REPLICATION_FULL_TABLE, RESTStream
 from nekt_singer_sdk.streams.core import Stream
 
 from tap_facebook.api_helper import has_reached_api_limit, sleep_if_rate_limited
@@ -258,7 +258,10 @@ class IncrementalFacebookStream(FacebookStream):
         if next_page_token is not None:
             params["after"] = next_page_token
         if self.replication_key:
-            ts = pendulum.parse(self.get_starting_replication_key_value(context))
+            if self.replication_method == REPLICATION_FULL_TABLE:
+                ts = pendulum.parse(self.config["start_date"])
+            else:
+                ts = pendulum.parse(self.get_starting_replication_key_value(context))
             params["filtering"] = json.dumps(
                 [
                     {
