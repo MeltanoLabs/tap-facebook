@@ -1,57 +1,58 @@
-[tool.poetry]
+[build-system]
+requires = ["poetry-core", "poetry-dynamic-versioning"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[project]
 name = "meltano-tap-facebook"
-version = "0.0.0"
+dynamic = ["version"]
 description = "`tap-facebook` is a Singer tap for facebook, built with the Meltano SDK for Singer Taps."
-authors = ["Meltano <hello@meltano.com>"]
+authors = [ { name = "Meltano", email = "hello@meltano.com" } ]
 keywords = [
     "ELT",
     "facebook",
 ]
 license = "Elastic-2.0"
+license-files = ["LICENSE"]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "facebook-business~=21.0.3",
+    "pendulum~=3.1.0",
+    "requests~=2.32",
+    "singer-sdk~=0.47.0",
+]
+
+[project.scripts]
+# CLI declaration
+tap-facebook = 'tap_facebook.tap:TapFacebook.cli'
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2",
+    "singer-sdk[testing]",
+]
+typing = [
+    "mypy>=1.13",
+    "types-requests~=2.32",
+]
+
+[tool.poetry]
+requires-poetry = ">=2.2"
 packages = [
     { include = "tap_facebook" },
 ]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = ">=3.9"
-facebook-business = "~=21.0.3"
-pendulum = "~=3.1.0"
-requests = "~=2.32"
-
-[tool.poetry.dependencies."singer-sdk"]
-version = "~=0.47.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=8.2"
-
-[tool.poetry.group.dev.dependencies."singer-sdk"]
-version = "~=0.47.0"
-extras = ["testing"]
-
-[tool.poetry.group.typing.dependencies]
-mypy = ">=1.13"
-types-requests = "~=2.32"
+version = "0.0.0"
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3 # Vertical Hanging Indent
 src_paths = "tap_facebook"
 
-[build-system]
-requires = ["poetry-core", "poetry-dynamic-versioning"]
-build-backend = "poetry_dynamic_versioning.backend"
-
-[tool.poetry.scripts]
-# CLI declaration
-tap-facebook = 'tap_facebook.tap:TapFacebook.cli'
-
 [tool.poetry-dynamic-versioning]
 enable = true
 
 [tool.ruff]
 line-length = 100
-target-version = "py39"
 
 [tool.ruff.lint]
 ignore = ["ANN101", "DJ", "PD", "D101", "D102"]
