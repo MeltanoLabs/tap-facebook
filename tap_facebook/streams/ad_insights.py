@@ -18,10 +18,7 @@ from facebook_business.api import FacebookRequest
 from facebook_business.exceptions import FacebookRequestError
 from nekt_singer_sdk import typing as th
 from nekt_singer_sdk.custom_logger import internal_logger, user_logger
-from nekt_singer_sdk.streams.core import (
-    REPLICATION_FULL_TABLE,
-    REPLICATION_INCREMENTAL,
-)
+from nekt_singer_sdk.streams.core import REPLICATION_FULL_TABLE, REPLICATION_INCREMENTAL
 
 from tap_facebook.api_helper import CALL_THRESHOLD_PERCENTAGE, has_reached_api_limit
 from tap_facebook.client import FacebookSDKStream
@@ -148,10 +145,10 @@ EXCLUDED_FIELDS = [
     # "video_avg_time_watched_actions",
     "video_continuous_2_sec_watched_actions",
     # "video_p100_watched_actions",
-    "video_p25_watched_actions",
-    "video_p50_watched_actions",
-    "video_p75_watched_actions",
-    "video_p95_watched_actions",
+    # "video_p25_watched_actions",
+    # "video_p50_watched_actions",
+    # "video_p75_watched_actions",
+    # "video_p95_watched_actions",
     "video_play_actions",
     "video_play_curve_actions",
     "video_play_retention_0_to_15s_actions",
@@ -581,6 +578,14 @@ class AdsInsightByDevicePlatformStream(AdsInsightStream):
 
 
 class AdsInsightByRegionStream(AdsInsightStream):
+    name = "adsinsights_by_region"
+
+    @property
+    def report_breakdowns(self) -> list[str] | None:
+        return ["region"]
+
+
+class AdsInsightByHourStream(AdsInsightStream):
     name = "adsinsights_by_region"
 
     @property
