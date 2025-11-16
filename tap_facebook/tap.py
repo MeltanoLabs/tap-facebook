@@ -19,6 +19,7 @@ from tap_facebook.streams import (
     AdsInsightByCountryStream,
     AdsInsightByDevicePlatformStream,
     AdsInsightByRegionStream,
+    AdsInsightHourlyAdvertiserTimezoneStream,
     AdsInsightStream,
     AdsStream,
     AdVideos,
@@ -47,6 +48,7 @@ ADVANCED_STREAM_TYPES = [
     AdsInsightByCountryStream,
     AdsInsightByDevicePlatformStream,
     AdsInsightByRegionStream,
+    AdsInsightHourlyAdvertiserTimezoneStream,
 ]
 
 

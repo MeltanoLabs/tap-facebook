@@ -553,6 +553,14 @@ class AdsInsightStream(FacebookSDKStream):
                 sys.exit(1)
 
 
+class AdsInsightHourlyAdvertiserTimezoneStream(AdsInsightStream):
+    name = "adsinsights_hourly_advertiser_timezone"
+
+    @property
+    def report_breakdowns(self) -> list[str] | None:
+        return ["hourly_stats_aggregated_by_advertiser_time_zone"]
+
+
 class AdsInsightByAgeAndGenderStream(AdsInsightStream):
     name = "adsinsights_by_age_and_gender"
 

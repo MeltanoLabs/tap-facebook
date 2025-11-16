@@ -7,6 +7,7 @@ from tap_facebook.streams.ad_insights import (
     AdsInsightByCountryStream,
     AdsInsightByDevicePlatformStream,
     AdsInsightByRegionStream,
+    AdsInsightHourlyAdvertiserTimezoneStream,
     AdsInsightStream,
 )
 from tap_facebook.streams.ad_labels import AdLabelsStream
