@@ -582,7 +582,7 @@ class AdsInsightByDevicePlatformStream(AdsInsightStream):
 
     @property
     def report_breakdowns(self) -> list[str] | None:
-        return ["device_platform"]
+        return ["publisher_platform", "device_platform", "impression_device", "platform_position"]
 
 
 class AdsInsightByRegionStream(AdsInsightStream):
