@@ -134,7 +134,7 @@ EXCLUDED_FIELDS = [
     # "unique_ctr",
     "unique_inline_link_click_ctr",
     "unique_inline_link_clicks",
-    "unique_link_clicks_ctr",
+    # "unique_link_clicks_ctr",
     "unique_outbound_clicks",
     "unique_outbound_clicks_ctr",
     "unique_video_continuous_2_sec_watched_actions",
