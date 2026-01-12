@@ -10,10 +10,12 @@ from nekt_singer_sdk.typing import (
     BooleanType,
     IntegerType,
     NumberType,
+    ObjectType,
     PropertiesList,
     Property,
     StringType,
 )
+from singer_sdk.typing import DateTimeType
 
 from tap_facebook.client import FacebookStream
 
@@ -116,6 +118,7 @@ class AdAccountsStream(FacebookStream):
         "salesforce_invoice_group_id",
         "business_zip",
         "tax_id",
+        "funding_source_details",
     ]
 
     name = "adaccounts"
@@ -209,6 +212,29 @@ class AdAccountsStream(FacebookStream):
         Property("salesforce_invoice_group_id", StringType),
         Property("business_zip", StringType),
         Property("tax_id", StringType),
+        Property(
+            "funding_source_details",
+            ObjectType(
+                Property("id", StringType),
+                Property("type", IntegerType),
+                Property("display_string", StringType),
+                Property(
+                    "coupons",
+                    ArrayType(
+                        ObjectType(
+                            Property("coupon_id", StringType),
+                            Property("amount", StringType),
+                            Property("currency", StringType),
+                            Property("display_amount", StringType),
+                            Property("original_amount", StringType),
+                            Property("original_display_amount", StringType),
+                            Property("expiration_date", DateTimeType),
+                            Property("start_date", DateTimeType),
+                        )
+                    ),
+                ),
+            ),
+        ),
     ).to_dict()
 
     def post_process(
