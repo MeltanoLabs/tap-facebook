@@ -11,6 +11,7 @@ if t.TYPE_CHECKING:
     from tap_facebook.client import FacebookStream
 
 from tap_facebook.streams import (
+    ActivitiesStream,
     AdAccountsStream,
     AdImages,
     AdLabelsStream,
@@ -41,6 +42,7 @@ STREAM_TYPES = [
     CustomAudiences,
     AdImages,
     AdVideos,
+    ActivitiesStream,
 ]
 
 ADVANCED_STREAM_TYPES = [
