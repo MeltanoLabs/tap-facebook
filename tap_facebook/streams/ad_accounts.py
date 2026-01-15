@@ -223,10 +223,10 @@ class AdAccountsStream(FacebookStream):
                     ArrayType(
                         ObjectType(
                             Property("coupon_id", StringType),
-                            Property("amount", StringType),
+                            Property("amount", IntegerType),
                             Property("currency", StringType),
                             Property("display_amount", StringType),
-                            Property("original_amount", StringType),
+                            Property("original_amount", IntegerType),
                             Property("original_display_amount", StringType),
                             Property("expiration_date", DateTimeType),
                             Property("start_date", DateTimeType),
