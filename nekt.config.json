@@ -5,14 +5,22 @@
     "pip_url": "-e ./extract/tap-facebook",
     "executable": "tap-facebook",
     "variant": "meltanolabs",
-    "capabilities": ["state", "catalog", "discover"]
+    "capabilities": [
+      "state",
+      "catalog",
+      "discover"
+    ]
   },
   "connectors": [
     {
       "connector_slug": "facebook-ads",
       "config_template": {
         "type": "object",
-        "required": ["access_token", "account_id", "start_date"],
+        "required": [
+          "access_token",
+          "account_id",
+          "start_date"
+        ],
         "properties": {
           "access_token": {
             "type": "string",
@@ -62,7 +70,10 @@
             "order": 6,
             "format": "parent",
             "el_type": "extractor",
-            "required": ["lookback_window", "action_report_time"],
+            "required": [
+              "lookback_window",
+              "action_report_time"
+            ],
             "properties": {
               "lookback_window": {
                 "type": "integer",
@@ -221,7 +232,7 @@
             "type": "string",
             "title": "API version",
             "hidden": true,
-            "default": "v20.0",
+            "default": "v24.0",
             "el_type": "extractor",
             "description": "The API version to use with this connector."
           }
