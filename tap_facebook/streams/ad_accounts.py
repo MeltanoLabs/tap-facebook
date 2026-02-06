@@ -16,7 +16,6 @@ from nekt_singer_sdk.typing import (
     StringType,
 )
 from singer_sdk.typing import DateTimeType
-
 from tap_facebook.client import FacebookStream
 
 
@@ -125,7 +124,7 @@ class AdAccountsStream(FacebookStream):
     path = f"/adaccounts?fields={columns}"
     tap_stream_id = "adaccounts"
     primary_keys = ["created_time"]  # noqa: RUF012
-    replication_key = "created_time"
+    replication_key = None
 
     schema = PropertiesList(
         Property("account_id", StringType),
@@ -165,7 +164,7 @@ class AdAccountsStream(FacebookStream):
         Property("tax_id_type", StringType),
         Property("timezone_id", IntegerType),
         Property("timezone_name", StringType),
-        Property("timezone_offset_hours_utc", IntegerType),
+        Property("timezone_offset_hours_utc", NumberType),
         Property("agency_client_declaration_agency_representing_client", IntegerType),
         Property("agency_client_declaration_client_based_in_france", IntegerType),
         Property("agency_client_declaration_client_city", StringType),
