@@ -228,6 +228,27 @@
             ],
             "advanced_settings": true
           },
+          "ad_accounts_fields_mode": {
+            "type": "string",
+            "order": 12,
+            "title": "Ad accounts fields to extract",
+            "format": "dropdown",
+            "default": "basic",
+            "el_type": "extractor",
+            "docs_url": "https://docs.nekt.com/sources/facebook-ads#ad-accounts",
+            "description": "Controls which fields to extract from ad accounts. Use 'Basic' for core fields that work with limited permissions, and 'Extended' if you are sure you need that information, as it requires elevated permissions on all ad accounts.",
+            "allowed_values": [
+              {
+                "label": "Basic",
+                "value": "basic"
+              },
+              {
+                "label": "Extended",
+                "value": "extended"
+              }
+            ],
+            "advanced_settings": true
+          },
           "api_version": {
             "type": "string",
             "title": "API version",

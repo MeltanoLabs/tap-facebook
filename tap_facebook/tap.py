@@ -199,6 +199,18 @@ class TapFacebook(Tap):
             default="advanced",
         ),
         th.Property(
+            "ad_accounts_fields_mode",
+            th.StringType,
+            description=(
+                "Controls which fields to extract from ad accounts. "
+                "Options: 'basic' (core fields that work with limited permissions), "
+                "'extended' (all fields including sensitive data like funding_source_details, "
+                "owner, tax_id - requires elevated permissions on all ad accounts). "
+                "Use 'basic' if you encounter permission errors on /me/adaccounts."
+            ),
+            default="extended",
+        ),
+        th.Property(
             "creative_thumbnail_width",
             th.IntegerType,
             description="The width for creative thumbnails.",
