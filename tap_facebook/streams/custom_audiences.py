@@ -62,57 +62,124 @@ class CustomAudiences(FacebookStream):
         ]
 
     schema = PropertiesList(
-        Property("account_id", StringType),
-        Property("id", StringType),
-        Property("approximate_count_lower_bound", IntegerType),
-        Property("approximate_count_upper_bound", IntegerType),
-        Property("time_updated", IntegerType),
-        Property("time_created", IntegerType),
-        Property("time_content_updated", StringType),
-        Property("customer_file_source", StringType),
+        Property(
+            "account_id",
+            StringType,
+            description="ID of the ad account that owns the custom audience",
+        ),
+        Property(
+            "id",
+            StringType,
+            description="Unique ID of the custom audience",
+        ),
+        Property(
+            "approximate_count_lower_bound",
+            IntegerType,
+            description="Lower bound of approximate audience size",
+        ),
+        Property(
+            "approximate_count_upper_bound",
+            IntegerType,
+            description="Upper bound of approximate audience size",
+        ),
+        Property(
+            "time_updated",
+            IntegerType,
+            description="Unix timestamp when the audience was last updated",
+        ),
+        Property(
+            "time_created",
+            IntegerType,
+            description="Unix timestamp when the audience was created",
+        ),
+        Property(
+            "time_content_updated",
+            StringType,
+            description="When the audience content was last updated",
+        ),
+        Property(
+            "customer_file_source",
+            StringType,
+            description="Source of the customer file (e.g. USER_PROVIDED_ONLY, PARTNER_PROVIDED_ONLY)",
+        ),
         Property(
             "data_source",
             ObjectType(
-                Property("type", StringType),
-                Property("sub_type", StringType),
+                Property("type", StringType, description="Data source type"),
+                Property("sub_type", StringType, description="Data source sub-type"),
             ),
+            description="Data source type and sub-type for the audience",
         ),
         Property(
             "delivery_status",
             ObjectType(
-                Property("code", IntegerType),
-                Property("description", StringType),
+                Property("code", IntegerType, description="Delivery status code"),
+                Property("description", StringType, description="Delivery status description"),
             ),
+            description="Delivery status code and description",
         ),
-        Property("description", StringType),
+        Property(
+            "description",
+            StringType,
+            description="Description of the custom audience",
+        ),
         Property(
             "lookalike_spec",
             ObjectType(
-                Property("country", StringType),
-                Property("is_financial_service", BooleanType),
-                Property("origin_event_name", StringType),
-                Property("origin_event_source_name", StringType),
-                Property("product_set_name", StringType),
-                Property("ratio", NumberType),
-                Property("starting_ratio", NumberType),
-                Property("type", StringType),
+                Property("country", StringType, description="Country for lookalike audience"),
+                Property("is_financial_service", BooleanType, description="Whether lookalike is for financial service"),
+                Property("origin_event_name", StringType, description="Origin event name for lookalike"),
+                Property("origin_event_source_name", StringType, description="Origin event source name"),
+                Property("product_set_name", StringType, description="Product set name for lookalike"),
+                Property("ratio", NumberType, description="Lookalike audience ratio"),
+                Property("starting_ratio", NumberType, description="Lookalike starting ratio"),
+                Property("type", StringType, description="Lookalike spec type"),
             ),
+            description="Specification for lookalike audience (country, ratio, origin)",
         ),
-        Property("is_value_based", BooleanType),
+        Property(
+            "is_value_based",
+            BooleanType,
+            description="Whether this is a value-based custom audience",
+        ),
         Property(
             "operation_status",
             ObjectType(
-                Property("code", IntegerType),
-                Property("description", StringType),
+                Property("code", IntegerType, description="Operation status code"),
+                Property("description", StringType, description="Operation status description"),
             ),
+            description="Operation status code and description",
         ),
-        # Property("permission_for_actions", ObjectType()), TODO: Implement this
-        Property("pixel_id", StringType),
-        Property("retention_days", IntegerType),
-        Property("subtype", StringType),
-        Property("rule_aggregation", StringType),
-        Property("opt_out_link", StringType),
-        Property("name", StringType),
+        Property(
+            "pixel_id",
+            StringType,
+            description="Facebook Pixel ID associated with the audience",
+        ),
+        Property(
+            "retention_days",
+            IntegerType,
+            description="Number of days to retain the audience",
+        ),
+        Property(
+            "subtype",
+            StringType,
+            description="Subtype of the custom audience",
+        ),
+        Property(
+            "rule_aggregation",
+            StringType,
+            description="How rules are aggregated (AND or OR)",
+        ),
+        Property(
+            "opt_out_link",
+            StringType,
+            description="Opt-out link for the audience",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Name of the custom audience",
+        ),
     ).to_dict()
 
     def get_url_params(

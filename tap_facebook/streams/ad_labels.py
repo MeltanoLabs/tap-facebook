@@ -27,15 +27,32 @@ class AdLabelsStream(FacebookStream):
     replication_key = "updated_time"
 
     schema = PropertiesList(
-        Property("id", StringType),
+        Property(
+            "id",
+            StringType,
+            description="Unique ID of the ad label",
+        ),
         Property(
             "account",
             ObjectType(
-                Property("account_id", StringType),
-                Property("id", StringType),
+                Property("account_id", StringType, description="Ad account ID"),
+                Property("id", StringType, description="Ad account node ID"),
             ),
+            description="Ad account this label belongs to",
         ),
-        Property("created_time", StringType),
-        Property("updated_time", StringType),
-        Property("name", StringType),
+        Property(
+            "created_time",
+            StringType,
+            description="When the label was created",
+        ),
+        Property(
+            "updated_time",
+            StringType,
+            description="When the label was last updated",
+        ),
+        Property(
+            "name",
+            StringType,
+            description="Name of the ad label",
+        ),
     ).to_dict()
