@@ -169,6 +169,8 @@ AD_REPORT_RETRY_TIME = 2 * 60
 AD_REPORT_INCREMENT_SLEEP_TIME = 1
 INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
 INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 10 * 60
+INSIGHTS_MAX_JOB_RETRIES = 3
+INSIGHTS_RETRY_SLEEP_SECONDS = 30
 JOB_STALE_ERROR_MESSAGE = (
     "This is an intermittent error and may resolve itself on "
     "subsequent queries to the Facebook API. "
@@ -333,6 +335,7 @@ class AdsInsightStream(FacebookSDKStream):
                             "report_run_id": report_run_id,
                             "date": current_date.to_date_string(),
                             "date_obj": current_date,
+                            "params": params,
                         }
                     )
                     user_logger.info(f"[{self.name}] Queued report for {current_date.to_date_string()}")
@@ -362,11 +365,13 @@ class AdsInsightStream(FacebookSDKStream):
         for report_info in batch_reports:
             report_run_id = report_info["report_run_id"]
             report_date = report_info["date"]
+            params = report_info["params"]
 
             try:
-                job = self._run_job_to_completion(
-                    report_instance=AdReportRun(report_run_id),
+                job = self._run_job_with_retries(
+                    report_run_id=report_run_id,
                     report_date=report_date,
+                    params=params,
                 )
 
                 if isinstance(job, AdReportRun):
@@ -377,10 +382,66 @@ class AdsInsightStream(FacebookSDKStream):
                         else:
                             user_logger.warning(f"[{self.name}] Unexpected result type for {report_date}")
                 else:
-                    user_logger.warning(f"[{self.name}] Report job failed for {report_date}")
+                    user_logger.warning(
+                        f"[{self.name}] Report job failed for {report_date} after {INSIGHTS_MAX_JOB_RETRIES} attempts"
+                    )
 
             except Exception as e:
                 user_logger.error(f"[{self.name}] Error processing report for {report_date}: {e}")
+
+    def _run_job_with_retries(
+        self,
+        report_run_id: str,
+        report_date: str,
+        params: dict,
+    ) -> th.Any:
+        """Poll an async insight job, recreating it on transient failures.
+
+        Facebook's async insight jobs sporadically stall at 0% or fail outright.
+        Recreating the job for the same date usually succeeds, so we retry up to
+        INSIGHTS_MAX_JOB_RETRIES times before giving up on the day.
+        """
+        current_run_id = report_run_id
+        for attempt in range(1, INSIGHTS_MAX_JOB_RETRIES + 1):
+            job = self._run_job_to_completion(
+                report_instance=AdReportRun(current_run_id),
+                report_date=report_date,
+            )
+            if isinstance(job, AdReportRun):
+                return job
+
+            if attempt >= INSIGHTS_MAX_JOB_RETRIES:
+                return None
+
+            user_logger.warning(
+                f"[{self.name}] Retrying report for {report_date} "
+                f"(attempt {attempt + 1}/{INSIGHTS_MAX_JOB_RETRIES}) "
+                f"after sleeping {INSIGHTS_RETRY_SLEEP_SECONDS}s."
+            )
+            time.sleep(INSIGHTS_RETRY_SLEEP_SECONDS)
+
+            try:
+                response = self._trigger_async_insight_report_creation(
+                    params=params,
+                    account_id=self.config["account_id"],
+                )
+                self._check_facebook_api_usage(headers=response._headers)
+                if response.status() != HTTPStatus.OK:
+                    user_logger.warning(
+                        f"[{self.name}] Failed to re-queue report for {report_date}; aborting retries."
+                    )
+                    return None
+                current_run_id = response.json()["report_run_id"]
+                user_logger.info(
+                    f"[{self.name}] Re-queued report for {report_date} (run_id={current_run_id})"
+                )
+            except FacebookRequestError as fb_err:
+                user_logger.warning(
+                    f"[{self.name}] Error re-queueing report for {report_date}: {fb_err.api_error_message()}"
+                )
+                return None
+
+        return None
 
     def _run_job_to_completion(self, report_instance: AdReportRun, report_date: str) -> th.Any:
         status = None
