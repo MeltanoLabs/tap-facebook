@@ -61,6 +61,7 @@ EXCLUDED_FIELDS = [
     "estimated_ad_recallers_upper_bound",
     "marketing_messages_media_view_rate",
     "marketing_messages_phone_call_btn_click_rate",
+    "marketing_messages_website_purchase_values",
     "wish_bid",
 ]
 
