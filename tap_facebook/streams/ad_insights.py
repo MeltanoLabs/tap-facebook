@@ -92,7 +92,9 @@ class AdsInsightStream(Stream):
         keys = ["date_start", "account_id"]
         if level != "account":
             keys.append(f"{level}_id")
-        keys.extend(self._report_definition["breakdowns"])
+        # Breakdowns are deliberately NOT included. They belong to the real grain, but
+        # target-bigquery marks key properties REQUIRED, and BigQuery cannot widen an
+        # existing NULLABLE column to REQUIRED. Deduping happens in dbt on the full grain.
         # A report with an explicit `fields` list may not include every key, and a key
         # absent from the schema would be declared but never populated.
         available = self.schema["properties"]
