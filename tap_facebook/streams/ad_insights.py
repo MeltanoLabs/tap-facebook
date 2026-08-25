@@ -5,6 +5,7 @@ from __future__ import annotations
 import time
 import typing as t
 from functools import lru_cache
+from http import HTTPStatus
 
 import facebook_business.adobjects.user as fb_user
 import pendulum
@@ -14,6 +15,7 @@ from facebook_business.adobjects.adsactionstats import AdsActionStats
 from facebook_business.adobjects.adshistogramstats import AdsHistogramStats
 from facebook_business.adobjects.adsinsights import AdsInsights
 from facebook_business.api import FacebookAdsApi
+from facebook_business.exceptions import FacebookRequestError
 from singer_sdk import typing as th
 from singer_sdk.streams.core import REPLICATION_INCREMENTAL, Stream
 
@@ -68,6 +70,8 @@ EXCLUDED_FIELDS = [
 SLEEP_TIME_INCREMENT = 5
 INSIGHTS_MAX_WAIT_TO_START_SECONDS = 5 * 60
 INSIGHTS_MAX_WAIT_TO_FINISH_SECONDS = 30 * 60
+MAX_PAGINATION_RETRIES = 5
+PAGINATION_RETRY_DELAY = 10
 
 
 class AdsInsightStream(Stream):
@@ -83,7 +87,16 @@ class AdsInsightStream(Stream):
 
     @property
     def primary_keys(self) -> t.Sequence[str]:
-        return ["date_start", "account_id", "ad_id"] + self._report_definition["breakdowns"]
+        # The id field is level-dependent: an adset-level report never returns ad_id.
+        level = self._report_definition["level"]
+        keys = ["date_start", "account_id"]
+        if level != "account":
+            keys.append(f"{level}_id")
+        keys.extend(self._report_definition["breakdowns"])
+        # A report with an explicit `fields` list may not include every key, and a key
+        # absent from the schema would be declared but never populated.
+        available = self.schema["properties"]
+        return [key for key in keys if key in available]
 
     @primary_keys.setter
     def primary_keys(self, new_value: t.Sequence[str] | None) -> None:
@@ -131,9 +144,17 @@ class AdsInsightStream(Stream):
     @lru_cache  # noqa: B019
     def schema(self) -> dict:
         properties: list[th.Property] = []
+        # Selection prunes records but not the emitted SCHEMA message, so a report that
+        # requests a handful of fields would still declare every available one. An
+        # explicit `fields` list bounds the schema to what the report actually returns.
+        allowed = self._report_definition.get("fields")
         columns = list(AdsInsights.Field.__dict__)[1:]
         for field in columns:
-            if field in EXCLUDED_FIELDS:
+            # Field.__dict__ also carries class dunders, and which ones exist varies by
+            # Python version. Anything without a declared type is not a real API field.
+            if field not in AdsInsights._field_types:  # noqa: SLF001
+                continue
+            if allowed and field not in allowed:
                 continue
             if data_type := self._get_datatype(field):
                 properties.append(th.Property(field, data_type))
@@ -144,6 +165,7 @@ class AdsInsightStream(Stream):
                 for breakdown in self._report_definition["breakdowns"]
             ],
         )
+        properties.append(th.Property("extracted_at", th.DateTimeType()))
 
         return th.PropertiesList(*properties).to_dict()
 
@@ -225,6 +247,39 @@ class AdsInsightStream(Stream):
             columns = list(self.schema["properties"])
         return columns
 
+    def _get_records_with_retry(self, params: dict) -> t.Iterable[dict]:
+        """Run one insights job, retrying on transient Facebook 500s.
+
+        Records are buffered rather than streamed straight out: a 500 raised partway
+        through pagination would otherwise leave a partial window already emitted,
+        which the retry would then emit again as duplicates.
+        """
+        extracted_at = pendulum.now("UTC").to_iso8601_string()
+        for attempt in range(MAX_PAGINATION_RETRIES + 1):
+            try:
+                job = self._run_job_to_completion(params)
+                records = []
+                for obj in job.get_result():  # type: ignore[attr-defined]
+                    record = obj.export_all_data()
+                    record["extracted_at"] = extracted_at
+                    records.append(record)
+                yield from records
+                return  # noqa: TRY300
+            except FacebookRequestError as e:  # noqa: PERF203
+                if (
+                    e.http_status() == HTTPStatus.INTERNAL_SERVER_ERROR
+                    and attempt < MAX_PAGINATION_RETRIES
+                ):
+                    self.logger.warning(
+                        "Facebook API 500 error during pagination. Retry %s/%s in %s seconds.",
+                        attempt + 1,
+                        MAX_PAGINATION_RETRIES,
+                        PAGINATION_RETRY_DELAY,
+                    )
+                    time.sleep(PAGINATION_RETRY_DELAY)
+                    continue
+                raise
+
     def _get_start_date(
         self,
         context: Context | None,
@@ -283,7 +338,10 @@ class AdsInsightStream(Stream):
         report_start = self._get_start_date(context)
         report_end = report_start.add(days=time_increment)
 
-        columns = self._get_selected_columns()
+        columns = self._report_definition.get("fields") or self._get_selected_columns()
+        # Breakdowns (and extracted_at) live in the schema but are not AdsInsights fields;
+        # passing them in `fields` makes Facebook reject the job.
+        columns = [c for c in columns if c in AdsInsights.Field.__dict__]
         while report_start <= sync_end_date:
             params = {
                 "level": self._report_definition["level"],
@@ -302,9 +360,7 @@ class AdsInsightStream(Stream):
                     "until": report_end.to_date_string(),
                 },
             }
-            job = self._run_job_to_completion(params)  # type: ignore[func-returns-value]
-            for obj in job.get_result():
-                yield obj.export_all_data()
+            yield from self._get_records_with_retry(params)
             # Bump to the next increment
             report_start = report_start.add(days=time_increment)
             report_end = report_end.add(days=time_increment)

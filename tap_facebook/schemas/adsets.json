@@ -1,0 +1,163 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "campaign_id": {
+      "type": "string"
+    },
+    "created_time": {
+      "type": "string"
+    },
+    "updated_time": {
+      "type": "string"
+    },
+    "start_time": {
+      "type": "string"
+    },
+    "end_time": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "daily_budget": {
+      "type": "number"
+    },
+    "lifetime_budget": {
+      "type": "number"
+    },
+    "optimization_goal": {
+      "type": "string"
+    },
+    "targeting": {
+      "type": "object",
+      "properties": {
+        "publisher_platforms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "age_min": {
+          "type": "integer"
+        },
+        "age_max": {
+          "type": "integer"
+        },
+        "genders": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          }
+        },
+        "geo_locations": {
+          "type": "object",
+          "properties": {
+            "countries": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "regions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "excluded_geo_locations": {
+          "type": "object",
+          "properties": {
+            "countries": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "regions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "facebook_positions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "instagram_positions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "messenger_positions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "device_platforms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "flexible_spec": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "interests": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

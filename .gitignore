@@ -219,3 +219,7 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 .vscode/*
+
+# Local standalone-run files (contain credentials)
+config.json
+catalog.json

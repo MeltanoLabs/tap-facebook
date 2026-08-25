@@ -96,6 +96,16 @@ class TapFacebook(Tap):
                         default="ad",
                     ),
                     th.Property(
+                        "fields",
+                        th.ArrayType(th.StringType),
+                        description=(
+                            "Explicit list of insight fields to request. Also bounds the "
+                            "stream schema to those fields. When omitted, fields are taken "
+                            "from catalog selection and the schema covers every available "
+                            "field."
+                        ),
+                    ),
+                    th.Property(
                         "action_breakdowns",
                         th.ArrayType(th.StringType),
                         description=(
