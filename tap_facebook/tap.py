@@ -10,44 +10,9 @@ from singer_sdk import typing as th  # JSON schema typing helpers
 if t.TYPE_CHECKING:
     from tap_facebook.client import FacebookStream
 
-from tap_facebook.streams import (
-    AdAccountsStream,
-    AdImages,
-    AdLabelsStream,
-    AdsetsStream,
-    AdsInsightStream,
-    AdsStream,
-    AdVideos,
-    CampaignStream,
-    CreativeStream,
-    CustomAudiences,
-    CustomConversions,
-)
+from tap_facebook.streams import AdsetsStream, AdsInsightStream
 
-STREAM_TYPES = [
-    AdsetsStream,
-    AdsStream,
-    CampaignStream,
-    CreativeStream,
-    AdLabelsStream,
-    AdAccountsStream,
-    CustomConversions,
-    CustomAudiences,
-    AdImages,
-    AdVideos,
-]
-
-DEFAULT_INSIGHT_REPORT = {
-    "name": "default",
-    "level": "ad",
-    "action_breakdowns": [],
-    "breakdowns": [],
-    "time_increment_days": 1,
-    "action_attribution_windows_view": "1d_view",
-    "action_attribution_windows_click": "7d_click",
-    "action_report_time": "mixed",
-    "lookback_window": 28,
-}
+STREAM_TYPES = [AdsetsStream]
 
 
 class TapFacebook(Tap):
@@ -204,16 +169,12 @@ class TapFacebook(Tap):
             A list of discovered streams.
         """
         streams = [stream_class(tap=self) for stream_class in STREAM_TYPES]
-        report_configs = [  # type: ignore[misc]
-            DEFAULT_INSIGHT_REPORT,
-            *self.config.get("insight_reports_list"),
-        ]
         insight_streams = [
             AdsInsightStream(
                 tap=self,
                 report_definition=insight_report_definition,
             )
-            for insight_report_definition in report_configs
+            for insight_report_definition in self.config.get("insight_reports_list", [])
         ]
         return [*streams, *insight_streams]
 
